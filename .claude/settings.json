@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(python3 -c \"import serena_hooks, os; print\\(os.path.dirname\\(serena_hooks.__file__\\)\\)\")",
+      "Bash(pip show *)",
+      "Bash(find 'C:\\\\Users\\\\petrg/.local/share/uv/tools/serena-agent' -iname *.py)",
+      "Bash(xargs grep -l \"def remind\")",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(node -p \"require\\('./node_modules/eslint/package.json'\\).version\")",
+      "Bash(node -p \"require\\('./node_modules/next/package.json'\\).version\")",
+      "Bash(awk '{ print length, $0 }' d:/strictic/CLAUDE.md)",
+      "Bash(awk '$1>80{print}')",
+      "Bash(awk 'length>80{print FILENAME\": \"NR\" \\(\"length\"\\)\"}' d:/strictic/CLAUDE.md)",
+      "Bash(awk 'length>80{print NR\" \\(\"length\"\\)\"}' d:/strictic/CLAUDE.md)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('clsx:', p.dependencies?.clsx||p.devDependencies?.clsx||'MISSING'\\); console.log\\('tailwind-merge:', p.dependencies?.['tailwind-merge']||p.devDependencies?.['tailwind-merge']||'MISSING'\\)\")",
+      "Bash(npm i *)",
+      "Bash(npm audit *)",
+      "Bash(awk 'length>80{print NR\" \\(\"length\"\\)\"}' d:/strictic/src/lib/cn.ts)",
+      "Bash(awk '{ print NR\": \"length }' d:/strictic/src/app/page.tsx)",
+      "Bash(awk -F': ' '$2>80')",
+      "Bash(npx prettier *)",
+      "Bash(npx eslint *)",
+      "Bash(npx tsc *)",
+      "Bash(awk '{ if \\(length>80\\) print NR\": \"length }' d:/strictic/eslint/core.mjs)",
+      "Bash(awk '{ if \\(length>80\\) print NR\": \"length }' d:/strictic/eslint/utils.mjs)",
+      "Bash(awk '{ if \\(length>80\\) print NR\": \"length\" -- \"$0 }' d:/strictic/README.md)",
+      "Bash(awk '{ if \\(length>80\\) print NR\": \"length }' d:/strictic/src/app/layout.tsx)",
+      "Bash(awk '{ if \\(length>80\\) print NR\": \"length }' src/app/layout.tsx)",
+      "Bash(echo \"TSC_EXIT:$?\")",
+      "Bash(awk '{ if \\(length>80\\) print NR\": \"length }' CLAUDE.md)",
+      "Bash(npx next *)"
+    ]
+  }
+}
