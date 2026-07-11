@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import type { ReactNode } from 'react'
 import { Geist, Geist_Mono } from 'next/font/google'
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import './globals.css'
 
@@ -26,12 +26,12 @@ type RootLayoutProps = Readonly<{
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html
-      lang="en"
       className={cn(
         geistSans.variable,
         geistMono.variable,
         'h-full antialiased',
       )}
+      lang="en"
     >
       <body className="flex min-h-full flex-col">{children}</body>
     </html>

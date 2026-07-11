@@ -17,12 +17,12 @@ const Home = () => {
         )}
       >
         <Image
-          className="dark:invert"
-          src="/next.svg"
           alt="Next.js logo"
-          width={100}
+          className="dark:invert"
           height={20}
           priority
+          src="/next.svg"
+          width={100}
         />
         <div
           className={cn(
@@ -46,15 +46,15 @@ const Home = () => {
           >
             Looking for a starting point or more instructions? Head over to{' '}
             <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
               className="font-medium text-zinc-950 dark:text-zinc-50"
+              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
             >
               Templates
             </a>{' '}
             or the{' '}
             <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
               className="font-medium text-zinc-950 dark:text-zinc-50"
+              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
             >
               Learning
             </a>{' '}
@@ -69,15 +69,15 @@ const Home = () => {
               'hover:bg-[#383838] md:w-39.5 dark:hover:bg-[#ccc]',
             )}
             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
             rel="noopener noreferrer"
+            target="_blank"
           >
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
               alt="Vercel logomark"
-              width={16}
+              className="dark:invert"
               height={16}
+              src="/vercel.svg"
+              width={16}
             />
             Deploy Now
           </a>
@@ -89,8 +89,8 @@ const Home = () => {
               'dark:border-white/[.145] dark:hover:bg-[#1a1a1a]',
             )}
             href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
             rel="noopener noreferrer"
+            target="_blank"
           >
             Documentation
           </a>

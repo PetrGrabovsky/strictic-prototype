@@ -115,9 +115,11 @@ Next.js 16.2.10 (Turbopack), React 19.2.4, TS, Tailwind 4, ESLint 10,
   cryptic abbreviations.
 - Comments explain _why_, not _what_; self-explanatory code makes
   most comments unnecessary.
-- Comments above exported functions/components: JSDoc — `/**` alone,
-  lines start with a space then `*`, `*/` alone — not `//`; JSDoc
-  shows on hover at call sites. Plain `//` is fine inline.
+- Any documented declaration — exported _or_ local `const`/`function`/
+  `type` — uses JSDoc, never a `//` block (`/**` alone, lines start
+  with a space then `*`, `*/` alone): JSDoc shows on hover at every
+  reference site, a `//` block shows nowhere. Plain `//` stays fine for
+  inline notes that annotate a line, not a symbol.
 - TypeScript: always `type`; never `enum`/`interface`; no `any`, no
   `as` assertions (`as const` is fine), no unsafe-typing shortcuts.
 - Type precisely: `satisfies`, generics, discriminated unions where
