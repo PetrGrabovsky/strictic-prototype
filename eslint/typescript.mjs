@@ -84,6 +84,17 @@ export const typescript = () => [
         // deliberately skips: Next.js Server Actions must be `async` even
         // when the body never awaits anything.
         '@typescript-eslint/require-await': 'off',
+        // Two rules where unicorn's equivalent is the better tool, so its
+        // version stays on in unicorn.mjs and the tseslint one yields
+        // here (this layer loads after unicorn — it has to own the off).
+        // `prefer-array-find` covers a superset of `prefer-find`
+        // (`.filter().at(-1)`/`.pop()` → `.findLast()`, destructuring),
+        // and `.filter()[…]` is array-only so type info adds nothing.
+        '@typescript-eslint/prefer-find': 'off',
+        // `prefer-regexp-test` gives `.test()` for a boolean `str.match()`
+        // where this rule pushes the vaguer `.exec()`; both fire, so drop
+        // this one to avoid the double-report and conflicting fix.
+        '@typescript-eslint/prefer-regexp-exec': 'off',
       },
     },
     FILES.ts,
