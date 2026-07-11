@@ -36,7 +36,7 @@ const RECOMMENDED_RULES = Object.fromEntries(
  * Next.js's literal route-prop name (`{ params }`). An allowlist would
  * mean permanently fighting the framework's own vocabulary. Off.
  *
- * Three rules reconfigured (verified against real files, not just docs):
+ * Four rules reconfigured (verified against real files, not just docs):
  *
  * `filename-case` — `checkDirectories: true` confirmed safe for Next's
  * bracket/paren/`@`-prefixed routing folders (`[id]`, `(marketing)`,
@@ -55,6 +55,14 @@ const RECOMMENDED_RULES = Object.fromEntries(
  * file's end. `functions: 'separate'` enforces exactly that pattern —
  * verified it accepts the real `page.tsx` shape and rejects an inline
  * `export default function`.
+ *
+ * `consistent-boolean-name` — on by default, bidirectional (a boolean
+ * must start with an allowed prefix, and a prefixed name must be
+ * boolean). Its eleven default prefixes are trimmed to the four that
+ * cover every real case — `is`, `has`, `can`, `should` — so a boolean
+ * `willRetry`/`areValid` is pushed to `isRetrying`/`isValid`. Verified
+ * both directions fire and that a React prop named `disabled` stays
+ * untouched (`checkProperties` off).
  *
  * Six rules turned off where another layer already carries an
  * equal-or-better version — confirmed via `--print-config` and real
@@ -103,6 +111,28 @@ export const unicornRules = () => [
         ],
         'unicorn/no-array-reduce': ['error', { allowSimpleOperations: true }],
         'unicorn/default-export-style': ['error', { functions: 'separate' }],
+        'unicorn/consistent-boolean-name': [
+          'error',
+          {
+            // Off by default and left off: it would demand `isDisabled`
+            // for React/HTML's own boolean props (`disabled`, `checked`,
+            // `required`, `readOnly`), fighting the platform's vocabulary.
+            checkProperties: false,
+            prefixes: {
+              // Narrow the default eleven to the four that express every
+              // real case. Plural/tense variants add nothing: `isValid`
+              // over `areValid`, `hasAccess` over `haveAccess`,
+              // `isRetrying` over `willRetry`.
+              are: false,
+              have: false,
+              was: false,
+              were: false,
+              did: false,
+              will: false,
+              requires: false,
+            },
+          },
+        ],
         // Duplicate of core.mjs's `no-useless-concat`.
         'unicorn/no-useless-concat': 'off',
         // Duplicate of typescript-eslint's bundled `prefer-spread`.
