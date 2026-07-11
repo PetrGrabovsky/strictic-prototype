@@ -10,7 +10,8 @@ const ENUM_BAN = {
 const CLASS_DECLARATION_BAN = {
   selector: 'ClassDeclaration',
   message:
-    'Functional style: no classes. Exception: React error boundaries — disable locally there.',
+    'Functional style: no classes. Exception: React error boundaries — ' +
+    'disable locally there.',
 }
 
 const CLASS_EXPRESSION_BAN = {
@@ -93,16 +94,19 @@ export const typescript = () => [
     {
       rules: {
         // Enforce `import type` — keeps type-only imports out of the
-        // runtime graph.
+        // runtime graph. `separate-type-imports` emits a standalone
+        // `import type { X }` line rather than an inline `{ type X }`
+        // specifier: the erasable, compile-time-only imports stay
+        // visually distinct from the runtime import surface (which
+        // matters at a Server/Client boundary) and group cleanly once an
+        // import-ordering layer lands.
         '@typescript-eslint/consistent-type-imports': [
           'error',
-          { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
+          { prefer: 'type-imports', fixStyle: 'separate-type-imports' },
         ],
-        // Mirror for exports; inline specifier matches the import fixStyle.
-        '@typescript-eslint/consistent-type-exports': [
-          'error',
-          { fixMixedExportsWithInlineTypeSpecifier: true },
-        ],
+        // Mirror for exports; default (`false`) keeps them separate as
+        // `export type { X }`, matching the separate import style.
+        '@typescript-eslint/consistent-type-exports': 'error',
         // Collapse an all-inline-type import to a top-level `import type`,
         // dropping the leftover runtime side effect.
         '@typescript-eslint/no-import-type-side-effects': 'error',

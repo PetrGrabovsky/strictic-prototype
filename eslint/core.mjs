@@ -82,7 +82,8 @@ export const core = () => [
               {
                 name: 'next/router',
                 message:
-                  'Pages Router API. Use `next/navigation` (App Router) instead.',
+                  'Pages Router API. Use `next/navigation` (App Router) ' +
+                  'instead.',
               },
             ],
             patterns: [
