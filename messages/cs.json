@@ -4,5 +4,269 @@
   },
   "app": {
     "placeholder": "App shell — Etapa 4+"
+  },
+  "landing": {
+    "skip": "Přeskočit na obsah",
+    "cta": {
+      "start": "Začít zdarma",
+      "startNoCard": "Začít zdarma — bez karty",
+      "how": "Jak to funguje",
+      "micro": "Přihlášení na 1 klepnutí · bez karty · funguje offline"
+    },
+    "nav": {
+      "logoAria": "Strictic — domů",
+      "ariaLabel": "Hlavní navigace",
+      "how": "Jak to funguje",
+      "features": "Co umí",
+      "pricing": "Ceník",
+      "faq": "FAQ"
+    },
+    "hero": {
+      "kicker": "Domácí trénink s jednoručkami",
+      "h1": "Trénink doma, který tě <em>skutečně posouvá</em>.",
+      "slogan": "Maximum z času, který máš.",
+      "lead": "Řekneš, co máš doma — jednoručky, lavici, hrazdu — a čeho chceš dosáhnout. Strictic ti postaví tréninkový plán na míru, vede tě sérii po sérii a hlídá, ať váhy rostou. Bez řečí, bez reklam, bez lhaní.",
+      "trustline": {
+        "time": "45 minut na trénink",
+        "freq": "3× týdně stačí",
+        "plan": "plán ze 40+ cviků podle tvého vybavení"
+      },
+      "phone": {
+        "exercise": "Cvik 4/10",
+        "clock": "12:34",
+        "name": "Bench press s jednoručkami",
+        "muscles": "Prsa · triceps · přední rameno",
+        "weightLabel": "Dnešní váha",
+        "weight": "17,5",
+        "weightUnit": "kg / ruka",
+        "setDone": "✓ 10×",
+        "setCurrent": "série 2",
+        "setNext": "10×",
+        "cta": "Zapsat sérii",
+        "note": "Ukázka rozhraní — v produkci reálný screenshot aplikace"
+      }
+    },
+    "problem": {
+      "kicker": "Proč další fitness appka",
+      "h2": "Protože ty ostatní ti lžou.",
+      "cards": {
+        "plan": {
+          "title": "Plán, co ti nesedí",
+          "body": "Stáhneš „univerzální plán“ a půlku cviků nemáš na čem dělat. Strictic staví jen z toho, co máš skutečně doma — a s tvými reálnými váhami."
+        },
+        "circus": {
+          "title": "Motivační cirkus",
+          "body": "Konfety, odznáčky, výhrůžné streaky. My ti místo toho ukážeme čísla. Ta buď rostou, nebo nerostou — a to je jediná motivace, která vydrží."
+        },
+        "free": {
+          "title": "„Zdarma“, dokud nechceš cokoli udělat",
+          "body": "Znáš to: třetí kliknutí a paywall. Strictic je zdarma doopravdy — celý trénink, navyšování vah i pokrok. Písemně, níž na stránce."
+        }
+      }
+    },
+    "steps": {
+      "kicker": "Jak to funguje",
+      "h2": "Od nuly k prvnímu tréninku za 5 minut.",
+      "items": {
+        "equipment": {
+          "title": "Řekneš, co máš doma",
+          "body": "Přihlásíš se přes Google nebo Apple (1 klepnutí, žádné heslo) a rovnou naklikáš vybavení — jednoručky a jejich váhy, lavice, hrazda, gumy, kolečko.",
+          "imgTitle": "Obrázek · screenshot",
+          "imgDesc": "Obrazovka výběru vybavení: chipy „Jednoručky · Lavice · Hrazda · Gumy“, pod nimi preset „2–24 kg po 2“ a počítadlo „Sedí 10 cviků“."
+        },
+        "plan": {
+          "title": "Dostaneš plán na míru — a víš proč",
+          "body": "Cviky vybrané pro tvůj cíl, zkušenost a vybavení. U každého poctivé zdůvodnění. Neuděláš shyb? Dostaneš variantu s gumou, ne výmluvu.",
+          "imgTitle": "Obrázek · screenshot",
+          "imgDesc": "Odhalení plánu: „Tvůj plán · Svaly doma · 3× týdně · ~45 min“, seznam 9 cviků, u „Shyby s dopomocí gumy“ viditelný řádek „→ máš hrazdu i gumy; guma pomůže, dokud se neuneseš“."
+        },
+        "train": {
+          "title": "Cvičíš — a čísla rostou",
+          "body": "Aplikace tě vede sérii po sérii, hlídá pauzy, řekne ti, co si připravit, a sama navýší váhu, když na to máš. Progresivní přetížení bez tabulek v Excelu.",
+          "progLabel": "Bench press s jednoručkami",
+          "progValue": "12 → 17,5 kg",
+          "progDelta": "+46 %",
+          "progNote": "9 týdnů · reálná data z aplikace"
+        }
+      }
+    },
+    "features": {
+      "kicker": "Co Strictic umí",
+      "h2": "Všechno pro domácí trénink. Nic navíc.",
+      "cards": {
+        "progress": {
+          "title": "Progres hlídaný za tebe",
+          "body": "Splníš cílová opakování ve všech sériích → příště ti Strictic samo nabídne vyšší váhu z tvé reálné sady. Žádné počítání, žádné tabulky."
+        },
+        "mindless": {
+          "title": "Trénink bez přemýšlení",
+          "body": "Časovač pauzy s upozorněním, „připrav si 17,5 kg“ během odpočinku, lehčí den jedním klepnutím, když nemáš svůj den."
+        },
+        "chart": {
+          "title": "Pokrok černý na bílém",
+          "body": "Grafy vah a objemu, historie každého tréninku, poctivý odhad síly. Když se tři tréninky nehneš, appka to řekne — a poradí co dál."
+        },
+        "offline": {
+          "title": "Offline a na ploše",
+          "body": "Funguje v garáži bez signálu. Nainstaluješ si ji na plochu jako běžnou appku — bez app storu, bez aktualizací, bez povinného účtu."
+        }
+      },
+      "antibox": "<b>A co schválně neumí:</b> nepočítá kalorie, nepouští reklamy, neprodává tvá data, neposílá motivační spam a neslibuje „spálení tuku za 14 dní“. Dělá jednu věc — domácí silový trénink — a dělá ji pořádně."
+    },
+    "manifesto": {
+      "kicker": "Radikální poctivost",
+      "h2": "Pravidla, která si můžeš vytisknout.",
+      "lead": "Důvěra se nedá naklikat v marketingu. Tak ji dáváme písemně.",
+      "promiseTitle": "Slibujeme",
+      "promises": {
+        "free": {
+          "lead": "Zdarma znamená zdarma.",
+          "rest": " Celý trénink i pokrok, navždy. Plus jen přidává, nikdy neubírá."
+        },
+        "truth": {
+          "lead": "Řekneme ti pravdu.",
+          "rest": " I tu nepříjemnou — třeba že hubnutí se rozhoduje v kuchyni."
+        },
+        "data": {
+          "lead": "Tvá data jsou tvá.",
+          "rest": " Kdykoli je vyexportuješ nebo smažeš. Bez otázek."
+        },
+        "easyWeek": {
+          "lead": "První týden bude skoro lehký.",
+          "rest": " Schválně. Technika a návyk před egem."
+        }
+      },
+      "neverTitle": "Nikdy",
+      "nevers": {
+        "ads": {
+          "lead": "Žádné reklamy.",
+          "rest": " Nikde, nikdy."
+        },
+        "dataSale": {
+          "lead": "Žádný prodej dat.",
+          "rest": " Nejsi produkt."
+        },
+        "fakeDeals": {
+          "lead": "Žádné falešné slevy",
+          "rest": " a odpočty „posledních 10 minut“."
+        },
+        "fakeReviews": {
+          "lead": "Žádné vymyšlené recenze.",
+          "rest": " Až tu nějaké budou, budou od skutečných lidí."
+        }
+      }
+    },
+    "audience": {
+      "kicker": "Pro koho Strictic je",
+      "h2": "Domácí posilovna. Skutečný život.",
+      "cards": {
+        "dumbbells": {
+          "title": "Máš doma jednoručky",
+          "body": "Nastavitelné jednoručky jsou nejlepší základ cvičení doma — a Strictic z nich vytěží maximum. Lavice nebo hrazda plán rozšíří, nejsou ale podmínkou."
+        },
+        "comeback": {
+          "title": "Začínáš, nebo se vracíš",
+          "body": "Dostaneš méně cviků, srozumitelný návod u každého z nich a konzervativní startovní váhy. Full-body trénink pro začátečníky bez strachu, že něco pokazíš."
+        },
+        "time": {
+          "title": "Máš 45 minut, ne dvě hodiny",
+          "body": "Řekneš, kolik času máš, a plán se vejde. Tři tréninky týdně stačí na viditelný posun — když jsou vedené pořádně."
+        }
+      }
+    },
+    "founder": {
+      "kicker": "Kdo to dělá",
+      "h2": "Jedna appka. Jeden člověk. Nula investorů.",
+      "p1": "Je mi 37. Skoro šestnáct let jsem sloužil v armádě — pohyb byl součást práce. Pak jsem se stal programátorem, přibyly dvě děti, sedavá práce… a kila. Jednoho dne jsem se na sebe v zrcadle nemohl podívat.",
+      "p2": "Chtěl jsem do posilovny. Když jsem viděl ty fronty na lavičku, otočil jsem se: doma mi z dřívějška zbyly nastavitelné jednoručky a lavice. Jenže cvičit „když je čas“ nefungovalo. Tak jsem si napsal aplikaci — navrhne mi nejefektivnější trénink pro moje vybavení a můj čas, hlídá pokrok a sama zvedá váhy. Z každé půlhodiny vytáhne, co v ní je.",
+      "p3": "Fungovalo to. Pokrok jsem viděl [DOPLNIT: reálné číslo pokroku, např. „+15 kg na tlacích za 10 týdnů“] — a tak jsem to dodělal pro všechny, kdo mají málo času a kus železa doma.",
+      "p4": "Strictic ti neslíbí zázraky. Řekne ti narovinu, na co tvůj čas a vybavení stačí — a vytáhne z nich všechno.",
+      "sig": "— Petr · autor appky Strictic",
+      "imgTitle": "Fotka · autor",
+      "imgDesc": "Reálná fotka autora v domácí posilovně u lavice s jednoručkami. Přirozené světlo, žádná stocková fotka — autenticita je tady celý smysl."
+    },
+    "pricing": {
+      "kicker": "Ceník — narovinu",
+      "h2": "Zdarma pro trénink. Plus pro trenéra.",
+      "free": {
+        "title": "Zdarma",
+        "price": "0 Kč",
+        "period": "navždy",
+        "sub": "Přihlášení přes Google/Apple · bez karty",
+        "features": {
+          "plan": "Plán na míru podle vybavení, zkušenosti a času",
+          "guidance": "Vedení tréninku: série, pauzy, časovač",
+          "progression": "Automatické navyšování vah",
+          "progress": "Pokrok, grafy a historie",
+          "offline": "Offline režim a instalace na plochu"
+        },
+        "cta": "Začít zdarma"
+      },
+      "plus": {
+        "tag": "S trenérem",
+        "title": "Plus",
+        "price": "990 Kč",
+        "period": "/ rok",
+        "sub": "≈ 83 Kč měsíčně · nebo 119 Kč měsíčně · 7 dní zkušebně",
+        "features": {
+          "coach": "Trenér postaví plán podle cíle <b>tvými slovy</b> („bolí mě rameno, chci hlavně ruce“)",
+          "revision": "Revize plánu při plató, novém vybavení nebo změně cíle",
+          "questions": "Otázky trenérovi kdykoli — odpoví narovinu",
+          "sync": "Synchronizace mezi telefonem a počítačem"
+        },
+        "cta": "Vyzkoušet 7 dní",
+        "note": "Zdarma verze existencí Plus nikdy nezchudne — viz sliby výš."
+      }
+    },
+    "faq": {
+      "kicker": "Časté otázky",
+      "h2": "Na rovinu, jako všechno tady.",
+      "items": {
+        "dumbbells": {
+          "question": "Stačí mi doma jen jednoručky?",
+          "answer": "Ano. Nastavitelné jednoručky jsou nejlepší základ domácí posilovny — Strictic z nich postaví kompletní full-body trénink. Lavice, hrazda nebo gumy plán rozšíří o další cviky, ale nejsou podmínka."
+        },
+        "free": {
+          "question": "Je Strictic opravdu zdarma?",
+          "answer": "Ano. Plán na míru, celé vedení tréninku, navyšování vah i pokrok jsou zdarma navždy. Placené Plus přidává AI trenéra a synchronizaci — zdarma verze tím nikdy nezchudne."
+        },
+        "offline": {
+          "question": "Funguje bez internetu?",
+          "answer": "Ano. Strictic je webová aplikace (PWA) — po prvním načtení funguje kompletně offline, i v garáži bez signálu. Data se ukládají u tebe v zařízení."
+        },
+        "install": {
+          "question": "Jak si appku nainstaluju na iPhone nebo Android?",
+          "answer": "Android (Chrome): menu → „Přidat na plochu“. iPhone: otevři web v Safari → Sdílet → „Přidat na plochu“. Pak běží jako běžná aplikace."
+        },
+        "beginner": {
+          "question": "Je to vhodné pro úplné začátečníky?",
+          "answer": "Ano. Řekneš, že začínáš, a dostaneš méně cviků, srozumitelný návod „Jak na to“ u každého a konzervativní startovní váhy. První trénink má být skoro lehký — schválně, technika před egem."
+        },
+        "weightloss": {
+          "question": "Zhubnu s tím?",
+          "answer": "Narovinu: hubnutí se rozhoduje v kuchyni, ne v appce. Trénink ti při hubnutí udrží svaly a sílu — a přesně tak ho Strictic postaví. Zázraky neslibujeme; kdo je slibuje, lže."
+        },
+        "youtube": {
+          "question": "Čím se to liší od videí na YouTube?",
+          "answer": "Video ti ukáže cvik, ale nepamatuje si tvoje váhy, série ani progres. Strictic si pamatuje každou sérii, samo navyšuje zátěž a vede tě trénink po tréninku — z konzistence rostou výsledky, ne z koukání."
+        },
+        "minimal": {
+          "question": "Co když mám jen hrazdu a odporové gumy?",
+          "answer": "Strictic postaví plán i z toho — shyby s dopomocí gumy, kliky, dřepy s vlastní vahou, gumové veslování. A poctivě ti řekne, kde bez závaží narazíš na strop progrese."
+        }
+      }
+    },
+    "final": {
+      "h2": "První trénink můžeš mít dnes.",
+      "lead": "Pět minut nastavení. Přihlášení na jedno klepnutí, žádná karta. Jen ty, tvoje činky a plán, který dává smysl.",
+      "cta": "Začít zdarma"
+    },
+    "footer": {
+      "copyright": "© 2026 Strictic · Vyrobeno v Česku 🇨🇿",
+      "ariaLabel": "Patička",
+      "privacy": "Ochrana soukromí",
+      "terms": "Podmínky",
+      "contact": "Kontakt"
+    }
   }
 }

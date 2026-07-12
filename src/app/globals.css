@@ -50,3 +50,85 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/*
+ * Landing motion. Kept out of Tailwind because the hero stagger needs
+ * per-child delays. Gated behind `no-preference` so a reduced-motion
+ * user never gets the initial `opacity: 0` — content shows immediately.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes strictic-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes strictic-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-7px);
+    }
+  }
+
+  .hero-rise > * {
+    opacity: 0;
+    animation: strictic-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .hero-rise > *:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .hero-rise > *:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+  .hero-rise > *:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+  .hero-rise > *:nth-child(4) {
+    animation-delay: 0.28s;
+  }
+  .hero-rise > *:nth-child(5) {
+    animation-delay: 0.34s;
+  }
+  .hero-rise > *:nth-child(6) {
+    animation-delay: 0.4s;
+  }
+  .hero-rise > *:nth-child(7) {
+    animation-delay: 0.46s;
+  }
+
+  .hero-float {
+    animation: strictic-float 5.5s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* FAQ disclosure marker: "+" when closed, "–" when open. */
+.faq-marker::after {
+  content: '+';
+}
+details[open] .faq-marker::after {
+  content: '–';
+}
