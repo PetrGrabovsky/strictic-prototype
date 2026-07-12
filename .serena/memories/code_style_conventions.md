@@ -2,6 +2,24 @@
 
 - TypeScript, Next.js App Router conventions.
 - Formatting via Prettier (plugins: prettier-plugin-tailwindcss, prettier-plugin-packagejson) — run `npm run format`.
-- Linting via ESLint 9 flat config (`eslint.config.mjs`), includes `@next/eslint-plugin-next`, `typescript-eslint`, `eslint-config-prettier`.
+- Linting via ESLint 10 flat config (`eslint.config.mjs`), composed from
+  10 layers in `eslint/` (each a named `block()` for
+  `--inspect-config` debuggability), in order: `bootstrap` (ignores +
+  TS parser/projectService) → `core` (`@eslint/js` recommended +
+  additions) → `unicorn` (`flat/recommended`, `unicorn/*` filtered) →
+  `typescript` (`typescript-eslint` recommendedTypeChecked +
+  stylisticTypeChecked) → `sonar` (`eslint-plugin-sonarjs`, 14
+  hand-picked dataflow/bug rules, not `recommended`) → `imports`
+  (`eslint-plugin-import-x`) → `perfectionist` (import/export/type/JSX-
+  prop sorting, natural order) → `react` (`eslint-plugin-react` +
+  `eslint-plugin-react-hooks`, incl. React Compiler diagnostics) →
+  `a11y` (`eslint-plugin-jsx-a11y`) → `next`
+  (`@next/eslint-plugin-next`) → `prettierCompat`
+  (`eslint-config-prettier`, must load last). Every layer is curated,
+  not preset-as-is — rules chosen/dropped per concept to avoid
+  cross-plugin duplication (documented in each layer's JSDoc).
+- A `Stop` hook in `.claude/settings.json` runs `npm run lint`
+  automatically when a task finishes and blocks (feeds errors back)
+  until it's clean.
 - React Compiler enabled (`babel-plugin-react-compiler`) — avoid manual memoization patterns that fight the compiler.
 - Commit messages: Conventional Commits per `commitlint.config.mjs`: `type(scope?): subject`, all lowercase, imperative, no trailing dot. Scope optional; omit only for project-wide changes.

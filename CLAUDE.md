@@ -14,6 +14,10 @@ Next.js 16.2.10 (Turbopack), React 19.2.4, TS, Tailwind 4, ESLint 10,
 - `src/lib/` — shared utilities (pure, React-free)
 - alias `@/*` → `./src/*`
 
+Deeper context (architecture rationale, design tokens, build plan) lives in
+`docs/reference/` — start from `docs/reference/STRICTIC-BUILD-GUIDE.md`, which
+indexes the rest. This file stays the short operational contract.
+
 ## Commands
 
 - `npm run dev` — dev server
@@ -22,6 +26,16 @@ Next.js 16.2.10 (Turbopack), React 19.2.4, TS, Tailwind 4, ESLint 10,
 - `npm run lint` — eslint
 - `npm run format` — prettier --write .
 - `npm run format:check` — prettier --check .
+
+## Linting is the source of truth
+
+The layered ESLint config in `eslint/` mechanically enforces the code
+rules — don't restate individual lint rules in this file; a prose copy
+just drifts out of sync with the config. Run `npm run lint` (or
+`lint:fix`) and `npm run format` before treating any task as done; a
+`Stop` hook also runs `npm run lint` and blocks on failure. This file
+carries only what the linter can't check: architecture, framework
+patterns, and the intent behind a choice.
 
 ## Architecture
 
@@ -37,6 +51,9 @@ Next.js 16.2.10 (Turbopack), React 19.2.4, TS, Tailwind 4, ESLint 10,
   not access control.
 - Secrets never reach the client: only `NEXT_PUBLIC_*` env vars may
   enter the browser bundle. Everything else stays server-only.
+- `process.env` is read in exactly one place — `src/lib/env.ts`, which
+  validates it (zod) and re-exports a typed object. Import env from
+  there; never touch `process.env` elsewhere (lint enforces this).
 - Prefer React/Next.js built-ins over custom code (`useOptimistic`,
   `useActionState`, `cache`, `next/image`, `next/font`) — newest stable
   API, not the oldest that still works.
@@ -55,6 +72,9 @@ Next.js 16.2.10 (Turbopack), React 19.2.4, TS, Tailwind 4, ESLint 10,
 - i18n-ready from day one: no hardcoded user-facing text in JSX. Every
   string is a key (`t('key')`) resolved from a JSON messages file —
   even before the i18n library itself is wired up.
+- i18n navigation goes through `@/i18n/routing` (its `Link`, `redirect`,
+  `usePathname`, `useRouter`) — never raw `next/link` or
+  `next/navigation`, which silently drop the locale prefix from the URL.
 - RTL-ready from day one: logical CSS properties only. Use
   `ms-*/me-*/ps-*/pe-*/start-*/end-*/text-start/text-end`; never
   `ml/mr/pl/pr/left/right/text-left/text-right`. Layouts must mirror
