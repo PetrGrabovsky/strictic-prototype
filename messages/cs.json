@@ -13,6 +13,19 @@
       "how": "Jak to funguje",
       "micro": "Přihlášení na 1 klepnutí · bez karty · funguje offline"
     },
+    "authModal": {
+      "title": "Pokračovat do Strictic",
+      "subtitle": "Žádné heslo, žádná karta. Trvá to pár vteřin.",
+      "google": "Pokračovat s Google",
+      "apple": "Pokračovat s Apple",
+      "or": "nebo",
+      "emailLabel": "E-mailová adresa",
+      "emailPlaceholder": "tvuj@email.cz",
+      "emailSubmit": "Pokračovat e-mailem",
+      "loading": "Přihlašuji…",
+      "close": "Zavřít",
+      "legal": "Pokračováním souhlasíš s <terms>podmínkami</terms> a <privacy>ochranou soukromí</privacy>."
+    },
     "nav": {
       "logoAria": "Strictic — domů",
       "ariaLabel": "Hlavní navigace",
