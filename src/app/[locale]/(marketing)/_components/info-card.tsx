@@ -1,5 +1,5 @@
-const CARD = 'rounded-md border border-line bg-surface p-[24px]'
-const CARD_H3 = 'mb-[8px] text-lg leading-[1.12] tracking-[-0.02em]'
+const CARD = 'rounded-md border border-line bg-surface p-6'
+const CARD_H3 = 'mb-2 text-lg leading-[1.12] tracking-[-0.02em]'
 const CARD_P = 'text-sm text-ink-2'
 
 type Props = Readonly<{

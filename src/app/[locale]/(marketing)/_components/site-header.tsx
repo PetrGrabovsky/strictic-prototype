@@ -25,13 +25,13 @@ export const SiteHeader = async () => {
         'bg-bg/85 backdrop-blur-[10px]',
       )}
     >
-      <div className={cn(WRAP, 'flex h-[62px] items-center justify-between')}>
+      <div className={cn(WRAP, 'flex h-15.5 items-center justify-between')}>
         <a aria-label={t('nav.logoAria')} href="#zacit">
           <Logo />
         </a>
         <nav
           aria-label={t('nav.ariaLabel')}
-          className="flex items-center gap-[26px]"
+          className="flex items-center gap-6.5"
         >
           {NAV_LINKS.map((link) => (
             <a

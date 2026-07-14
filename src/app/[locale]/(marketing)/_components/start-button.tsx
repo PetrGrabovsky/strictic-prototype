@@ -1,5 +1,6 @@
 'use client'
 
+import { trackEvent } from './analytics'
 import { useAuthModal } from './auth-modal-provider'
 import type { ButtonVariant } from './button-classes'
 import { buttonClass } from './button-classes'
@@ -21,10 +22,17 @@ export const StartButton = ({
 }: Props) => {
   const openAuthModal = useAuthModal()
 
+  // Record the funnel's "landing → wizard start" step before the modal
+  // opens, so the event fires even if the modal render throws.
+  const handleClick = () => {
+    trackEvent('landing_cta')
+    openAuthModal()
+  }
+
   return (
     <button
       className={buttonClass(variant, className)}
-      onClick={openAuthModal}
+      onClick={handleClick}
       type="button"
     >
       {label}

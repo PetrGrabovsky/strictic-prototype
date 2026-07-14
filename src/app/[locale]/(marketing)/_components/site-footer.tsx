@@ -11,18 +11,18 @@ export const SiteFooter = async () => {
   const t = await getTranslations('landing')
 
   return (
-    <footer className="border-line text-ink-3 border-t py-[34px] text-sm">
+    <footer className="border-line text-ink-3 border-t py-8.5 text-sm">
       <div
         className={cn(
           WRAP,
           'flex flex-wrap items-center justify-between',
-          'gap-x-[26px] gap-y-[12px]',
+          'gap-x-6.5 gap-y-3',
         )}
       >
         <div>{t('footer.copyright')}</div>
         <nav
           aria-label={t('footer.ariaLabel')}
-          className="flex flex-wrap gap-x-[8px]"
+          className="flex flex-wrap gap-x-2"
         >
           <Link className="hover:text-ink" href="/ochrana-soukromi">
             {t('footer.privacy')}

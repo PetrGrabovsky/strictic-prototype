@@ -84,6 +84,16 @@ during the port to the nearest step (`p-2/3/4/5/6/7` = 8/12/16/20/24/28). Local
 exceptions: `env(safe-area-inset-*)`, chart internals (fixed bar width 42px —
 BUILD-GUIDE §4, DO NOT CHANGE).
 
+**Never write an arbitrary `[Npx]` when a scale token exists** — write the
+token: `px-4` not `px-[16px]`, `gap-2.5` not `gap-[10px]`. Half-steps (`.5`,
+i.e. 2px) are on-scale and fine (`mt-4.5`, `gap-6.5`); off-grid values (odd px
+like 9/11/15/17) round to the nearest step per the rule above (`[15px]`→`px-4`,
+`[11px]`→`py-3`). Tailwind 4 generates every numeric step on demand, so the
+token always exists — brackets stay ONLY for values with no scale equivalent:
+fluid `clamp()`, `min()/max()`, arbitrary breakpoints (`min-[760px]:`), grid
+templates (`grid-cols-[64px_1fr]`), off-scale radii (`rounded-[34px]`) and
+`backdrop-blur-[6px]`.
+
 ## 6. Shadows — from 7 values to 4 tokens + 1 ring
 
 | Token           | Value                                                               | Use                                     |

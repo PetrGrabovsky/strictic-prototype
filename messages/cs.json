@@ -7,6 +7,11 @@
   },
   "landing": {
     "skip": "Přeskočit na obsah",
+    "meta": {
+      "title": "Strictic — chytrý plán pro domácí trénink s jednoručkami",
+      "description": "Řekni, co máš doma a kolik máš času. Strictic ti sestaví plán na míru, vede tě sérii po sérii a sám navyšuje váhy. Zdarma, bez reklam, offline.",
+      "ogImageAlt": "Strictic — aplikace pro chytrý domácí silový trénink"
+    },
     "cta": {
       "start": "Začít zdarma",
       "startNoCard": "Začít zdarma — bez karty",
@@ -46,15 +51,17 @@
       },
       "phone": {
         "exercise": "Cvik 4/10",
-        "clock": "12:34",
+        "exerciseNext": "Příště: vyšší váha",
         "name": "Bench press s jednoručkami",
         "muscles": "Prsa · triceps · přední rameno",
         "weightLabel": "Dnešní váha",
         "weight": "17,5",
+        "weightNext": "20",
         "weightUnit": "kg / ruka",
-        "setDone": "✓ 10×",
-        "setCurrent": "série 2",
-        "setNext": "10×",
+        "set2": "série 2",
+        "set3": "série 3",
+        "repsDone": "✓ 10×",
+        "repsTarget": "10×",
         "cta": "Zapsat sérii",
         "note": "Ukázka rozhraní — v produkci reálný screenshot aplikace"
       }

@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { routing } from '@/i18n/routing'
 import { cn } from '@/lib/cn'
+import { PLAUSIBLE_DOMAIN, PLAUSIBLE_SRC, SITE_URL } from '@/lib/site-config'
 import '../globals.css'
 
 const inter = Inter({
@@ -30,7 +31,13 @@ export const generateMetadata = async ({
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'common' })
 
-  return { title: t('appName') }
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: t('appName'),
+      template: `%s · ${t('appName')}`,
+    },
+  }
 }
 
 const LocaleLayout = async ({ children, params }: Props) => {
@@ -52,6 +59,24 @@ const LocaleLayout = async ({ children, params }: Props) => {
     >
       <body className="flex min-h-full flex-col">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
+
+        {/*
+         * Plausible — privacy-friendly, cookieless analytics. Rendered as a
+         * plain `async` script so React 19 hoists it into <head> with
+         * `data-domain` intact (Plausible reads that off its own tag). The
+         * init stub queues `plausible()` calls fired before the script
+         * finishes loading. Domain/src are placeholders until the account
+         * exists (see `@/lib/site-config`).
+         */}
+        <script async data-domain={PLAUSIBLE_DOMAIN} src={PLAUSIBLE_SRC} />
+        <script
+          // eslint-disable-next-line react/no-danger -- static init stub
+          dangerouslySetInnerHTML={{
+            __html:
+              'window.plausible=window.plausible||function(){' +
+              '(window.plausible.q=window.plausible.q||[]).push(arguments)}',
+          }}
+        />
       </body>
     </html>
   )

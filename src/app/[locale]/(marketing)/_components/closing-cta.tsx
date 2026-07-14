@@ -22,11 +22,11 @@ export const ClosingCta = async () => {
       >
         {t('final.h2')}
       </h2>
-      <p className={cn(LEAD, 'mx-auto mt-[14px] mb-[28px] max-w-[520px]')}>
+      <p className={cn(LEAD, 'mx-auto mt-3.5 mb-7 max-w-130')}>
         {t('final.lead')}
       </p>
       <StartButton label={t('final.cta')} />
-      <span className="text-ink-3 mt-[10px] block text-xs tracking-[0.08em]">
+      <span className="text-ink-3 mt-2.5 block text-xs tracking-[0.08em]">
         {t('cta.micro')}
       </span>
     </ContentSection>

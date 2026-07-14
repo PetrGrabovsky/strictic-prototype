@@ -24,33 +24,33 @@ export const Hero = async () => {
 
   return (
     <section
-      className="scroll-mt-[76px] pt-[78px] pb-[66px]"
+      className="scroll-mt-19 pt-19.5 pb-16.5"
       data-sticky-after
       id="zacit"
     >
       <div
         className={cn(
           WRAP,
-          'grid grid-cols-1 gap-[40px]',
+          'grid grid-cols-1 gap-10',
           'min-[860px]:grid-cols-[1.05fr_0.9fr]',
-          'min-[860px]:items-center min-[860px]:gap-[52px]',
+          'min-[860px]:items-center min-[860px]:gap-13',
         )}
       >
         <div className="hero-rise">
           <span className={KICKER}>{t('hero.kicker')}</span>
           <h1
             className={cn(
-              'mb-[18px] text-[clamp(34px,5.6vw,56px)] font-extrabold',
+              'mb-4.5 text-[clamp(34px,5.6vw,56px)] font-extrabold',
               'leading-[1.12] tracking-[-0.02em]',
             )}
           >
             {t.rich('hero.h1', { em: renderEm })}
           </h1>
-          <p className="text-accent-deep mb-[8px] text-lg font-semibold">
+          <p className="text-accent-deep mb-2 text-lg font-semibold">
             {t('hero.slogan')}
           </p>
-          <p className={cn(LEAD, 'mb-[28px]')}>{t('hero.lead')}</p>
-          <div className="flex flex-wrap gap-[10px] max-[560px]:flex-col">
+          <p className={cn(LEAD, 'mb-7')}>{t('hero.lead')}</p>
+          <div className="flex flex-wrap gap-2.5 max-[560px]:flex-col">
             <StartButton
               className="max-[560px]:w-full"
               label={t('cta.start')}
@@ -62,12 +62,12 @@ export const Hero = async () => {
               {t('cta.how')}
             </a>
           </div>
-          <span className="text-ink-3 mt-[10px] block text-xs tracking-[0.08em]">
+          <span className="text-ink-3 mt-2.5 block text-xs tracking-[0.08em]">
             {t('cta.micro')}
           </span>
           <ul
             className={cn(
-              'mt-[26px] flex list-none flex-wrap gap-x-[18px] gap-y-[8px]',
+              'mt-6.5 flex list-none flex-wrap gap-x-4.5 gap-y-2',
               'text-ink-3 text-xs tracking-[0.08em]',
             )}
           >

@@ -50,11 +50,11 @@ export const Reveal = ({ children, className }: Props) => {
     <div
       className={cn(
         'motion-safe:transition-[opacity,transform]',
-        'motion-safe:duration-[600ms] motion-safe:ease-[cubic-bezier(0.16,1,0.3,1)]',
+        'motion-safe:duration-600 motion-safe:ease-[cubic-bezier(0.16,1,0.3,1)]',
         isVisible
           ? 'opacity-100'
           : cn(
-              'translate-y-[18px] opacity-0',
+              'translate-y-4.5 opacity-0',
               'motion-reduce:translate-y-0 motion-reduce:opacity-100',
             ),
         className,

@@ -117,6 +117,27 @@ html {
   .hero-float {
     animation: strictic-float 5.5s ease-in-out infinite;
   }
+
+  @keyframes strictic-bump {
+    0% {
+      transform: scale(1);
+    }
+    45% {
+      transform: scale(1.09);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  /*
+   * Weight-increase pulse in the hero phone mock. Lives inside
+   * `no-preference` so reduced-motion users see the higher weight as a
+   * plain static value with no animation.
+   */
+  .phone-bump {
+    animation: strictic-bump 0.5s ease-out;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

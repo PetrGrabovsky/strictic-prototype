@@ -19,7 +19,7 @@ export const FeaturesSection = async () => {
   return (
     <ContentSection id="umi">
       <SectionHeading kicker={t('features.kicker')} title={t('features.h2')} />
-      <div className="mt-[34px] grid grid-cols-1 gap-[18px] min-[760px]:grid-cols-2">
+      <div className="mt-8.5 grid grid-cols-1 gap-4.5 min-[760px]:grid-cols-2">
         {FEATURE_CARDS.map((id) => (
           <InfoCard
             body={t(`features.cards.${id}.body`)}
@@ -30,8 +30,8 @@ export const FeaturesSection = async () => {
       </div>
       <div
         className={cn(
-          'border-line mt-[18px] rounded-md border border-l-4',
-          'border-l-accent bg-surface px-[20px] py-[18px]',
+          'border-line mt-4.5 rounded-md border border-l-4',
+          'border-l-accent bg-surface px-5 py-4.5',
           'text-ink-2 text-base',
         )}
       >

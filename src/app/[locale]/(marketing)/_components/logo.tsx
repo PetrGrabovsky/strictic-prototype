@@ -14,7 +14,7 @@ type Props = Readonly<{
 export const Logo = ({ className, height = 22, width = 16 }: Props) => (
   <span
     className={cn(
-      'inline-flex items-center gap-[11px]',
+      'inline-flex items-center gap-3',
       'text-ink text-lg leading-none font-extrabold tracking-[-0.02em]',
       className,
     )}

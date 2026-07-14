@@ -3,7 +3,7 @@ import { cn } from '@/lib/cn'
 import { ContentSection } from './content-section'
 import { SectionHeading } from './section-heading'
 
-const PILLAR_LI = 'border-t border-d-line py-[9px] text-base text-d-ink-2'
+const PILLAR_LI = 'border-t border-d-line py-2 text-base text-d-ink-2'
 
 // Two mirrored columns share one shape: a coloured title + icon and a
 // list of lead/rest promise lines.
@@ -36,15 +36,15 @@ export const ManifestoSection = async () => {
         lead={t('manifesto.lead')}
         title={t('manifesto.h2')}
       />
-      <div className="mt-[34px] grid grid-cols-1 gap-[16px] min-[760px]:grid-cols-2">
+      <div className="mt-8.5 grid grid-cols-1 gap-4 min-[760px]:grid-cols-2">
         {COLUMNS.map((column) => (
           <div
-            className="border-d-line bg-d-card rounded-md border p-[24px]"
+            className="border-d-line bg-d-card rounded-md border p-6"
             key={column.group}
           >
             <h3
               className={cn(
-                'mb-[14px] text-xs tracking-[0.14em] uppercase',
+                'mb-3.5 text-xs tracking-[0.14em] uppercase',
                 column.tone,
               )}
             >

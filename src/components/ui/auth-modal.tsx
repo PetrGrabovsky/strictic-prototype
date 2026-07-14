@@ -28,7 +28,7 @@ const FOCUSABLE_SELECTOR = 'a[href], button, input'
 const LEGAL_LINK_CLASS = 'underline hover:text-ink'
 
 const OAUTH_BASE = cn(
-  'flex h-[52px] w-full items-center justify-center gap-[10px]',
+  'flex h-13 w-full items-center justify-center gap-2.5',
   'rounded-md text-base font-semibold',
   'transition-[background-color,border-color] duration-150',
 )
@@ -54,7 +54,7 @@ const Spinner = () => (
   <span
     aria-hidden
     className={cn(
-      'size-[17px] rounded-full border-2',
+      'size-4 rounded-full border-2',
       'border-current/30 border-t-current motion-safe:animate-spin',
     )}
   />
@@ -226,7 +226,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
     <div
       aria-hidden={!open}
       className={cn(
-        'fixed inset-0 z-[200] flex items-end justify-center sm:items-center',
+        'fixed inset-0 z-200 flex items-end justify-center sm:items-center',
         'bg-ink/60 p-0 sm:p-6',
         'motion-safe:transition-[opacity,backdrop-filter]',
         'motion-safe:duration-200 motion-safe:ease-out',
@@ -243,7 +243,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
           // `static m-0` overrides the UA `dialog` rule (position:absolute
           // + margin:auto), so the always-open dialog lays out as a normal
           // flex child of the overlay — bottom sheet on mobile, centred above.
-          'static m-0 block w-full max-w-[440px]',
+          'static m-0 block w-full max-w-110',
           'max-h-[88vh] overflow-y-auto',
           'bg-surface text-ink border-0 p-7',
           'rounded-t-lg shadow-[0_-8px_40px_rgba(10,10,10,0.18)] sm:rounded-lg',
@@ -256,7 +256,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
         open
         ref={cardRef}
       >
-        <div className="mb-[18px] flex justify-end">
+        <div className="mb-4.5 flex justify-end">
           <button
             aria-label={t('close')}
             className={cn(
@@ -272,16 +272,16 @@ export const AuthModal = ({ onClose, open }: Props) => {
         </div>
 
         <h2
-          className="mb-[6px] text-lg font-bold tracking-[-0.02em]"
+          className="mb-1.5 text-lg font-bold tracking-[-0.02em]"
           id={HEADING_ID}
         >
           {t('title')}
         </h2>
-        <p className="text-ink-2 mb-[22px] text-sm leading-relaxed">
+        <p className="text-ink-2 mb-5.5 text-sm leading-relaxed">
           {t('subtitle')}
         </p>
 
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           {OAUTH_BUTTONS.map(({ Icon, id, tone }) => (
             <button
               aria-busy={pendingProvider === id}
@@ -323,7 +323,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
               aria-disabled={pendingProvider === 'email'}
               autoComplete="email"
               className={cn(
-                'h-[50px] min-w-0 flex-1 rounded-md px-[15px]',
+                'h-12.5 min-w-0 flex-1 rounded-md px-4',
                 'border-line-field bg-surface text-ink border text-base',
                 'placeholder:text-ink-3',
               )}
@@ -339,7 +339,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
               aria-disabled={pendingProvider === 'email'}
               aria-label={t('emailSubmit')}
               className={cn(
-                'flex size-[50px] shrink-0 items-center justify-center',
+                'flex size-12.5 shrink-0 items-center justify-center',
                 'bg-ink text-surface rounded-md hover:bg-black',
                 pendingProvider === 'email' && 'opacity-60',
               )}
@@ -350,7 +350,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
           </div>
         </form>
 
-        <p className="text-ink-3 mt-[18px] text-center text-xs leading-relaxed">
+        <p className="text-ink-3 mt-4.5 text-center text-xs leading-relaxed">
           {t.rich('legal', {
             privacy: renderPrivacyLink,
             terms: renderTermsLink,

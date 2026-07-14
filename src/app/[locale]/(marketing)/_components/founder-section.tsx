@@ -15,20 +15,20 @@ export const FounderSection = async () => {
       <SectionHeading kicker={t('founder.kicker')} title={t('founder.h2')} />
       <div
         className={cn(
-          'mt-[30px] grid grid-cols-1 items-center gap-[38px]',
+          'mt-7.5 grid grid-cols-1 items-center gap-9.5',
           'min-[820px]:grid-cols-[1fr_300px]',
         )}
       >
-        <div className="text-ink-2 max-w-[560px] text-base">
+        <div className="text-ink-2 max-w-140 text-base">
           {FOUNDER_PARAGRAPHS.map((id, index) => (
-            <p className={index === 0 ? undefined : 'mt-[12px]'} key={id}>
+            <p className={index === 0 ? undefined : 'mt-3'} key={id}>
               {t(`founder.${id}`)}
             </p>
           ))}
-          <div className="text-ink-3 mt-[16px] text-xs">{t('founder.sig')}</div>
+          <div className="text-ink-3 mt-4 text-xs">{t('founder.sig')}</div>
         </div>
         <PlaceholderCard
-          className="min-h-[220px]"
+          className="min-h-55"
           description={t('founder.imgDesc')}
           title={t('founder.imgTitle')}
         />

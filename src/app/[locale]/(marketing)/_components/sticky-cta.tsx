@@ -64,7 +64,7 @@ export const StickyCta = ({ label }: Props) => {
   return (
     <div
       className={cn(
-        'fixed inset-x-0 bottom-0 z-[60] hidden max-[760px]:block',
+        'fixed inset-x-0 bottom-0 z-60 hidden max-[760px]:block',
         'border-line-2 bg-bg/90 border-t p-4 backdrop-blur-md',
         'transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
         'motion-reduce:transition-none',
@@ -72,7 +72,7 @@ export const StickyCta = ({ label }: Props) => {
       )}
       inert={!isVisible}
     >
-      <StartButton className="w-full py-[15px]" label={label} />
+      <StartButton className="w-full py-4" label={label} />
     </div>
   )
 }

@@ -4,7 +4,7 @@ export type ButtonVariant = 'ghost' | 'nav' | 'primary'
 
 const BASE = cn(
   'inline-flex cursor-pointer items-center justify-center gap-2',
-  'rounded-md px-[30px] py-[17px] text-base leading-none font-bold',
+  'rounded-md px-7.5 py-4 text-base leading-none font-bold',
   'transition-[transform,box-shadow,background-color] duration-100 ease-out',
 )
 
@@ -18,7 +18,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
     'hover:border-ink',
   ),
   nav: cn(
-    'bg-accent px-[18px] py-[11px] text-sm font-semibold text-d-bg',
+    'bg-accent px-4.5 py-3 text-sm font-semibold text-d-bg',
     'hover:bg-accent-deep hover:text-white',
   ),
 }

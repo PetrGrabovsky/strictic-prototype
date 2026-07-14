@@ -30,13 +30,13 @@ export const StepsSection = async () => {
   return (
     <ContentSection id="jak">
       <SectionHeading kicker={t('steps.kicker')} title={t('steps.h2')} />
-      <div className="mt-[30px]">
+      <div className="mt-7.5">
         {STEP_ITEMS.map((id, index) => (
           <div
             className={cn(
-              'grid grid-cols-1 items-center gap-[16px] border-t',
-              'border-line py-[30px]',
-              'min-[820px]:grid-cols-[64px_1fr_0.9fr] min-[820px]:gap-[26px]',
+              'grid grid-cols-1 items-center gap-4 border-t',
+              'border-line py-7.5',
+              'min-[820px]:grid-cols-[64px_1fr_0.9fr] min-[820px]:gap-6.5',
               index === STEP_ITEMS.length - 1 && 'border-b',
             )}
             key={id}
@@ -45,36 +45,36 @@ export const StepsSection = async () => {
               {`0${index + 1}`}
             </div>
             <div>
-              <h3 className="mb-[6px] text-lg leading-[1.12] tracking-[-0.02em]">
+              <h3 className="mb-1.5 text-lg leading-[1.12] tracking-[-0.02em]">
                 {t(`steps.items.${id}.title`)}
               </h3>
-              <p className="text-ink-2 max-w-[420px] text-base">
+              <p className="text-ink-2 max-w-105 text-base">
                 {t(`steps.items.${id}.body`)}
               </p>
             </div>
             {id === 'train' ? (
-              <div className="border-line bg-surface rounded-md border p-[22px]">
+              <div className="border-line bg-surface rounded-md border p-5.5">
                 <div className="text-2xs text-ink-3 tracking-[0.14em] uppercase">
                   {t('steps.items.train.progLabel')}
                 </div>
-                <div className="mt-[4px] mb-[12px] flex items-baseline gap-[10px]">
-                  <span className="text-[34px] font-extrabold tabular-nums">
+                <div className="mt-1 mb-3 flex items-baseline gap-2.5">
+                  <span className="text-2xl font-extrabold tabular-nums">
                     {t('steps.items.train.progValue')}
                   </span>
                   <span className="text-green text-xs font-semibold">
                     {t('steps.items.train.progDelta')}
                   </span>
                 </div>
-                <div aria-hidden className="flex h-[56px] items-end gap-[6px]">
+                <div aria-hidden className="flex h-14 items-end gap-1.5">
                   {PROGRESS_BARS.map((bar) => (
                     <i
-                      className="bg-accent flex-1 rounded-t-[6px] opacity-90"
+                      className="bg-accent flex-1 rounded-t-sm opacity-90"
                       key={bar.id}
                       style={{ height: `${bar.height}%` }}
                     />
                   ))}
                 </div>
-                <small className="text-2xs text-ink-3 mt-[10px] block tracking-[0.08em]">
+                <small className="text-2xs text-ink-3 mt-2.5 block tracking-[0.08em]">
                   {t('steps.items.train.progNote')}
                 </small>
               </div>
