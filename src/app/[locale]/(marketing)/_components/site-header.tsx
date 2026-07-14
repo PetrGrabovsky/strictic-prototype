@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
+import { Logo } from '@/components/ui/logo'
 import { cn } from '@/lib/cn'
 import { WRAP } from './landing-styles'
-import { Logo } from './logo'
 import { StartButton } from './start-button'
 
 const NAV_LINKS = [
@@ -27,7 +27,7 @@ export const SiteHeader = async () => {
     >
       <div className={cn(WRAP, 'flex h-15.5 items-center justify-between')}>
         <a aria-label={t('nav.logoAria')} href="#zacit">
-          <Logo />
+          <Logo withWordmark />
         </a>
         <nav
           aria-label={t('nav.ariaLabel')}

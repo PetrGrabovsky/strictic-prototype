@@ -8,6 +8,11 @@ Next.js version.
 Next.js 16.2.10 (Turbopack), React 19.2.4, TS, Tailwind 4, ESLint 10,
 `babel-plugin-react-compiler`. No test framework yet.
 
+Key deps (reuse before adding a package): zod (validation, incl.
+`env.ts`), next-intl (i18n + `@/i18n/routing`), class-variance-authority
+
+- clsx + tailwind-merge (styling via `cn`/`cva`).
+
 ## Structure
 
 - `src/app/` — App Router
@@ -70,8 +75,8 @@ patterns, and the intent behind a choice.
   Turbopack's module resolution/Fast Refresh. Import directly from the
   source file (`@/lib/cn`, not `@/lib`).
 - i18n-ready from day one: no hardcoded user-facing text in JSX. Every
-  string is a key (`t('key')`) resolved from a JSON messages file —
-  even before the i18n library itself is wired up.
+  string is a key (`t('key')`) resolved via next-intl from a JSON
+  messages file (`messages/`).
 - i18n navigation goes through `@/i18n/routing` (its `Link`, `redirect`,
   `usePathname`, `useRouter`) — never raw `next/link` or
   `next/navigation`, which silently drop the locale prefix from the URL.
