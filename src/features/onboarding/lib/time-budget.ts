@@ -11,8 +11,14 @@ const DEFAULT_WORK_S = 40
 const ISOLATION_TRIM_REST_S = 60
 const MIN_ACCESSORY_SETS = 2
 const MIN_COMPOUND_REST_S = 90
-const MIN_SETS = 2
 const UNRANKED = 99
+
+/**
+ * The engine's hard floor on working sets: neither the time-budget trim nor
+ * the light-day variant ever programs fewer than two working sets of a
+ * movement (spec §7). Exported so both levers share one floor and can't drift.
+ */
+export const MIN_WORKING_SETS = 2
 
 /** Accessory drop order — lowest value first (spec §7 trim ladder). */
 const TRIM_RANK: Partial<Record<ExercisePattern, number>> = {
@@ -80,7 +86,7 @@ const lowerCompoundRest = (items: readonly PlannedItem[]): PlannedItem[] =>
 
 const lowerAllSets = (items: readonly PlannedItem[]): PlannedItem[] =>
   items.map((item) =>
-    item.sets > MIN_SETS ? { ...item, sets: MIN_SETS } : item,
+    item.sets > MIN_WORKING_SETS ? { ...item, sets: MIN_WORKING_SETS } : item,
   )
 
 const lowestValueAccessoryIndex = (items: readonly PlannedItem[]): number => {

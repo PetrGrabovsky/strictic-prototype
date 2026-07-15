@@ -5,6 +5,141 @@
   "app": {
     "placeholder": "App shell — Etapa 4+"
   },
+  "onboarding": {
+    "back": "Zpět",
+    "next": "Pokračovat",
+    "finish": "Sestavit plán",
+    "stepStatus": "Krok {current} z {total}",
+    "building": "Skládám ti plán…",
+    "equipment": {
+      "kicker": "Tvoje vybavení",
+      "title": "Co máš doma?",
+      "lead": "Vyber, s čím cvičíš. Plán se přizpůsobí — radíme jen to, co reálně máš.",
+      "items": {
+        "dumbbells": "Jednoručky",
+        "barbell": "Obouruční činka",
+        "kettlebell": "Kettlebell",
+        "bench": "Lavice",
+        "pullup_bar": "Hrazda",
+        "ab_wheel": "Kolečko na břicho",
+        "bands": "Odporové gumy"
+      },
+      "fitCount": "Sestavíme {count, plural, one {# cvik} few {# cviky} other {# cviků}} na míru tvému vybavení.",
+      "fitCountLow": "Přidej jednoručky nebo činku a plán bude pestřejší — teď vyjde {count, plural, one {# cvik} few {# cviky} other {# cviků}}.",
+      "weights": {
+        "dumbbells": "Váhy jednoruček",
+        "barbell": "Váhy obouruční činky",
+        "kettlebell": "Váhy kettlebellů",
+        "hint": "Zaškrtni jen ty váhy, které opravdu máš — jen mezi nimi navyšujeme.",
+        "empty": "Vyber aspoň jednu váhu."
+      },
+      "bands": {
+        "label": "Síla gum",
+        "hint": "Vyber, jaké odporové gumy máš.",
+        "empty": "Vyber aspoň jednu sílu gumy.",
+        "levels": {
+          "light": "Lehká",
+          "medium": "Střední",
+          "heavy": "Silná"
+        }
+      }
+    },
+    "about": {
+      "kicker": "Pár věcí o tobě",
+      "title": "Ať plán sedne na tebe",
+      "experienceLabel": "Zkušenost s posilováním",
+      "experience": {
+        "new": {
+          "title": "Začínám",
+          "desc": "Nikdy jsem pořádně necvičil nebo jen výjimečně."
+        },
+        "returning": {
+          "title": "Vracím se",
+          "desc": "Někdy jsem cvičil, teď po pauze zase začínám."
+        },
+        "regular": {
+          "title": "Cvičím pravidelně",
+          "desc": "Posiluju delší dobu a technika mi sedí."
+        }
+      },
+      "sexLabel": "Pohlaví (nepovinné)",
+      "sexHint": "Pomáhá odhadnout bezpečné startovní váhy. Klidně přeskoč.",
+      "sex": {
+        "male": "Muž",
+        "female": "Žena",
+        "unspecified": "Neuvádět"
+      },
+      "pushupsLabel": "Kolik zvládneš kliků v kuse?",
+      "pushups": {
+        "0-5": "0–5",
+        "6-15": "6–15",
+        "16+": "16 a více",
+        "unknown": "Nevím"
+      },
+      "pullupsLabel": "Kolik zvládneš shybů v kuse?",
+      "pullups": {
+        "0": "Žádný",
+        "1-3": "1–3",
+        "4+": "4 a více",
+        "unknown": "Nevím"
+      }
+    },
+    "goal": {
+      "kicker": "Tvůj cíl",
+      "title": "Čeho chceš dosáhnout?",
+      "lead": "Vyber hlavní cíl. Podle něj naladíme výběr cviků i délku pauz.",
+      "options": {
+        "hypertrophy": {
+          "title": "Nabrat svaly",
+          "desc": "Viditelně větší svaly — objem a pravidelný růst."
+        },
+        "strength": {
+          "title": "Přidat na síle",
+          "desc": "Být silnější — těžší váhy a delší pauzy."
+        },
+        "fat_loss": {
+          "title": "Zhubnout",
+          "desc": "Udržet svaly a sílu, zatímco shazuješ."
+        },
+        "health": {
+          "title": "Zdraví a forma",
+          "desc": "Cítit se dobře a udržet se ve formě."
+        }
+      },
+      "restrictionsLabel": "Něco tě omezuje?",
+      "restrictionsHint": "Zaškrtni, na co si dát pozor — cviky podle toho upravíme.",
+      "restrictions": {
+        "shoulder": "Rameno",
+        "back": "Záda",
+        "knee": "Koleno"
+      }
+    },
+    "time": {
+      "kicker": "Kolik máš času",
+      "title": "Kolik času máš na trénink?",
+      "lead": "Podle času a počtu dní vejdeme plán tak, aby ti sedl.",
+      "minutesLabel": "Minut na trénink",
+      "minutesDecrease": "Ubrat minuty",
+      "minutesIncrease": "Přidat minuty",
+      "daysLabel": "Dní v týdnu",
+      "daysDecrease": "Ubrat dny",
+      "daysIncrease": "Přidat dny"
+    },
+    "reveal": {
+      "kicker": "Tvůj plán je hotový",
+      "frequency": "{count}× týdně",
+      "duration": "~{count} min",
+      "exerciseCount": "{count, plural, one {# cvik} few {# cviky} other {# cviků}}",
+      "warmupLabel": "Zahřátí",
+      "notesLabel": "Na rovinu",
+      "setsReps": "{sets} × {reps}",
+      "setsHold": "{sets} × {seconds} s",
+      "rest": "pauza {seconds} s",
+      "startWeight": "start {weight}",
+      "perHand": "/ ruka",
+      "cta": "Jdu cvičit"
+    }
+  },
   "exercises": {
     "air_squat": { "name": "Dřep s vlastní vahou" },
     "goblet_squat": { "name": "Goblet dřep" },

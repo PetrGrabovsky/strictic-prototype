@@ -33,6 +33,9 @@ type AnchorGroup =
  * dumbbell/kettlebell numbers are verbatim from the spec; the four `bar_*`
  * (total-weight) anchors are a documented engine estimate — the spec gives no
  * barbell numbers, only that rounding runs against the total-weight list.
+ *
+ * TODO(phase-2): revisit the `bar_*` anchors against real barbell numbers
+ * once the spec provides them — these are the engine's own guess, not spec.
  */
 const ANCHORS: Record<AnchorGroup, Anchor> = {
   bar_curl: { female: 12, male: 20 },

@@ -5,11 +5,11 @@
  * React-free module that imports nothing; the caller injects the instance.
  */
 export type Formatter = {
-  dateTime: (
-    value: Date | number,
-    options?: Intl.DateTimeFormatOptions,
-  ) => string
-  number: (value: number, options?: Intl.NumberFormatOptions) => string
+  // Method syntax (not arrow properties) so parameters stay bivariant: the
+  // next-intl formatter's option types are narrower than the `Intl.*` ones,
+  // and strict contravariance would otherwise reject a real `useFormatter()`.
+  dateTime(value: Date | number, options?: Intl.DateTimeFormatOptions): string
+  number(value: number, options?: Intl.NumberFormatOptions): string
 }
 
 /** Volume switches from kilograms to tonnes at and above this many kg. */

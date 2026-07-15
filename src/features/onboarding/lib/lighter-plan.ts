@@ -1,12 +1,16 @@
-import { estimateMinutesFromPlan } from '@/features/onboarding/lib/time-budget'
+import {
+  estimateMinutesFromPlan,
+  MIN_WORKING_SETS,
+} from '@/features/onboarding/lib/time-budget'
 import type { Plan, PlanExercise } from '@/types/plan'
 
-const MIN_SETS = 2
-
-/** Drop one working set (never below {@link MIN_SETS}) — the light-day lever. */
+/**
+ * Drop one working set (never below {@link MIN_WORKING_SETS}) — the light-day
+ * lever.
+ */
 const lighten = (exercise: PlanExercise): PlanExercise => ({
   ...exercise,
-  sets: Math.max(MIN_SETS, exercise.sets - 1),
+  sets: Math.max(MIN_WORKING_SETS, exercise.sets - 1),
 })
 
 /**

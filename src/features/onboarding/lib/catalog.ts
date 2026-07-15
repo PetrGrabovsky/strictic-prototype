@@ -34,3 +34,14 @@ export const isFeasible = (exercise: Exercise, gear: Gear): boolean =>
   exercise.equipment.some((alternative) =>
     alternative.every((item) => gear[item]),
   )
+
+/**
+ * How many catalog exercises the given gear can support at all — feasibility
+ * only, ignoring experience/time. Feeds the equipment step's "we'll build N
+ * exercises" preview.
+ */
+export const countFeasibleExercises = (gear: Gear): number =>
+  EXERCISES.reduce(
+    (total, exercise) => total + (isFeasible(exercise, gear) ? 1 : 0),
+    0,
+  )
