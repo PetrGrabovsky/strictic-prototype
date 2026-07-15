@@ -94,7 +94,13 @@ export const imports = () => [
         // for devDependencies.
         'import-x/no-extraneous-dependencies': [
           'error',
-          { devDependencies: ['**/*.config.{mjs,ts}', 'eslint/**/*.mjs'] },
+          {
+            devDependencies: [
+              '**/*.config.{mjs,ts}',
+              '**/*.test.{ts,tsx}',
+              'eslint/**/*.mjs',
+            ],
+          },
         ],
       },
     },

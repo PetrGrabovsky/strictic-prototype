@@ -6,7 +6,7 @@ Next.js version.
 ## Stack
 
 Next.js 16.2.10 (Turbopack), React 19.2.4, TS, Tailwind 4, ESLint 10,
-`babel-plugin-react-compiler`. No test framework yet.
+`babel-plugin-react-compiler`, Vitest (unit tests, colocated `*.test.ts`).
 
 Key deps (reuse before adding a package): zod (validation, incl.
 `env.ts`), next-intl (i18n + `@/i18n/routing`), class-variance-authority
@@ -17,6 +17,8 @@ Key deps (reuse before adding a package): zod (validation, incl.
 
 - `src/app/` — App Router
 - `src/lib/` — shared utilities (pure, React-free)
+- `src/features/` — feature-first domains (`components/`, `lib/`,
+  `types.ts` per feature; e.g. `onboarding/lib` = the plan engine)
 - alias `@/*` → `./src/*`
 
 Deeper context (architecture rationale, design tokens, build plan) lives in
@@ -31,6 +33,7 @@ indexes the rest. This file stays the short operational contract.
 - `npm run lint` — eslint
 - `npm run format` — prettier --write .
 - `npm run format:check` — prettier --check .
+- `npm test` — vitest (run once); `npx vitest` to watch
 
 ## Linting is the source of truth
 
@@ -38,9 +41,11 @@ The layered ESLint config in `eslint/` mechanically enforces the code
 rules — don't restate individual lint rules in this file; a prose copy
 just drifts out of sync with the config. Run `npm run lint` (or
 `lint:fix`) and `npm run format` before treating any task as done; a
-`Stop` hook also runs `npm run lint` and blocks on failure. This file
-carries only what the linter can't check: architecture, framework
-patterns, and the intent behind a choice.
+`Stop` hook also runs `npm run lint` and blocks on failure. When a
+change touches logic with tests, run `npm test` too — a `pre-push` hook
+runs the suite and blocks the push on a red test. This file carries only
+what the linter can't check: architecture, framework patterns, and the
+intent behind a choice.
 
 ## Architecture
 
