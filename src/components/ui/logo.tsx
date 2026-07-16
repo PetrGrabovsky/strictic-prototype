@@ -40,7 +40,7 @@ export const Logo = ({
     <span
       className={cn(
         'inline-flex items-center gap-3',
-        'text-ink text-lg leading-none font-extrabold tracking-[-0.02em]',
+        'text-ink text-lg leading-none font-extrabold tracking-tight',
         className,
       )}
     >

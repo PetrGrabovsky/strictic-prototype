@@ -112,7 +112,7 @@ const isLoadable = (item: EquipmentId): item is LoadableImplement =>
  * first alternative the user fully owns decides the implement — so an exercise
  * offered as dumbbell-or-kettlebell rounds against whichever they actually own.
  */
-const implementWeights = (
+export const implementWeights = (
   exercise: Exercise,
   equipment: Equipment,
   gear: Gear,

@@ -12,7 +12,7 @@ export const GRID3 = cn(
 /** Small uppercase eyebrow above a section heading. */
 export const KICKER = cn(
   'mb-3 block text-xs font-semibold uppercase',
-  'tracking-[0.14em] text-accent-deep',
+  'tracking-widest text-accent-deep',
 )
 
 /** Muted intro paragraph under a section heading. */

@@ -218,7 +218,7 @@ export const Stepper = ({
     <div className="min-w-0 flex-1">
       <div
         className={cn(
-          'text-2xs mb-1.5 text-center tracking-[0.14em] uppercase',
+          'text-2xs mb-1.5 text-center tracking-widest uppercase',
           labelColor,
         )}
       >

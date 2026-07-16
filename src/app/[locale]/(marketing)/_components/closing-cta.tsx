@@ -17,7 +17,7 @@ export const ClosingCta = async () => {
       <h2
         className={cn(
           'text-[clamp(28px,4.6vw,42px)] font-bold',
-          'leading-[1.12] tracking-[-0.02em]',
+          'leading-[1.12] tracking-tight',
         )}
       >
         {t('final.h2')}
@@ -26,7 +26,7 @@ export const ClosingCta = async () => {
         {t('final.lead')}
       </p>
       <StartButton label={t('final.cta')} />
-      <span className="text-ink-3 mt-2.5 block text-xs tracking-[0.08em]">
+      <span className="text-ink-3 mt-2.5 block text-xs tracking-wide">
         {t('cta.micro')}
       </span>
     </ContentSection>

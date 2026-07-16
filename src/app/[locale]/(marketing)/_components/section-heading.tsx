@@ -3,7 +3,7 @@ import { KICKER, LEAD } from './landing-styles'
 
 const H2 = cn(
   'mb-3.5 text-[clamp(26px,4vw,38px)] font-bold',
-  'leading-[1.12] tracking-[-0.02em]',
+  'leading-[1.12] tracking-tight',
 )
 
 type Props = Readonly<{

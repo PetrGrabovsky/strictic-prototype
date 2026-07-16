@@ -50,13 +50,13 @@ export const PriceCard = ({
         className={cn(
           'absolute -top-3 left-6 rounded-full',
           'bg-accent text-2xs px-2.5 py-1 font-semibold',
-          'text-d-bg tracking-[0.14em] uppercase',
+          'text-d-bg tracking-widest uppercase',
         )}
       >
         {tag}
       </span>
     ) : null}
-    <h3 className="mb-1 text-lg leading-[1.12] tracking-[-0.02em]">{title}</h3>
+    <h3 className="mb-1 text-lg leading-[1.12] tracking-tight">{title}</h3>
     <div className="mt-1.5 mb-0.5 text-2xl font-extrabold">
       {price} <small className="text-ink-3 text-sm font-medium">{period}</small>
     </div>

@@ -157,7 +157,7 @@ export const OnboardingWizard = () => {
           <StepDots steps={dots} />
         </div>
       </div>
-      <p className="text-2xs text-ink-3 mt-2 font-mono tracking-[0.14em] uppercase">
+      <p className="text-2xs text-ink-3 mt-2 font-mono tracking-widest uppercase">
         {t('stepStatus', { current: stepIndex + 1, total: STEP_IDS.length })}
       </p>
 

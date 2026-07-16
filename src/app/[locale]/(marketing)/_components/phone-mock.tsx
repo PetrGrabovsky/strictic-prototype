@@ -30,7 +30,7 @@ export const PhoneMock = async () => {
   return (
     <div className="hero-float">
       <PhoneMockScreen labels={labels} />
-      <div className="text-2xs text-ink-3 mt-3.5 text-center tracking-[0.08em]">
+      <div className="text-2xs text-ink-3 mt-3.5 text-center tracking-wide">
         {t('hero.phone.note')}
       </div>
     </div>

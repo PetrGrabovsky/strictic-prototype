@@ -271,10 +271,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
           </button>
         </div>
 
-        <h2
-          className="mb-1.5 text-lg font-bold tracking-[-0.02em]"
-          id={HEADING_ID}
-        >
+        <h2 className="mb-1.5 text-lg font-bold tracking-tight" id={HEADING_ID}>
           {t('title')}
         </h2>
         <p className="text-ink-2 mb-5.5 text-sm leading-relaxed">
@@ -306,7 +303,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
           <span
             className={cn(
               'text-2xs font-mono uppercase',
-              'text-ink-3 tracking-[0.14em]',
+              'text-ink-3 tracking-widest',
             )}
           >
             {t('or')}

@@ -6,5 +6,5 @@ import { cn } from '@/lib/cn'
  * style can't drift across the steps, the weight picker and the plan reveal.
  */
 export const FIELD_LABEL = cn(
-  'text-2xs font-mono font-medium uppercase tracking-[0.14em] text-ink-2',
+  'text-2xs font-mono font-medium uppercase tracking-widest text-ink-2',
 )

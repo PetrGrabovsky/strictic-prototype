@@ -41,7 +41,7 @@ export const Hero = async () => {
           <h1
             className={cn(
               'mb-4.5 text-[clamp(34px,5.6vw,56px)] font-extrabold',
-              'leading-[1.12] tracking-[-0.02em]',
+              'leading-[1.12] tracking-tight',
             )}
           >
             {t.rich('hero.h1', { em: renderEm })}
@@ -62,13 +62,13 @@ export const Hero = async () => {
               {t('cta.how')}
             </a>
           </div>
-          <span className="text-ink-3 mt-2.5 block text-xs tracking-[0.08em]">
+          <span className="text-ink-3 mt-2.5 block text-xs tracking-wide">
             {t('cta.micro')}
           </span>
           <ul
             className={cn(
               'mt-6.5 flex list-none flex-wrap gap-x-4.5 gap-y-2',
-              'text-ink-3 text-xs tracking-[0.08em]',
+              'text-ink-3 text-xs tracking-wide',
             )}
           >
             {TRUSTLINE.map((key) => (

@@ -176,25 +176,25 @@ export const PhoneMockScreen = ({ labels }: Props) => {
       <div
         className={cn(
           'mb-4 flex justify-between tabular-nums',
-          'text-2xs text-d-ink-2 tracking-[0.14em] uppercase',
+          'text-2xs text-d-ink-2 tracking-widest uppercase',
         )}
       >
         <span>{frame.exercise}</span>
         <span>{formatClock(seconds)}</span>
       </div>
-      <div className="mb-0.5 text-lg font-bold tracking-[-0.02em]">
+      <div className="mb-0.5 text-lg font-bold tracking-tight">
         {labels.name}
       </div>
       <div
         className={cn(
           'text-2xs mb-4.5 uppercase',
-          'text-d-ink-2 tracking-[0.08em]',
+          'text-d-ink-2 tracking-wide',
         )}
       >
         {labels.muscles}
       </div>
       <div className="border-d-line bg-d-card mb-3 rounded-md border p-4">
-        <div className="text-2xs text-d-ink-2 tracking-[0.14em] uppercase">
+        <div className="text-2xs text-d-ink-2 tracking-widest uppercase">
           {labels.weightLabel}
         </div>
         {/*

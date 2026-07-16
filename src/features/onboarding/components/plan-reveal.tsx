@@ -14,7 +14,7 @@ type Props = {
 
 const META_CHIP_CLASS = cn(
   'text-2xs rounded-full border border-line-2 bg-surface px-3 py-1',
-  'font-mono font-medium uppercase tracking-[0.08em] text-ink-2',
+  'font-mono font-medium uppercase tracking-wide text-ink-2',
 )
 
 /**
@@ -48,7 +48,7 @@ export const PlanReveal = ({ onStart, plan }: Props) => {
   return (
     <div>
       <p className={FIELD_LABEL}>{t('kicker')}</p>
-      <h1 className="text-ink mt-2 text-3xl font-bold tracking-[-0.02em]">
+      <h1 className="text-ink mt-2 text-3xl font-bold tracking-tight">
         {meta.plan_name_cs}
       </h1>
 

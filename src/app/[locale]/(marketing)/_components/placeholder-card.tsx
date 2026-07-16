@@ -4,7 +4,7 @@ const PH = cn(
   'flex min-h-42.5 flex-col justify-center gap-1.5 rounded-md',
   'border-2 border-dashed border-line-2 bg-cream p-5.5',
 )
-const PH_TITLE = 'text-2xs uppercase tracking-[0.14em] text-accent-deep'
+const PH_TITLE = 'text-2xs uppercase tracking-widest text-accent-deep'
 const PH_DESC = 'text-sm leading-normal text-ink-3'
 
 type Props = Readonly<{

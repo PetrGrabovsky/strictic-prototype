@@ -45,7 +45,7 @@ export const StepsSection = async () => {
               {`0${index + 1}`}
             </div>
             <div>
-              <h3 className="mb-1.5 text-lg leading-[1.12] tracking-[-0.02em]">
+              <h3 className="mb-1.5 text-lg leading-[1.12] tracking-tight">
                 {t(`steps.items.${id}.title`)}
               </h3>
               <p className="text-ink-2 max-w-105 text-base">
@@ -54,7 +54,7 @@ export const StepsSection = async () => {
             </div>
             {id === 'train' ? (
               <div className="border-line bg-surface rounded-md border p-5.5">
-                <div className="text-2xs text-ink-3 tracking-[0.14em] uppercase">
+                <div className="text-2xs text-ink-3 tracking-widest uppercase">
                   {t('steps.items.train.progLabel')}
                 </div>
                 <div className="mt-1 mb-3 flex items-baseline gap-2.5">
@@ -74,7 +74,7 @@ export const StepsSection = async () => {
                     />
                   ))}
                 </div>
-                <small className="text-2xs text-ink-3 mt-2.5 block tracking-[0.08em]">
+                <small className="text-2xs text-ink-3 mt-2.5 block tracking-wide">
                   {t('steps.items.train.progNote')}
                 </small>
               </div>

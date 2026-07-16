@@ -16,7 +16,7 @@ import type { Plan, PlanExercise } from '@/types/plan'
 
 /** The mono uppercase micro-label (DESIGN-SYSTEM §2 label role). */
 const LABEL_CLASS = cn(
-  'text-2xs font-mono font-medium uppercase tracking-[0.14em] text-ink-2',
+  'text-2xs font-mono font-medium uppercase tracking-widest text-ink-2',
 )
 
 type ViewState =
@@ -118,7 +118,7 @@ export const HomeScreen = () => {
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-6 pb-8">
       <header>
         <p className={LABEL_CLASS}>{t('kicker')}</p>
-        <h1 className="text-ink mt-2 text-3xl font-bold tracking-[-0.02em]">
+        <h1 className="text-ink mt-2 text-3xl font-bold tracking-tight">
           {plan.meta.plan_name_cs}
         </h1>
       </header>

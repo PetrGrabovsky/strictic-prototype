@@ -20,3 +20,12 @@ export const PLAN_STORAGE_KEY = 'fitcoach:plan:v1'
 export const FREE_COACH_MESSAGES = 3
 export const FREE_PLAN_GENERATIONS = 1
 export const PLUS_COACH_MESSAGES_PER_MONTH = 100
+
+/**
+ * How long a paused workout stays resumable. Reopening the training screen
+ * within this window of the last saved step silently continues the session
+ * (the {@link WorkoutSession} `ts` guard from `types/workout.ts`); past it, a
+ * stale session is ignored and the workout starts fresh. Six hours comfortably
+ * covers a mid-session interruption without ever resurrecting yesterday's run.
+ */
+export const SESSION_RESUME_WINDOW_MS = 6 * 60 * 60 * 1000

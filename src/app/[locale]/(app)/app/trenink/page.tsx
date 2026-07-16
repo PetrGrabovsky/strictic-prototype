@@ -1,25 +1,21 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { setRequestLocale } from 'next-intl/server'
+import { WorkoutScreen } from '@/features/workout/components/workout-screen'
 
 type Props = Readonly<{
   params: Promise<{ locale: string }>
 }>
 
 /**
- * Placeholder for the workout screen — the real set-by-set flow is the next
- * step in Etapa 5. It exists now only so the Home CTA ("Jdu cvičit") has a
- * destination to route to.
+ * The workout screen route. A thin server shell: it fixes the request locale,
+ * then hands off to the client {@link WorkoutScreen}, which reads the persisted
+ * plan and drives the set-by-set flow (plan/profile live in `localStorage`
+ * until the Supabase swap in Etapa 6, so the interactive work is client-side).
  */
 const TrainingPage = async ({ params }: Props) => {
   const { locale } = await params
   setRequestLocale(locale)
 
-  const t = await getTranslations('training')
-
-  return (
-    <main className="flex flex-1 items-center justify-center px-5 py-8">
-      <p className="text-ink-2 text-center text-sm">{t('placeholder')}</p>
-    </main>
-  )
+  return <WorkoutScreen />
 }
 
 export default TrainingPage

@@ -44,7 +44,7 @@ export const ManifestoSection = async () => {
           >
             <h3
               className={cn(
-                'mb-3.5 text-xs tracking-[0.14em] uppercase',
+                'mb-3.5 text-xs tracking-widest uppercase',
                 column.tone,
               )}
             >
