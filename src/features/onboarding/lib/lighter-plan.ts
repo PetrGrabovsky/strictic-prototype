@@ -29,3 +29,23 @@ export const lighterPlan = (plan: Plan): Plan => {
     plan: lighter,
   }
 }
+
+/**
+ * Below this weekly frequency there is no microcycle to deload — a once-a-week
+ * plan must never run permanently light.
+ */
+const MIN_DELOAD_FREQUENCY = 2
+
+/**
+ * Whether the upcoming session is a deload (rendered via {@link lighterPlan}).
+ * The last session of each weekly microcycle runs lighter, so with
+ * `completedSessions` already finished and a `frequency`-per-week plan the
+ * deload lands on sessions `frequency`, `2·frequency`, … — the earlier
+ * sessions of every block stay full, and a once-a-week plan never deloads.
+ */
+export const isDeloadSession = (
+  completedSessions: number,
+  frequency: number,
+): boolean =>
+  frequency >= MIN_DELOAD_FREQUENCY &&
+  completedSessions % frequency === frequency - 1

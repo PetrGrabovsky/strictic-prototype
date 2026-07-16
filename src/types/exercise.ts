@@ -1,25 +1,29 @@
+import { z } from 'zod'
 import type { EquipmentId } from '@/types/equipment'
 
 /**
  * Movement pattern (spec §3.1). Compound patterns plus `iso_*` slots the
  * compounds miss (side/rear delts, biceps, triceps, traps, calves).
  */
-export type ExercisePattern =
-  | 'carry'
-  | 'core'
-  | 'hinge'
-  | 'iso_biceps'
-  | 'iso_calves'
-  | 'iso_rear_delt'
-  | 'iso_side_delt'
-  | 'iso_traps'
-  | 'iso_triceps'
-  | 'lunge'
-  | 'pull_h'
-  | 'pull_v'
-  | 'push_h'
-  | 'push_v'
-  | 'squat'
+export const exercisePatternSchema = z.enum([
+  'carry',
+  'core',
+  'hinge',
+  'iso_biceps',
+  'iso_calves',
+  'iso_rear_delt',
+  'iso_side_delt',
+  'iso_traps',
+  'iso_triceps',
+  'lunge',
+  'pull_h',
+  'pull_v',
+  'push_h',
+  'push_v',
+  'squat',
+])
+
+export type ExercisePattern = z.infer<typeof exercisePatternSchema>
 
 /** How the exercise is loaded (spec §3.1). */
 export type LoadType = 'band' | 'bodyweight' | 'external'
@@ -47,55 +51,58 @@ export type Muscle =
   | 'upper_back'
 
 /** Every catalog id — constrains `Exercise.id` and the scaling references. */
-export type ExerciseId =
-  | 'ab_rollout'
-  | 'air_squat'
-  | 'band_assisted_pullup'
-  | 'band_curl'
-  | 'band_lateral_raise'
-  | 'band_ohp'
-  | 'band_pull_apart'
-  | 'band_row'
-  | 'bb_bent_row'
-  | 'bb_curl'
-  | 'bb_floor_press'
-  | 'bb_rdl'
-  | 'bulgarian_split_squat'
-  | 'chest_supported_row'
-  | 'chinup'
-  | 'db_bench_press'
-  | 'db_bent_row'
-  | 'db_calf_raise'
-  | 'db_curl'
-  | 'db_floor_press'
-  | 'db_hammer_curl'
-  | 'db_lateral_raise'
-  | 'db_oh_triceps'
-  | 'db_ohp'
-  | 'db_rdl'
-  | 'db_rear_delt_fly'
-  | 'db_row_bench'
-  | 'db_shrug'
-  | 'db_single_leg_rdl'
-  | 'db_split_squat'
-  | 'deadbug'
-  | 'decline_pushup'
-  | 'diamond_pushup'
-  | 'glute_bridge_bw'
-  | 'goblet_squat'
-  | 'hip_thrust_db'
-  | 'hollow_hold'
-  | 'incline_pushup'
-  | 'kb_swing'
-  | 'negative_pullup'
-  | 'pike_pushup'
-  | 'plank'
-  | 'pullup'
-  | 'pushup'
-  | 'reverse_lunge_db'
-  | 'side_plank'
-  | 'step_up_db'
-  | 'suitcase_carry'
+export const exerciseIdSchema = z.enum([
+  'ab_rollout',
+  'air_squat',
+  'band_assisted_pullup',
+  'band_curl',
+  'band_lateral_raise',
+  'band_ohp',
+  'band_pull_apart',
+  'band_row',
+  'bb_bent_row',
+  'bb_curl',
+  'bb_floor_press',
+  'bb_rdl',
+  'bulgarian_split_squat',
+  'chest_supported_row',
+  'chinup',
+  'db_bench_press',
+  'db_bent_row',
+  'db_calf_raise',
+  'db_curl',
+  'db_floor_press',
+  'db_hammer_curl',
+  'db_lateral_raise',
+  'db_oh_triceps',
+  'db_ohp',
+  'db_rdl',
+  'db_rear_delt_fly',
+  'db_row_bench',
+  'db_shrug',
+  'db_single_leg_rdl',
+  'db_split_squat',
+  'deadbug',
+  'decline_pushup',
+  'diamond_pushup',
+  'glute_bridge_bw',
+  'goblet_squat',
+  'hip_thrust_db',
+  'hollow_hold',
+  'incline_pushup',
+  'kb_swing',
+  'negative_pullup',
+  'pike_pushup',
+  'plank',
+  'pullup',
+  'pushup',
+  'reverse_lunge_db',
+  'side_plank',
+  'step_up_db',
+  'suitcase_carry',
+])
+
+export type ExerciseId = z.infer<typeof exerciseIdSchema>
 
 /**
  * A catalog exercise (spec §3.1 record format). This is versioned reference

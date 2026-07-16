@@ -2,8 +2,20 @@
   "common": {
     "appName": "Strictic"
   },
-  "app": {
-    "placeholder": "App shell — Etapa 4+"
+  "home": {
+    "kicker": "Tvůj plán",
+    "todayWorkout": "Dnešní trénink",
+    "setsReps": "{sets} × {reps}",
+    "setsHold": "{sets} × {seconds} s",
+    "cta": "Jdu cvičit",
+    "loading": "Načítám…",
+    "lighterDay": {
+      "title": "Lehčí den",
+      "description": "Dnešek je odlehčený — o sérii míň u každého cviku. Pracovní váhy se nemění a postup se neřeší, příští plný trénink jede zase od nich."
+    }
+  },
+  "training": {
+    "placeholder": "Tréninková obrazovka přijde v dalším kroku."
   },
   "onboarding": {
     "back": "Zpět",

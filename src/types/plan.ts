@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { ExerciseId, ExercisePattern } from '@/types/exercise'
+import { exerciseIdSchema, exercisePatternSchema } from '@/types/exercise'
 
 /**
  * Primary training goal (spec §4 `goal_primary`). The MVP wizard offers these
@@ -20,25 +20,22 @@ export type GoalPrimary = z.infer<typeof goalPrimarySchema>
  * Plan-level metadata (spec §4 `meta`). Snake_case field names are the wire
  * contract: the deterministic engine and the Phase-2 AI generator must emit
  * byte-identical shapes so the rest of the app never learns which produced it
- * (STRICTIC-MVP §4).
+ * (STRICTIC-MVP §4). Validated on read so a stored plan of an outdated shape is
+ * discarded rather than crashing the app.
  */
-export type PlanMeta = {
-  /** 3–5 honest Czech sentences: what they get, why, what to expect. */
-  coach_summary_cs: string
-  /** Injuries/limitations found, snake_case English (e.g. `low_back`). */
-  detected_constraints: readonly string[]
-  /** Movement patterns dropped because of a constraint (e.g. `push_v`). */
-  excluded_patterns: readonly ExercisePattern[]
-  frequency_per_week: number
-  goal_primary: GoalPrimary
-  /** 0–3 blunt caveats (e.g. diet drives fat loss). */
-  honest_notes_cs: readonly string[]
-  /** Short, ownable Czech plan name, e.g. `Svaly doma · 3× týdně`. */
-  plan_name_cs: string
-  session_time_est_min: number
-  /** The MVP only programs a single repeated full-body template. */
-  split: 'full_body'
-}
+export const planMetaSchema = z.object({
+  coach_summary_cs: z.string(), // 3–5 honest Czech sentences: what/why/expect
+  detected_constraints: z.array(z.string()).readonly(), // e.g. `low_back`
+  excluded_patterns: z.array(exercisePatternSchema).readonly(), // e.g. `push_v`
+  frequency_per_week: z.number(),
+  goal_primary: goalPrimarySchema,
+  honest_notes_cs: z.array(z.string()).readonly(), // 0–3 blunt caveats
+  plan_name_cs: z.string(), // short, ownable, e.g. `Svaly doma · 3× týdně`
+  session_time_est_min: z.number(),
+  split: z.literal('full_body'), // MVP programs one repeated full-body template
+})
+
+export type PlanMeta = z.infer<typeof planMetaSchema>
 
 /**
  * One prescribed exercise in a plan (spec §4 `plan[]`). `reps` xor `hold_s` is
@@ -46,25 +43,29 @@ export type PlanMeta = {
  * `load_type: external` exercises and always comes from the user's own weight
  * list.
  */
-export type PlanExercise = {
-  exercise_id: ExerciseId
-  hold_s: null | number
-  reps: null | number
-  rest_s: number
-  /** Set only when an easier/harder variant was chosen (spec §4). */
-  scaling_note_cs: null | string
-  sets: number
-  start_weight_kg: null | number
-  /** One personal Czech sentence referencing their gear/goal/capability. */
-  why_this_for_you_cs: string
-}
+export const planExerciseSchema = z.object({
+  exercise_id: exerciseIdSchema,
+  hold_s: z.number().nullable(),
+  reps: z.number().nullable(),
+  rest_s: z.number(),
+  scaling_note_cs: z.string().nullable(), // set only when a variant was chosen
+  sets: z.number(),
+  start_weight_kg: z.number().nullable(),
+  why_this_for_you_cs: z.string(), // one personal Czech sentence for the user
+})
+
+export type PlanExercise = z.infer<typeof planExerciseSchema>
 
 /**
  * The full generated plan (spec §4). Produced by the deterministic engine
  * today ({@link buildPlan}); the AI coach returns the same shape in Phase 2.
+ * Persisted verbatim under {@link PLAN_STORAGE_KEY} so Home can render it
+ * without recomputing (the engine input is richer than the stored profile).
  */
-export type Plan = {
-  meta: PlanMeta
-  plan: readonly PlanExercise[]
-  warmup_cs: string
-}
+export const planSchema = z.object({
+  meta: planMetaSchema,
+  plan: z.array(planExerciseSchema).readonly(),
+  warmup_cs: z.string(),
+})
+
+export type Plan = z.infer<typeof planSchema>

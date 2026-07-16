@@ -16,7 +16,7 @@ import {
   type WizardDraft,
 } from '@/features/onboarding/lib/wizard'
 import { cn } from '@/lib/cn'
-import { saveProfile } from '@/lib/storage'
+import { savePlan, saveProfile } from '@/lib/storage'
 import type { Plan } from '@/types/plan'
 import { AboutStep } from './about-step'
 import { EquipmentStep } from './equipment-step'
@@ -33,7 +33,7 @@ const BUILD_DELAY_MS = 700
 const STEP_IDS = ['equipment', 'about', 'goal', 'time'] as const
 
 const CONTAINER_CLASS = cn(
-  'mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pt-6 pb-8',
+  'mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-6 pb-8',
 )
 
 /**
@@ -114,6 +114,7 @@ export const OnboardingWizard = () => {
     setTimeout(() => {
       const generated = buildPlan(draftToPlanInput(draft))
       void saveProfile(draftToProfile(draft))
+      void savePlan(generated)
       setPlan(generated)
       setPhase('reveal')
     }, BUILD_DELAY_MS)

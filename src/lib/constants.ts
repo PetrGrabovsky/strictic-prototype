@@ -11,6 +11,7 @@ export const EQUIPMENT_STORAGE_KEY = 'fitcoach:equip:v2'
 export const SESSION_STORAGE_KEY = 'fitcoach:session:v1'
 export const HISTORY_STORAGE_KEY = 'fitcoach:history:v1'
 export const COACH_STORAGE_KEY = 'fitcoach:coach:v1'
+export const PLAN_STORAGE_KEY = 'fitcoach:plan:v1'
 
 /**
  * Free-tier limits (blueprint §2.3 / §4). The deterministic core is free

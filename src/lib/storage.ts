@@ -3,11 +3,14 @@ import {
   COACH_STORAGE_KEY,
   EQUIPMENT_STORAGE_KEY,
   HISTORY_STORAGE_KEY,
+  PLAN_STORAGE_KEY,
   PROGRESS_STORAGE_KEY,
   SESSION_STORAGE_KEY,
 } from '@/lib/constants'
 import { coachStateSchema } from '@/types/coach'
 import type { CoachState } from '@/types/coach'
+import { planSchema } from '@/types/plan'
+import type { Plan } from '@/types/plan'
 import { profileSchema } from '@/types/profile'
 import type { Profile } from '@/types/profile'
 import {
@@ -82,6 +85,13 @@ export const loadProfile = async (): Promise<null | Profile> =>
 
 export const saveProfile = async (value: Profile): Promise<void> => {
   write(EQUIPMENT_STORAGE_KEY, value)
+}
+
+export const loadPlan = async (): Promise<null | Plan> =>
+  read(PLAN_STORAGE_KEY, planSchema)
+
+export const savePlan = async (value: Plan): Promise<void> => {
+  write(PLAN_STORAGE_KEY, value)
 }
 
 export const loadProgress = async (): Promise<null | WorkoutProgress> =>
