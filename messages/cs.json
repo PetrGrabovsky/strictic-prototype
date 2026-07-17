@@ -8,6 +8,7 @@
     "setsReps": "{sets} × {reps}",
     "setsHold": "{sets} × {seconds} s",
     "cta": "Jdu cvičit",
+    "progressCta": "Zobrazit pokrok",
     "loading": "Načítám…",
     "lighterDay": {
       "title": "Lehčí den",
@@ -89,6 +90,83 @@
     "error": {
       "title": "Trénink se zasekl",
       "description": "Něco se v tréninku pokazilo. Tvoje zapsané série jsou uložené — zkus to prosím znovu.",
+      "retry": "Zkusit znovu",
+      "backHome": "Zpět na přehled"
+    }
+  },
+  "progress": {
+    "loading": "Načítám pokrok…",
+    "kicker": "Pokrok",
+    "title": "Tvůj pokrok",
+    "titleWithSpan": "Tvůj pokrok · {weeks, plural, one {# týden} few {# týdny} other {# týdnů}}",
+    "startNote": "Teprve začínáš — po pár trénincích tu u každého cviku uvidíš, jak ti roste váha.",
+    "dateRange": "{from} – {to}",
+    "backToPlan": "Zpátky na plán",
+    "empty": {
+      "title": "Zatím tu nic není",
+      "body": "Odcvič první trénink a uvidíš přesně, o kolik jsi zesílil. Žádná vymyšlená čísla — jen tvoje.",
+      "cta": "Zpátky na plán"
+    },
+    "carousel": {
+      "label": "Pokrok po cvicích",
+      "heading": "Pokrok po cvicích",
+      "counter": "{current}/{total}",
+      "dot": "Cvik {position}",
+      "previous": "Předchozí cvik",
+      "next": "Další cvik"
+    },
+    "trend": {
+      "topProgress": "Tvůj největší pokrok",
+      "start": "Startovní čára",
+      "up": "Zesílil jsi",
+      "down": "Tentokrát níž",
+      "flat": "Držíš se"
+    },
+    "badge": {
+      "start": "1. záznam",
+      "up": "+{pct} %",
+      "down": "{pct} %",
+      "flat": "beze změny"
+    },
+    "card": {
+      "reps": "× {reps} opak.",
+      "workingWeight": "pracovní váha na sérii",
+      "strengthEstimate": " · odhad síly {from} → {to}",
+      "sessions": "{count, plural, one {# trénink} few {# tréninky} other {# tréninků}}",
+      "share": "Sdílet cvik"
+    },
+    "volume": {
+      "heading": "Objem za trénink",
+      "sessions": "{count, plural, one {# trénink} few {# tréninky} other {# tréninků}}",
+      "totalLabel": "zvednuto celkem"
+    },
+    "regularity": {
+      "heading": "Pravidelnost",
+      "windowLabel": "tréninků za 30 dní",
+      "rangeStart": "před 10 týdny",
+      "rangeEnd": "teď"
+    },
+    "consistency": {
+      "gap": "Chvíli jsi nebyl — život se stane, jedem dál.",
+      "strong": "Skvělý rytmus. Tohle dělá výsledky.",
+      "solid": "Solidní pravidelnost, drž to.",
+      "starting": "Začínáš — klíč je se vracet."
+    },
+    "share": {
+      "kicker": "Můj pokrok",
+      "tagline": "Domácí trénink. Poctivě.",
+      "deltaLabel": "SÍLA NAHORU",
+      "deltaValue": "+{pct} %",
+      "firstRecordLabel": "1. ZÁZNAM",
+      "sessionsLabel": "TRÉNINKŮ",
+      "sublineChange": "{from} → {to} · {reps}×",
+      "sublineStart": "start · {to} · {reps}×",
+      "downloaded": "Obrázek stažen",
+      "failed": "Sdílení se nezdařilo"
+    },
+    "error": {
+      "title": "Pokrok se nenačetl",
+      "description": "Něco se při načítání pokroku pokazilo. Tvoje historie je v bezpečí — zkus to prosím znovu.",
       "retry": "Zkusit znovu",
       "backHome": "Zpět na přehled"
     }

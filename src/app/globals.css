@@ -47,6 +47,10 @@
   --radius-lg: 1.125rem; /* 18px */
   --radius-full: 999px;
 
+  /* Card elevation (DESIGN-SYSTEM §6) — first use: the Progress hero cards. */
+  --shadow-card:
+    0 1px 2px rgb(10 10 10 / 0.04), 0 20px 44px -24px rgb(10 10 10 / 0.18);
+
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 

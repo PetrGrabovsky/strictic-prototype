@@ -56,6 +56,23 @@ const FeatherIcon = () => (
   </svg>
 )
 
+/** Trending-up mark for the Progress link; inherits `currentColor`. */
+const TrendingUpIcon = () => (
+  <svg
+    aria-hidden
+    fill="none"
+    height="20"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+    viewBox="0 0 24 24"
+    width="20"
+  >
+    <path d="M22 7 13.5 15.5l-5-5L2 17M16 7h6v6" />
+  </svg>
+)
+
 /**
  * The Home screen: today's workout drawn from the persisted plan. A client
  * component because the profile, plan and history all live in `localStorage`
@@ -172,6 +189,17 @@ export const HomeScreen = () => {
       >
         <DumbbellIcon />
         {t('cta')}
+      </Link>
+
+      <Link
+        className={cn(
+          buttonVariants({ size: 'lg', variant: 'ghost' }),
+          'mt-3 w-full',
+        )}
+        href="/app/pokrok"
+      >
+        <TrendingUpIcon />
+        {t('progressCta')}
       </Link>
     </main>
   )
