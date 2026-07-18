@@ -1,7 +1,8 @@
 import { useFormatter } from 'next-intl'
-import { fmtKg } from '@/lib/format'
-import { FIELD_LABEL } from './onboarding-styles'
-import { SelectableChip } from './selectable-chip'
+import { cn } from '@/lib/cn'
+import { formatKg } from '@/lib/format'
+import { MICRO_LABEL } from '@/styles/type'
+import { SelectableChip } from './selectable'
 
 type Props = {
   emptyHint: string
@@ -35,14 +36,14 @@ export const WeightPicker = ({
 
   return (
     <div className="border-line mt-6 border-t pt-5">
-      <h2 className={FIELD_LABEL}>{label}</h2>
+      <h2 className={cn(MICRO_LABEL, 'text-ink-2')}>{label}</h2>
       <p className="text-ink-3 mt-1 text-sm leading-relaxed">{hint}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {options.map((weight) => (
           <SelectableChip
             checked={selected.includes(weight)}
             key={weight}
-            label={fmtKg(format, weight)}
+            label={formatKg(format, weight)}
             onChange={() => toggle(weight)}
           />
         ))}

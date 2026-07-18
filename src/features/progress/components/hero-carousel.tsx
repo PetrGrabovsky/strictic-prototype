@@ -1,12 +1,10 @@
-'use client'
-
 import type { ReactNode, UIEvent } from 'react'
-import { useRef, useState } from 'react'
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from '@/features/progress/components/icons'
+import { useEffect, useRef, useState } from 'react'
+import { IconButton } from '@/components/ui/icon-button'
+import { ChevronLeftIcon, ChevronRightIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/cn'
+import { SCROLLBAR_HIDDEN } from '@/styles/layout'
+import { SECTION_LABEL } from '@/styles/type'
 
 /** One page of the carousel: a stable key plus its rendered card. */
 type Slide = {
@@ -20,17 +18,16 @@ type Props = {
   dotLabel: (position: number) => string
   heading: string
   nextLabel: string
-  prevLabel: string
+  previousLabel: string
   slides: readonly Slide[]
 }
 
-const ARROW_ICON_SIZE = 17
+const ARROW_ICON_SIZE = 16
 
-/** 44px round tap target (BUILD-GUIDE/CLAUDE tap-target floor) on a surface. */
+/** The arrows' skin on top of {@link IconButton}: a bordered surface disc. */
 const ARROW_CLASS = cn(
-  'flex size-11 shrink-0 items-center justify-center rounded-full',
-  'border-line-2 text-ink bg-surface cursor-pointer border',
-  'touch-manipulation hover:brightness-95 active:brightness-90',
+  'border-line-2 text-ink bg-surface rounded-full border',
+  'hover:brightness-95 active:brightness-90',
 )
 
 /**
@@ -48,7 +45,7 @@ export const HeroCarousel = ({
   dotLabel,
   heading,
   nextLabel,
-  prevLabel,
+  previousLabel,
   slides,
 }: Props) => {
   const trackRef = useRef<HTMLDivElement>(null)
@@ -56,6 +53,9 @@ export const HeroCarousel = ({
   const [activeIndex, setActiveIndex] = useState(0)
   const total = slides.length
   const hasControls = total > 1
+
+  // Cancel a frame still pending when the carousel unmounts mid-scroll.
+  useEffect(() => () => cancelAnimationFrame(scrollFrame.current), [])
 
   const pageWidth = (): number => (trackRef.current?.clientWidth ?? 1) || 1
 
@@ -95,9 +95,7 @@ export const HeroCarousel = ({
   return (
     <section aria-label={ariaLabel} aria-roledescription="carousel">
       <div className="mx-0.5 mb-2.5 flex items-center justify-between">
-        <h2 className="text-ink-2 font-mono text-xs font-medium tracking-widest uppercase">
-          {heading}
-        </h2>
+        <h2 className={cn(SECTION_LABEL, 'text-ink-2')}>{heading}</h2>
         <span className="text-ink-3 font-mono text-xs tabular-nums">
           {counterLabel(activeIndex + 1, total)}
         </span>
@@ -105,9 +103,8 @@ export const HeroCarousel = ({
 
       <div
         className={cn(
-          'flex snap-x snap-mandatory rounded-lg',
-          '[-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]',
-          '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+          SCROLLBAR_HIDDEN,
+          'flex snap-x snap-mandatory rounded-md',
           hasControls ? 'overflow-x-auto' : 'overflow-x-hidden',
         )}
         onScroll={handleScroll}
@@ -125,14 +122,13 @@ export const HeroCarousel = ({
 
       {hasControls ? (
         <div className="mt-3.5 flex items-center justify-center gap-3.5">
-          <button
-            aria-label={prevLabel}
+          <IconButton
             className={ARROW_CLASS}
+            label={previousLabel}
             onClick={() => pageBy(-1)}
-            type="button"
           >
             <ChevronLeftIcon size={ARROW_ICON_SIZE} />
-          </button>
+          </IconButton>
 
           <div className="flex items-center">
             {slides.map((slide, position) => (
@@ -148,7 +144,7 @@ export const HeroCarousel = ({
                   className={cn(
                     'h-1.5 rounded-full transition-[width,background-color] duration-200',
                     position === activeIndex
-                      ? 'bg-accent w-4.5'
+                      ? 'bg-accent w-4'
                       : 'bg-line-2 w-1.5',
                   )}
                 />
@@ -156,14 +152,13 @@ export const HeroCarousel = ({
             ))}
           </div>
 
-          <button
-            aria-label={nextLabel}
+          <IconButton
             className={ARROW_CLASS}
+            label={nextLabel}
             onClick={() => pageBy(1)}
-            type="button"
           >
             <ChevronRightIcon size={ARROW_ICON_SIZE} />
-          </button>
+          </IconButton>
         </div>
       ) : null}
     </section>

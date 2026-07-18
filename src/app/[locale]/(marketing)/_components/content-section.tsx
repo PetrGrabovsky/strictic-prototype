@@ -3,8 +3,8 @@ import { cn } from '@/lib/cn'
 import { WRAP } from './landing-styles'
 import { Reveal } from './reveal'
 
-const SECTION = 'py-18.5'
-const SECTION_ANCHOR = 'scroll-mt-19 pt-5 pb-18.5'
+const SECTION = 'py-18'
+const SECTION_ANCHOR = 'scroll-mt-20 pt-5 pb-18'
 
 type Props = Readonly<{
   children: ReactNode

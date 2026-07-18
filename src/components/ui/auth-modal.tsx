@@ -3,9 +3,12 @@
 import { useTranslations } from 'next-intl'
 import type { ReactNode, SyntheticEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
+import { IconButton } from '@/components/ui/icon-button'
+import { ArrowRightIcon, CloseIcon } from '@/components/ui/icons'
 import { Link } from '@/i18n/routing'
 import { cn } from '@/lib/cn'
-import { AppleIcon, ArrowIcon, CloseIcon, GoogleIcon } from './auth-modal-icons'
+import { MICRO_LABEL } from '@/styles/type'
+import { AppleIcon, GoogleIcon } from './auth-modal-icons'
 
 /** Sign-in providers the mock can be "pending" on. */
 type Provider = 'apple' | 'email' | 'google'
@@ -34,7 +37,7 @@ const OAUTH_BASE = cn(
 )
 
 const OAUTH_TONE = {
-  apple: 'border border-ink bg-ink text-surface hover:bg-black',
+  apple: 'border border-ink bg-ink text-surface hover:brightness-90',
   google: 'border border-line-field bg-surface text-ink hover:bg-bg',
 } satisfies Record<Exclude<Provider, 'email'>, string>
 
@@ -246,9 +249,9 @@ export const AuthModal = ({ onClose, open }: Props) => {
           'static m-0 block w-full max-w-110',
           'max-h-[88vh] overflow-y-auto',
           'bg-surface text-ink border-0 p-7',
-          'rounded-t-lg shadow-[0_-8px_40px_rgba(10,10,10,0.18)] sm:rounded-lg',
+          'shadow-sheet rounded-t-lg sm:rounded-lg',
           'motion-safe:transition-[transform,opacity]',
-          'motion-safe:duration-200 motion-safe:ease-[cubic-bezier(0.16,1,0.3,1)]',
+          'motion-safe:ease-out-expo motion-safe:duration-200',
           open
             ? 'translate-y-0 opacity-100'
             : 'translate-y-5 opacity-0 motion-reduce:translate-y-0',
@@ -256,25 +259,20 @@ export const AuthModal = ({ onClose, open }: Props) => {
         open
         ref={cardRef}
       >
-        <div className="mb-4.5 flex justify-end">
-          <button
-            aria-label={t('close')}
-            className={cn(
-              'flex size-11 shrink-0 items-center justify-center',
-              'bg-bg text-ink-3 rounded-full',
-              'hover:bg-line hover:text-ink',
-            )}
+        <div className="mb-4 flex justify-end">
+          <IconButton
+            className="bg-bg text-ink-3 hover:bg-line hover:text-ink rounded-full"
+            label={t('close')}
             onClick={onClose}
-            type="button"
           >
             <CloseIcon />
-          </button>
+          </IconButton>
         </div>
 
         <h2 className="mb-1.5 text-lg font-bold tracking-tight" id={HEADING_ID}>
           {t('title')}
         </h2>
-        <p className="text-ink-2 mb-5.5 text-sm leading-relaxed">
+        <p className="text-ink-2 mb-5 text-sm leading-relaxed">
           {t('subtitle')}
         </p>
 
@@ -300,14 +298,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
 
         <div className="my-4 flex items-center gap-3">
           <span className="bg-line h-px flex-1" />
-          <span
-            className={cn(
-              'text-2xs font-mono uppercase',
-              'text-ink-3 tracking-widest',
-            )}
-          >
-            {t('or')}
-          </span>
+          <span className={cn(MICRO_LABEL, 'text-ink-3')}>{t('or')}</span>
           <span className="bg-line h-px flex-1" />
         </div>
 
@@ -320,7 +311,7 @@ export const AuthModal = ({ onClose, open }: Props) => {
               aria-disabled={pendingProvider === 'email'}
               autoComplete="email"
               className={cn(
-                'h-12.5 min-w-0 flex-1 rounded-md px-4',
+                'h-12 min-w-0 flex-1 rounded-md px-4',
                 'border-line-field bg-surface text-ink border text-base',
                 'placeholder:text-ink-3',
               )}
@@ -336,18 +327,18 @@ export const AuthModal = ({ onClose, open }: Props) => {
               aria-disabled={pendingProvider === 'email'}
               aria-label={t('emailSubmit')}
               className={cn(
-                'flex size-12.5 shrink-0 items-center justify-center',
-                'bg-ink text-surface rounded-md hover:bg-black',
+                'flex size-12 shrink-0 items-center justify-center',
+                'bg-ink text-surface rounded-md hover:brightness-90',
                 pendingProvider === 'email' && 'opacity-60',
               )}
               type="submit"
             >
-              {pendingProvider === 'email' ? <Spinner /> : <ArrowIcon />}
+              {pendingProvider === 'email' ? <Spinner /> : <ArrowRightIcon />}
             </button>
           </div>
         </form>
 
-        <p className="text-ink-3 mt-4.5 text-center text-xs leading-relaxed">
+        <p className="text-ink-3 mt-4 text-center text-xs leading-relaxed">
           {t.rich('legal', {
             privacy: renderPrivacyLink,
             terms: renderTermsLink,

@@ -1,3 +1,4 @@
+import { createBarScale } from '@/features/progress/lib/bar-scale'
 import { tokens } from '@/styles/tokens'
 
 /** The share image is a fixed 1080×1080 square (DESIGN-SYSTEM §3, §7). */
@@ -5,16 +6,20 @@ const CANVAS_SIZE = 1080
 const MARGIN = 92
 const FALLBACK_FAMILY = 'system-ui, sans-serif'
 
-const SPARK_TOP = 648
-const SPARK_HEIGHT = 190
-const SPARK_GAP = 12
-const SPARK_MAX_POINTS = 14
+const SPARKLINE_TOP = 648
+const SPARKLINE_HEIGHT = 190
+const SPARKLINE_GAP = 12
+const SPARKLINE_MAX_POINTS = 14
 const BAR_RADIUS = 8
-const SPARK_BASE_FRACTION = 0.3
-const SPARK_SPAN_FRACTION = 0.7
-const SPARK_SINGLE_FRACTION = 0.62
 
-type Ctx = CanvasRenderingContext2D
+/** Vertical anchors of the card's text blocks (canvas y coordinates). */
+const KICKER_Y = 300
+const NAME_Y = 384
+const HEADLINE_Y = 540
+const SUBLINE_Y = 600
+const STAT_Y = 905
+
+type CanvasContext = CanvasRenderingContext2D
 
 /**
  * Everything drawn onto the share card. All copy is passed in already
@@ -23,13 +28,13 @@ type Ctx = CanvasRenderingContext2D
  */
 export type ShareCard = {
   brand: string
-  foot: string
+  footer: string
   headline: string
   kicker: string
   name: string
-  spark: readonly number[]
-  sparkFromLabel: string
-  sparkToLabel: string
+  sparkline: readonly number[]
+  sparklineFromLabel: string
+  sparklineToLabel: string
   statLabel: string
   statValue: string
   subline: string
@@ -46,24 +51,31 @@ type ShareOutcome = 'downloaded' | 'failed' | 'shared'
  */
 const withAlpha = (hex: string, alpha: number): string => {
   const value = hex.replace('#', '')
-  const r = Number.parseInt(value.slice(0, 2), 16)
-  const g = Number.parseInt(value.slice(2, 4), 16)
-  const b = Number.parseInt(value.slice(4, 6), 16)
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  const red = Number.parseInt(value.slice(0, 2), 16)
+  const green = Number.parseInt(value.slice(2, 4), 16)
+  const blue = Number.parseInt(value.slice(4, 6), 16)
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`
 }
 
 const fontOf = (family: string, weight: number, size: number): string =>
   `${weight} ${size}px ${family}`
 
+/** Clipping stops here — fewer characters would be unreadable anyway. */
+const MIN_CLIPPED_CHARS = 4
+
 /** Truncate to fit `maxWidth`, appending an ellipsis when it had to cut. */
-const fitText = (ctx: Ctx, text: string, maxWidth: number): string => {
-  if (ctx.measureText(text).width <= maxWidth) {
+const fitText = (
+  context: CanvasContext,
+  text: string,
+  maxWidth: number,
+): string => {
+  if (context.measureText(text).width <= maxWidth) {
     return text
   }
   let clipped = text
   while (
-    clipped.length > 4 &&
-    ctx.measureText(`${clipped}…`).width > maxWidth
+    clipped.length > MIN_CLIPPED_CHARS &&
+    context.measureText(`${clipped}…`).width > maxWidth
   ) {
     clipped = clipped.slice(0, -1)
   }
@@ -71,121 +83,127 @@ const fitText = (ctx: Ctx, text: string, maxWidth: number): string => {
 }
 
 const drawStat = (
-  ctx: Ctx,
+  context: CanvasContext,
   family: string,
   x: number,
   y: number,
   value: string,
   label: string,
 ): void => {
-  ctx.textAlign = 'left'
-  ctx.fillStyle = tokens.dark.ink
-  ctx.font = fontOf(family, 700, 52)
-  ctx.fillText(value, x, y)
-  ctx.fillStyle = withAlpha(tokens.dark.ink, 0.4)
-  ctx.font = fontOf(family, 600, 22)
-  ctx.fillText(label, x, y + 34)
+  context.textAlign = 'left'
+  context.fillStyle = tokens.dark.ink
+  context.font = fontOf(family, 700, 52)
+  context.fillText(value, x, y)
+  context.fillStyle = withAlpha(tokens.dark.ink, 0.4)
+  context.font = fontOf(family, 600, 22)
+  context.fillText(label, x, y + 34)
 }
 
 /** The mini bar chart under the headline, newest bar at full strength. */
-const drawSpark = (ctx: Ctx, family: string, card: ShareCard): void => {
-  const points = card.spark.slice(-SPARK_MAX_POINTS)
+const drawSparkline = (
+  context: CanvasContext,
+  family: string,
+  card: ShareCard,
+): void => {
+  const points = card.sparkline.slice(-SPARKLINE_MAX_POINTS)
   if (points.length === 0) {
     return
   }
   const left = MARGIN
   const width = CANVAS_SIZE - 2 * MARGIN
-  const floor = SPARK_TOP + SPARK_HEIGHT
-  const min = Math.min(...points)
-  const max = Math.max(...points)
-  const range = max - min || 1
+  const floor = SPARKLINE_TOP + SPARKLINE_HEIGHT
   const lastIndex = points.length - 1
 
-  ctx.strokeStyle = withAlpha(tokens.dark.ink, 0.1)
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  ctx.moveTo(left, floor)
-  ctx.lineTo(left + width, floor)
-  ctx.stroke()
+  context.strokeStyle = withAlpha(tokens.dark.ink, 0.1)
+  context.lineWidth = 2
+  context.beginPath()
+  context.moveTo(left, floor)
+  context.lineTo(left + width, floor)
+  context.stroke()
 
-  const barWidth = (width - SPARK_GAP * lastIndex) / points.length
-  const fractionOf = (value: number): number =>
-    points.length === 1
-      ? SPARK_SINGLE_FRACTION
-      : SPARK_BASE_FRACTION + SPARK_SPAN_FRACTION * ((value - min) / range)
+  const barWidth = (width - SPARKLINE_GAP * lastIndex) / points.length
+  const fractionOf = createBarScale(points)
 
   for (const [index, value] of points.entries()) {
-    const barHeight = fractionOf(value) * SPARK_HEIGHT
-    const x = left + index * (barWidth + SPARK_GAP)
-    ctx.globalAlpha = index === lastIndex ? 1 : 0.5
-    ctx.fillStyle = tokens.dark.accent
-    ctx.beginPath()
-    ctx.roundRect(x, floor - barHeight, barWidth, barHeight, [
+    const barHeight = fractionOf(value) * SPARKLINE_HEIGHT
+    const x = left + index * (barWidth + SPARKLINE_GAP)
+    context.globalAlpha = index === lastIndex ? 1 : 0.5
+    context.fillStyle = tokens.dark.accent
+    context.beginPath()
+    context.roundRect(x, floor - barHeight, barWidth, barHeight, [
       BAR_RADIUS,
       BAR_RADIUS,
       0,
       0,
     ])
-    ctx.fill()
+    context.fill()
   }
-  ctx.globalAlpha = 1
+  context.globalAlpha = 1
 
   if (points.length > 1) {
-    const firstBar = fractionOf(points[0]) * SPARK_HEIGHT
-    ctx.textAlign = 'left'
-    ctx.fillStyle = withAlpha(tokens.dark.ink, 0.5)
-    ctx.font = fontOf(family, 600, 24)
-    ctx.fillText(card.sparkFromLabel, left, floor - firstBar - 16)
+    const firstBar = fractionOf(points[0]) * SPARKLINE_HEIGHT
+    context.textAlign = 'left'
+    context.fillStyle = withAlpha(tokens.dark.ink, 0.5)
+    context.font = fontOf(family, 600, 24)
+    context.fillText(card.sparklineFromLabel, left, floor - firstBar - 16)
   }
-  const lastBar = fractionOf(points[lastIndex]) * SPARK_HEIGHT
-  ctx.textAlign = 'right'
-  ctx.fillStyle = tokens.dark.ink
-  ctx.font = fontOf(family, 700, 27)
-  ctx.fillText(card.sparkToLabel, left + width, floor - lastBar - 16)
-  ctx.textAlign = 'left'
+  const lastBar = fractionOf(points[lastIndex]) * SPARKLINE_HEIGHT
+  context.textAlign = 'right'
+  context.fillStyle = tokens.dark.ink
+  context.font = fontOf(family, 700, 27)
+  context.fillText(card.sparklineToLabel, left + width, floor - lastBar - 16)
+  context.textAlign = 'left'
 }
 
-const drawHeader = (ctx: Ctx, family: string, card: ShareCard): void => {
-  ctx.textBaseline = 'alphabetic'
-  ctx.textAlign = 'left'
-  ctx.fillStyle = tokens.dark.ink
-  ctx.font = fontOf(family, 700, 46)
-  ctx.fillText(card.brand, MARGIN, MARGIN + 40)
-  const brandWidth = ctx.measureText(card.brand).width
-  ctx.fillStyle = tokens.dark.accent
-  ctx.beginPath()
-  ctx.arc(MARGIN + brandWidth + 20, MARGIN + 22, 7, 0, Math.PI * 2)
-  ctx.fill()
+const drawHeader = (
+  context: CanvasContext,
+  family: string,
+  card: ShareCard,
+): void => {
+  context.textBaseline = 'alphabetic'
+  context.textAlign = 'left'
+  context.fillStyle = tokens.dark.ink
+  context.font = fontOf(family, 700, 46)
+  context.fillText(card.brand, MARGIN, MARGIN + 40)
+  const brandWidth = context.measureText(card.brand).width
+  context.fillStyle = tokens.dark.accent
+  context.beginPath()
+  context.arc(MARGIN + brandWidth + 20, MARGIN + 22, 7, 0, Math.PI * 2)
+  context.fill()
 
-  ctx.textAlign = 'right'
-  ctx.fillStyle = withAlpha(tokens.dark.ink, 0.45)
-  ctx.font = fontOf(family, 600, 23)
-  ctx.fillText(card.kicker.toUpperCase(), CANVAS_SIZE - MARGIN, MARGIN + 34)
-  ctx.textAlign = 'left'
+  context.textAlign = 'right'
+  context.fillStyle = withAlpha(tokens.dark.ink, 0.45)
+  context.font = fontOf(family, 600, 23)
+  context.fillText(card.kicker.toUpperCase(), CANVAS_SIZE - MARGIN, MARGIN + 34)
+  context.textAlign = 'left'
 }
 
-const drawFooter = (ctx: Ctx, family: string, card: ShareCard): void => {
+const drawFooter = (
+  context: CanvasContext,
+  family: string,
+  card: ShareCard,
+): void => {
   const line = CANVAS_SIZE - 150
-  ctx.strokeStyle = withAlpha(tokens.dark.ink, 0.12)
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  ctx.moveTo(MARGIN, line)
-  ctx.lineTo(CANVAS_SIZE - MARGIN, line)
-  ctx.stroke()
+  context.strokeStyle = withAlpha(tokens.dark.ink, 0.12)
+  context.lineWidth = 2
+  context.beginPath()
+  context.moveTo(MARGIN, line)
+  context.lineTo(CANVAS_SIZE - MARGIN, line)
+  context.stroke()
 
-  ctx.textAlign = 'left'
-  ctx.fillStyle = withAlpha(tokens.dark.ink, 0.8)
-  ctx.font = fontOf(family, 600, 27)
-  ctx.fillText(card.tagline, MARGIN, line + 46)
-  ctx.fillStyle = withAlpha(tokens.dark.ink, 0.32)
-  ctx.font = fontOf(family, 500, 22)
-  ctx.fillText(card.foot, MARGIN, line + 80)
+  context.textAlign = 'left'
+  context.fillStyle = withAlpha(tokens.dark.ink, 0.8)
+  context.font = fontOf(family, 600, 27)
+  context.fillText(card.tagline, MARGIN, line + 46)
+  context.fillStyle = withAlpha(tokens.dark.ink, 0.32)
+  context.font = fontOf(family, 500, 22)
+  context.fillText(card.footer, MARGIN, line + 80)
 
-  ctx.textAlign = 'right'
-  ctx.fillStyle = tokens.dark.accent
-  ctx.font = fontOf(family, 700, 30)
-  ctx.fillText(card.url, CANVAS_SIZE - MARGIN, line + 60)
-  ctx.textAlign = 'left'
+  context.textAlign = 'right'
+  context.fillStyle = tokens.dark.accent
+  context.font = fontOf(family, 700, 30)
+  context.fillText(card.url, CANVAS_SIZE - MARGIN, line + 60)
+  context.textAlign = 'left'
 }
 
 /**
@@ -202,8 +220,8 @@ export const buildShareCanvas = async (
   const canvas = document.createElement('canvas')
   canvas.width = CANVAS_SIZE
   canvas.height = CANVAS_SIZE
-  const ctx = canvas.getContext('2d')
-  if (ctx === null) {
+  const context = canvas.getContext('2d')
+  if (context === null) {
     return null
   }
   try {
@@ -213,9 +231,9 @@ export const buildShareCanvas = async (
   }
   const family = getComputedStyle(document.body).fontFamily || FALLBACK_FAMILY
 
-  ctx.fillStyle = tokens.dark.bg
-  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
-  const glow = ctx.createRadialGradient(
+  context.fillStyle = tokens.dark.bg
+  context.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+  const glow = context.createRadialGradient(
     CANVAS_SIZE * 0.84,
     CANVAS_SIZE * 0.12,
     0,
@@ -225,28 +243,32 @@ export const buildShareCanvas = async (
   )
   glow.addColorStop(0, withAlpha(tokens.dark.accent, 0.2))
   glow.addColorStop(1, withAlpha(tokens.dark.accent, 0))
-  ctx.fillStyle = glow
-  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+  context.fillStyle = glow
+  context.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
-  drawHeader(ctx, family, card)
+  drawHeader(context, family, card)
 
-  ctx.fillStyle = tokens.dark.accent
-  ctx.font = fontOf(family, 600, 26)
-  ctx.fillText(card.kicker.toUpperCase(), MARGIN, 300)
+  context.fillStyle = tokens.dark.accent
+  context.font = fontOf(family, 600, 26)
+  context.fillText(card.kicker.toUpperCase(), MARGIN, KICKER_Y)
 
-  ctx.fillStyle = tokens.dark.ink
-  ctx.font = fontOf(family, 700, 60)
-  ctx.fillText(fitText(ctx, card.name, CANVAS_SIZE - 2 * MARGIN), MARGIN, 384)
+  context.fillStyle = tokens.dark.ink
+  context.font = fontOf(family, 700, 60)
+  context.fillText(
+    fitText(context, card.name, CANVAS_SIZE - 2 * MARGIN),
+    MARGIN,
+    NAME_Y,
+  )
 
-  ctx.font = fontOf(family, 800, 150)
-  ctx.fillText(card.headline, MARGIN, 540)
-  ctx.fillStyle = withAlpha(tokens.dark.ink, 0.45)
-  ctx.font = fontOf(family, 600, 40)
-  ctx.fillText(card.subline, MARGIN, 600)
+  context.font = fontOf(family, 800, 150)
+  context.fillText(card.headline, MARGIN, HEADLINE_Y)
+  context.fillStyle = withAlpha(tokens.dark.ink, 0.45)
+  context.font = fontOf(family, 600, 40)
+  context.fillText(card.subline, MARGIN, SUBLINE_Y)
 
-  drawSpark(ctx, family, card)
-  drawStat(ctx, family, MARGIN, 905, card.statValue, card.statLabel)
-  drawFooter(ctx, family, card)
+  drawSparkline(context, family, card)
+  drawStat(context, family, MARGIN, STAT_Y, card.statValue, card.statLabel)
+  drawFooter(context, family, card)
 
   return canvas
 }
@@ -261,7 +283,7 @@ export const deliverShareImage = async (
   filename: string,
 ): Promise<ShareOutcome> => {
   const blob = await new Promise<Blob | null>((resolve) => {
-    canvas.toBlob((result) => resolve(result), 'image/png', 0.95)
+    canvas.toBlob(resolve, 'image/png')
   })
   if (blob === null) {
     return 'failed'

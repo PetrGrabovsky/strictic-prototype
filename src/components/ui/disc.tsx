@@ -3,28 +3,28 @@ import { cn } from '@/lib/cn'
 
 type Props = {
   children: ReactNode
-  dark?: boolean
   dim?: boolean
+  tone?: 'dark' | 'light'
 }
 
 /**
- * A 38px numbered circle. Filled (accent-outlined) when active; outlined only
- * when `dim`. `dark` swaps to the training-screen palette.
+ * A 36px numbered circle. Filled (accent-outlined) when active; outlined only
+ * when `dim`. `tone="dark"` swaps to the training-screen palette.
  */
-export const Disc = ({ children, dark = false, dim = false }: Props) => {
-  let tone = 'border-accent bg-ink text-white'
+export const Disc = ({ children, dim = false, tone = 'light' }: Props) => {
+  let palette = 'border-accent bg-ink text-surface'
   if (dim) {
-    tone = 'border-line-2 text-accent bg-transparent'
-  } else if (dark) {
-    tone = 'border-accent text-d-ink bg-black'
+    palette = 'border-line-2 text-accent bg-transparent'
+  } else if (tone === 'dark') {
+    palette = 'border-accent text-d-ink bg-d-bg'
   }
 
   return (
     <div
       className={cn(
-        'flex size-9.5 shrink-0 items-center justify-center rounded-full',
+        'flex size-9 shrink-0 items-center justify-center rounded-full',
         'border-2 text-base font-semibold',
-        tone,
+        palette,
       )}
     >
       {children}

@@ -8,8 +8,8 @@ type StepDot = {
 }
 
 type Props = {
-  dark?: boolean
   steps: readonly StepDot[]
+  tone?: 'dark' | 'light'
 }
 
 /**
@@ -17,9 +17,10 @@ type Props = {
  * `aria-hidden` — the textual "exercise x/N" is the accessible source of
  * truth, so this carries no tap targets or labels.
  */
-export const StepDots = ({ dark = false, steps }: Props) => {
-  const filled = dark ? 'bg-d-accent' : 'bg-accent'
-  const track = dark ? 'bg-d-line-2' : 'bg-line-2'
+export const StepDots = ({ steps, tone = 'light' }: Props) => {
+  const isDark = tone === 'dark'
+  const filled = isDark ? 'bg-d-accent' : 'bg-accent'
+  const track = isDark ? 'bg-d-line-2' : 'bg-line-2'
 
   return (
     <div aria-hidden className="mt-1.5 flex gap-1">

@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/cn'
 
@@ -8,7 +6,30 @@ const HOLD_INTERVAL_MS = 80
 
 const MINUS_ICON_PATH = 'M5 12h14'
 const PLUS_ICON_PATH = 'M12 5v14M5 12h14'
-const REPEAT_ICON_SIZE = 19
+const REPEAT_ICON_SIZE = 20
+
+/**
+ * Decimals display with a comma (`7,5`): the app ships Czech only
+ * (`@/i18n/routing`), and the tap-to-type field already reads comma input,
+ * so the resting display must match it. Revisit if a second locale lands.
+ */
+const toDisplayValue = (value: number): string =>
+  String(value).replace('.', ',')
+
+/**
+ * The repeat timer id is a delay `setTimeout` that swaps itself for a
+ * `setInterval`, so a stale id may belong to either — clear both.
+ */
+const clearRepeatTimer = (
+  timer: null | ReturnType<typeof setTimeout>,
+): void => {
+  if (timer === null) {
+    return
+  }
+
+  clearTimeout(timer)
+  clearInterval(timer)
+}
 
 type RepeatButtonProps = {
   ariaLabel: string
@@ -62,7 +83,6 @@ const RepeatButton = ({
 
 type Props = {
   active?: boolean
-  dark?: boolean
   decreaseLabel?: string
   editLabel?: string
   increaseLabel?: string
@@ -70,18 +90,18 @@ type Props = {
   onDecrement: () => void
   onIncrement: () => void
   onSet?: (value: number) => void
+  tone?: 'dark' | 'light'
   value: number
 }
 
 /**
  * A labelled number stepper: −/＋ with press-and-hold auto-repeat, plus an
- * optional tap-to-type field when `onSet` is given. `dark` switches to the
- * training-screen palette. a11y strings for the controls are passed in so the
- * primitive holds no hardcoded copy.
+ * optional tap-to-type field when `onSet` is given. `tone="dark"` switches to
+ * the training-screen palette. a11y strings for the controls are passed in so
+ * the primitive holds no hardcoded copy.
  */
 export const Stepper = ({
   active = false,
-  dark = false,
   decreaseLabel,
   editLabel,
   increaseLabel,
@@ -89,6 +109,7 @@ export const Stepper = ({
   onDecrement,
   onIncrement,
   onSet,
+  tone = 'light',
   value,
 }: Props) => {
   const [isEditing, setIsEditing] = useState(false)
@@ -98,12 +119,7 @@ export const Stepper = ({
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const stopRepeat = (): void => {
-    if (repeatTimer.current === null) {
-      return
-    }
-
-    clearTimeout(repeatTimer.current)
-    clearInterval(repeatTimer.current)
+    clearRepeatTimer(repeatTimer.current)
     repeatTimer.current = null
   }
 
@@ -129,24 +145,16 @@ export const Stepper = ({
   const commit = (): void => {
     const normalized = draft.replace(',', '.').trim()
     const parsed = Number(normalized)
-    if (normalized !== '' && !Number.isNaN(parsed)) {
+    // `isFinite`, not `!isNaN`: typed "Infinity" would survive rounding and
+    // clamping, then corrupt persisted logs (`JSON.stringify` → `null`).
+    if (normalized !== '' && Number.isFinite(parsed)) {
       onSet?.(parsed)
     }
     setIsEditing(false)
   }
 
   // Clear any pending repeat timer if the component unmounts mid-hold.
-  useEffect(
-    () => () => {
-      if (repeatTimer.current === null) {
-        return
-      }
-
-      clearTimeout(repeatTimer.current)
-      clearInterval(repeatTimer.current)
-    },
-    [],
-  )
+  useEffect(() => () => clearRepeatTimer(repeatTimer.current), [])
 
   // Focus the field when edit mode opens (avoids the a11y `autoFocus` pitfall).
   useEffect(() => {
@@ -158,12 +166,13 @@ export const Stepper = ({
     inputRef.current?.select()
   }, [isEditing])
 
-  const labelColor = dark ? 'text-d-ink-3' : 'text-ink-3'
-  const frame = dark ? 'border-d-line-2 bg-d-bg' : 'border-line-2 bg-surface'
-  const iconColor = dark ? 'text-d-ink' : 'text-ink'
-  const divider = dark ? 'border-d-line' : 'border-line'
-  const accentColor = dark ? 'text-d-accent' : 'text-accent'
-  const idleColor = dark ? 'text-d-ink' : 'text-ink'
+  const isDark = tone === 'dark'
+  const labelColor = isDark ? 'text-d-ink-3' : 'text-ink-3'
+  const frame = isDark ? 'border-d-line-2 bg-d-bg' : 'border-line-2 bg-surface'
+  const iconColor = isDark ? 'text-d-ink' : 'text-ink'
+  const divider = isDark ? 'border-d-line' : 'border-line'
+  const accentColor = isDark ? 'text-d-accent' : 'text-accent'
+  const idleColor = isDark ? 'text-d-ink' : 'text-ink'
   const valueColor = active ? accentColor : idleColor
   const fieldClasses = cn(
     'flex-1 border-x py-3 text-center text-xl font-bold tabular-nums',
@@ -202,16 +211,20 @@ export const Stepper = ({
         aria-label={editLabel ?? label}
         className={cn(fieldClasses, valueColor, 'cursor-text bg-transparent')}
         onClick={() => {
-          setDraft(String(value).replace('.', ','))
+          setDraft(toDisplayValue(value))
           setIsEditing(true)
         }}
         type="button"
       >
-        {value}
+        {toDisplayValue(value)}
       </button>
     )
   } else {
-    valueNode = <div className={cn(fieldClasses, valueColor)}>{value}</div>
+    valueNode = (
+      <div className={cn(fieldClasses, valueColor)}>
+        {toDisplayValue(value)}
+      </div>
+    )
   }
 
   return (

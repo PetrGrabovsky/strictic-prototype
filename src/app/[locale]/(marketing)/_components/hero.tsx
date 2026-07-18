@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
+import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/cn'
-import { buttonClass } from './button-classes'
 import { KICKER, LEAD, WRAP } from './landing-styles'
 import { PhoneMock } from './phone-mock'
 import { StartButton } from './start-button'
@@ -23,40 +23,31 @@ export const Hero = async () => {
   const t = await getTranslations('landing')
 
   return (
-    <section
-      className="scroll-mt-19 pt-19.5 pb-16.5"
-      data-sticky-after
-      id="zacit"
-    >
+    <section className="scroll-mt-20 pt-20 pb-16" data-sticky-after id="zacit">
       <div
         className={cn(
           WRAP,
           'grid grid-cols-1 gap-10',
-          'min-[860px]:grid-cols-[1.05fr_0.9fr]',
-          'min-[860px]:items-center min-[860px]:gap-13',
+          'split:grid-cols-[1.05fr_0.9fr]',
+          'split:items-center split:gap-13',
         )}
       >
         <div className="hero-rise">
           <span className={KICKER}>{t('hero.kicker')}</span>
-          <h1
-            className={cn(
-              'mb-4.5 text-[clamp(34px,5.6vw,56px)] font-extrabold',
-              'leading-[1.12] tracking-tight',
-            )}
-          >
+          <h1 className="text-display mb-4 font-extrabold tracking-tight">
             {t.rich('hero.h1', { em: renderEm })}
           </h1>
           <p className="text-accent-deep mb-2 text-lg font-semibold">
             {t('hero.slogan')}
           </p>
           <p className={cn(LEAD, 'mb-7')}>{t('hero.lead')}</p>
-          <div className="flex flex-wrap gap-2.5 max-[560px]:flex-col">
-            <StartButton
-              className="max-[560px]:w-full"
-              label={t('cta.start')}
-            />
+          <div className="max-phone:flex-col flex flex-wrap gap-2.5">
+            <StartButton className="max-phone:w-full" label={t('cta.start')} />
             <a
-              className={buttonClass('ghost', 'max-[560px]:w-full')}
+              className={cn(
+                buttonVariants({ size: 'lg', variant: 'ghost' }),
+                'max-phone:w-full',
+              )}
               href="#jak"
             >
               {t('cta.how')}
@@ -67,7 +58,7 @@ export const Hero = async () => {
           </span>
           <ul
             className={cn(
-              'mt-6.5 flex list-none flex-wrap gap-x-4.5 gap-y-2',
+              'mt-6 flex list-none flex-wrap gap-x-4 gap-y-2',
               'text-ink-3 text-xs tracking-wide',
             )}
           >

@@ -9,9 +9,9 @@ import {
   STANDARD_KETTLEBELL_WEIGHTS,
 } from '@/features/onboarding/lib/wizard'
 import { cn } from '@/lib/cn'
+import { MICRO_LABEL } from '@/styles/type'
 import type { BandLevel, Equipment, EquipmentId } from '@/types/equipment'
-import { FIELD_LABEL } from './onboarding-styles'
-import { SelectableChip } from './selectable-chip'
+import { SelectableChip } from './selectable'
 import { StepHeader } from './step-header'
 import { WeightPicker } from './weight-picker'
 
@@ -161,7 +161,7 @@ export const EquipmentStep = ({ equipment, onChange }: Props) => {
 
       {equipment.bands.available ? (
         <div className="border-line mt-6 border-t pt-5">
-          <h2 className={FIELD_LABEL}>{t('bands.label')}</h2>
+          <h2 className={cn(MICRO_LABEL, 'text-ink-2')}>{t('bands.label')}</h2>
           <p className="text-ink-3 mt-1 text-sm leading-relaxed">
             {t('bands.hint')}
           </p>

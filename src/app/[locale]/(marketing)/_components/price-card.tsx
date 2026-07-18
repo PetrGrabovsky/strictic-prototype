@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
+import { cardVariants } from '@/components/ui/card'
 import { cn } from '@/lib/cn'
-import type { ButtonVariant } from './button-classes'
-import { StartButton } from './start-button'
+import { StartButton, type StartButtonVariant } from './start-button'
 
 const PRICE_LI = 'border-t border-line py-2 text-sm text-ink-2'
 
@@ -12,7 +12,7 @@ type Feature = Readonly<{
 
 type Props = Readonly<{
   ctaLabel: string
-  ctaVariant?: ButtonVariant
+  ctaVariant?: StartButtonVariant
   featured?: boolean
   features: readonly Feature[]
   note?: string
@@ -41,8 +41,9 @@ export const PriceCard = ({
 }: Props) => (
   <div
     className={cn(
-      'bg-surface flex flex-col rounded-lg p-7',
-      featured ? 'border-accent relative border-2' : 'border-line border',
+      cardVariants({ inset: 'lg' }),
+      'flex flex-col',
+      featured && 'border-accent relative border-2',
     )}
   >
     {tag ? (
@@ -56,12 +57,12 @@ export const PriceCard = ({
         {tag}
       </span>
     ) : null}
-    <h3 className="mb-1 text-lg leading-[1.12] tracking-tight">{title}</h3>
+    <h3 className="leading-heading mb-1 text-lg tracking-tight">{title}</h3>
     <div className="mt-1.5 mb-0.5 text-2xl font-extrabold">
       {price} <small className="text-ink-3 text-sm font-medium">{period}</small>
     </div>
     <div className="text-ink-3 mb-4 text-xs">{sub}</div>
-    <ul className="mb-5.5 flex-1 list-none">
+    <ul className="mb-5 flex-1 list-none">
       {features.map((feature) => (
         <li className={PRICE_LI} key={feature.id}>
           <span aria-hidden className="text-green">

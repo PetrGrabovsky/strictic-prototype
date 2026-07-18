@@ -1,17 +1,15 @@
 /**
- * Storage keys — the localStorage namespace for each island of data. Values
- * are kept verbatim from the reference (`fitcoach:*`) as the on-disk wire
- * format; only the constant names are spelled out (the reference used
- * PKEY/EKEY/SKEY/HKEY/CKEY). A future rename to a `strictic:*` prefix is a
- * one-off migration, deliberately not done here to keep parity with the
- * reference's data shapes.
+ * Storage keys — the localStorage namespace for each island of data. All on
+ * the app's own `strictic:` prefix at `v1`: there are no real users before
+ * launch, so the old reference-era `fitcoach:*` keys were dropped rather than
+ * migrated, and Etapa 6 maps each key to its Supabase table.
  */
-export const PROGRESS_STORAGE_KEY = 'fitcoach:progress:v5'
-export const EQUIPMENT_STORAGE_KEY = 'fitcoach:equip:v2'
-export const SESSION_STORAGE_KEY = 'fitcoach:session:v1'
-export const HISTORY_STORAGE_KEY = 'fitcoach:history:v1'
-export const COACH_STORAGE_KEY = 'fitcoach:coach:v1'
-export const PLAN_STORAGE_KEY = 'fitcoach:plan:v1'
+export const PROGRESS_STORAGE_KEY = 'strictic:progress:v1'
+export const PROFILE_STORAGE_KEY = 'strictic:profile:v1'
+export const SESSION_STORAGE_KEY = 'strictic:session:v1'
+export const HISTORY_STORAGE_KEY = 'strictic:history:v1'
+export const COACH_STORAGE_KEY = 'strictic:coach:v1'
+export const PLAN_STORAGE_KEY = 'strictic:plan:v1'
 
 /**
  * Free-tier limits (blueprint §2.3 / §4). The deterministic core is free

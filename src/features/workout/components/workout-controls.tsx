@@ -1,15 +1,17 @@
 import { useTranslations } from 'next-intl'
-import { StepDots } from '@/components/ui/step-dots'
-import type { StepDotStatus } from '@/components/ui/step-dots'
+import { IconButton } from '@/components/ui/icon-button'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   FeatherIcon,
   VolumeOffIcon,
   VolumeOnIcon,
-} from '@/features/workout/components/icons'
-import { formatClock } from '@/features/workout/lib/format'
+} from '@/components/ui/icons'
+import { StepDots } from '@/components/ui/step-dots'
+import type { StepDotStatus } from '@/components/ui/step-dots'
 import { cn } from '@/lib/cn'
+import { formatClock } from '@/lib/format'
+import { SECTION_LABEL } from '@/styles/type'
 
 type Step = {
   id: string
@@ -29,12 +31,6 @@ type Props = {
   steps: readonly Step[]
   total: number
 }
-
-/** 44px tap target (WCAG 2.5.5) for the icon controls in the top bar. */
-const ICON_BUTTON = cn(
-  'flex size-11 shrink-0 items-center justify-center',
-  'touch-manipulation',
-)
 
 /**
  * The workout's own sticky sub-bar under the app header: exercise navigation,
@@ -56,27 +52,26 @@ export const WorkoutControls = ({
   const t = useTranslations('workout')
 
   return (
+    // `top-14` matches the `h-14` AppHeader this bar sticks directly beneath.
     <div className="bg-d-bg border-d-line sticky top-14 z-20 border-b px-5 pt-2 pb-2.5">
       <div className="mx-auto flex w-full max-w-md items-center justify-between">
         <div className="flex items-center">
-          <button
-            aria-label={t('previousExercise')}
-            className={cn(ICON_BUTTON, 'text-d-ink disabled:opacity-30')}
+          <IconButton
+            className="text-d-ink disabled:opacity-30"
             disabled={!canGoPrevious}
+            label={t('previousExercise')}
             onClick={onPrevious}
-            type="button"
           >
             <ChevronLeftIcon size={20} />
-          </button>
-          <button
-            aria-label={t('nextExercise')}
-            className={cn(ICON_BUTTON, 'text-d-ink disabled:opacity-30')}
+          </IconButton>
+          <IconButton
+            className="text-d-ink disabled:opacity-30"
             disabled={!canGoNext}
+            label={t('nextExercise')}
             onClick={onNext}
-            type="button"
           >
             <ChevronRightIcon size={20} />
-          </button>
+          </IconButton>
         </div>
 
         <div className="text-d-ink-2 font-mono text-xs tracking-wide tabular-nums">
@@ -88,27 +83,26 @@ export const WorkoutControls = ({
           {isEasy ? (
             <span
               className={cn(
+                SECTION_LABEL,
                 'text-d-accent inline-flex items-center gap-1',
-                'font-mono text-xs tracking-wide uppercase',
               )}
             >
-              <FeatherIcon size={13} />
+              <FeatherIcon size={14} />
               {t('lighter')}
             </span>
           ) : null}
-          <button
-            aria-label={t(isMuted ? 'soundOn' : 'soundOff')}
-            className={cn(ICON_BUTTON, 'text-d-ink-2')}
+          <IconButton
+            className="text-d-ink-2"
+            label={t(isMuted ? 'soundOn' : 'soundOff')}
             onClick={onToggleMute}
-            type="button"
           >
             {isMuted ? <VolumeOffIcon /> : <VolumeOnIcon />}
-          </button>
+          </IconButton>
         </div>
       </div>
 
       <div className="mx-auto w-full max-w-md">
-        <StepDots dark steps={steps} />
+        <StepDots steps={steps} tone="dark" />
       </div>
     </div>
   )

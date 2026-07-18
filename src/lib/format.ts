@@ -19,7 +19,7 @@ const TONNE_IN_KG = 1000
  * Weight with its unit, locale-formatted, e.g. `16 kg`, `17,5 kg` (cs). Use
  * for a single working weight (per hand where the exercise is per-hand).
  */
-export const fmtKg = (format: Formatter, kg: number): string =>
+export const formatKg = (format: Formatter, kg: number): string =>
   format.number(kg, {
     style: 'unit',
     unit: 'kilogram',
@@ -32,7 +32,7 @@ export const fmtKg = (format: Formatter, kg: number): string =>
  * `5,4 t` (cs). The `t` symbol is appended literally — `tonne` is not an
  * Intl-sanctioned unit — while the number itself is still locale-formatted.
  */
-export const fmtVol = (format: Formatter, kg: number): string =>
+export const formatVolume = (format: Formatter, kg: number): string =>
   kg >= TONNE_IN_KG
     ? `${format.number(kg / TONNE_IN_KG, { maximumFractionDigits: 1 })} t`
     : format.number(kg, {
@@ -46,7 +46,7 @@ export const fmtVol = (format: Formatter, kg: number): string =>
  * Workout length from seconds, e.g. `1 h 34 min`, `45 min`, `< 1 min` (cs).
  * Hours and minutes use Intl unit formatting so the labels localize too.
  */
-export const fmtDur = (format: Formatter, seconds: number): string => {
+export const formatDuration = (format: Formatter, seconds: number): string => {
   const totalMinutes = Math.max(0, Math.round(seconds / 60))
   const hours = Math.floor(totalMinutes / 60)
   const minutes = totalMinutes % 60
@@ -70,8 +70,34 @@ export const fmtDur = (format: Formatter, seconds: number): string => {
 }
 
 /** Short day-and-month date, e.g. `14. 7.` (cs). Accepts ms or a `Date`. */
-export const fmtDateShort = (format: Formatter, date: Date | number): string =>
+export const formatShortDate = (
+  format: Formatter,
+  date: Date | number,
+): string =>
   format.dateTime(typeof date === 'number' ? new Date(date) : date, {
     day: 'numeric',
     month: 'numeric',
   })
+
+const SECONDS_PER_MINUTE = 60
+const SECONDS_PER_HOUR = 3600
+
+const pad = (value: number): string => String(value).padStart(2, '0')
+
+/**
+ * A digital clock for the elapsed-time and rest displays: `m:ss`, growing to
+ * `h:mm:ss` only past an hour. Locale-independent (the digits are the same in
+ * every language) and Intl-free, so unlike the helpers above it takes no
+ * `Formatter`. Pair with a `tabular-nums` class so the digits never shift
+ * width as they tick (BUILD-GUIDE §4).
+ */
+export const formatClock = (totalSeconds: number): string => {
+  const safe = Math.max(0, Math.floor(totalSeconds))
+  const hours = Math.floor(safe / SECONDS_PER_HOUR)
+  const minutes = Math.floor((safe % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE)
+  const seconds = safe % SECONDS_PER_MINUTE
+  if (hours > 0) {
+    return `${hours}:${pad(minutes)}:${pad(seconds)}`
+  }
+  return `${minutes}:${pad(seconds)}`
+}

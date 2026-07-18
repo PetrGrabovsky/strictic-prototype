@@ -3,14 +3,14 @@ import type { PlannedItem } from '@/features/onboarding/lib/engine-types'
 import type { ExercisePattern } from '@/types/exercise'
 import type { PlanExercise } from '@/types/plan'
 
-const WARMUP_MIN = 6
-const PER_EXERCISE_MIN_FACTOR = 0.75
-const SECONDS_PER_MIN = 60
-const DEFAULT_WORK_S = 40
+const WARMUP_MINUTES = 6
+const PER_EXERCISE_MINUTES_FACTOR = 0.75
+const SECONDS_PER_MINUTE = 60
+const DEFAULT_WORK_SECONDS = 40
 
-const ISOLATION_TRIM_REST_S = 60
+const ISOLATION_TRIM_REST_SECONDS = 60
 const MIN_ACCESSORY_SETS = 2
-const MIN_COMPOUND_REST_S = 90
+const MIN_COMPOUND_REST_SECONDS = 90
 const UNRANKED = 99
 
 /**
@@ -37,15 +37,15 @@ const OPTIONAL_COMPOUND_PATTERNS: ReadonlySet<ExercisePattern> = new Set([
 ])
 
 const minutesFrom = (count: number, workingSeconds: number): number =>
-  WARMUP_MIN +
-  Math.round(PER_EXERCISE_MIN_FACTOR * count) +
-  Math.ceil(workingSeconds / SECONDS_PER_MIN)
+  WARMUP_MINUTES +
+  Math.round(PER_EXERCISE_MINUTES_FACTOR * count) +
+  Math.ceil(workingSeconds / SECONDS_PER_MINUTE)
 
 /** Session time estimate (spec hard rule 7 formula) for planned items. */
 export const estimateMinutes = (items: readonly PlannedItem[]): number => {
   let working = 0
   for (const item of items) {
-    working += item.sets * (item.exercise.secondsPerSetEst + item.restS)
+    working += item.sets * (item.exercise.secondsPerSetEst + item.restSeconds)
   }
   return minutesFrom(items.length, working)
 }
@@ -57,7 +57,8 @@ export const estimateMinutesFromPlan = (
   let working = 0
   for (const exercise of exercises) {
     const workSeconds =
-      getExercise(exercise.exercise_id)?.secondsPerSetEst ?? DEFAULT_WORK_S
+      getExercise(exercise.exercise_id)?.secondsPerSetEst ??
+      DEFAULT_WORK_SECONDS
     working += exercise.sets * (workSeconds + exercise.rest_s)
   }
   return minutesFrom(exercises.length, working)
@@ -65,8 +66,8 @@ export const estimateMinutesFromPlan = (
 
 const lowerIsolationRest = (items: readonly PlannedItem[]): PlannedItem[] =>
   items.map((item) =>
-    item.role === 'accessory' && item.restS > ISOLATION_TRIM_REST_S
-      ? { ...item, restS: ISOLATION_TRIM_REST_S }
+    item.role === 'accessory' && item.restSeconds > ISOLATION_TRIM_REST_SECONDS
+      ? { ...item, restSeconds: ISOLATION_TRIM_REST_SECONDS }
       : item,
   )
 
@@ -79,8 +80,8 @@ const lowerAccessorySets = (items: readonly PlannedItem[]): PlannedItem[] =>
 
 const lowerCompoundRest = (items: readonly PlannedItem[]): PlannedItem[] =>
   items.map((item) =>
-    item.role === 'compound' && item.restS > MIN_COMPOUND_REST_S
-      ? { ...item, restS: MIN_COMPOUND_REST_S }
+    item.role === 'compound' && item.restSeconds > MIN_COMPOUND_REST_SECONDS
+      ? { ...item, restSeconds: MIN_COMPOUND_REST_SECONDS }
       : item,
   )
 
@@ -107,16 +108,16 @@ const lowestValueAccessoryIndex = (items: readonly PlannedItem[]): number => {
 
 const dropWhileOver = (
   items: readonly PlannedItem[],
-  budgetMin: number,
+  budgetMinutes: number,
   pickIndex: (items: readonly PlannedItem[]) => number,
 ): readonly PlannedItem[] => {
   let current: readonly PlannedItem[] = items
-  while (estimateMinutes(current) > budgetMin) {
+  while (estimateMinutes(current) > budgetMinutes) {
     const index = pickIndex(current)
     if (index === -1) {
       break
     }
-    current = current.filter((_item, i) => i !== index)
+    current = current.filter((_item, position) => position !== index)
   }
   return current
 }
@@ -137,22 +138,22 @@ const optionalCompoundIndex = (items: readonly PlannedItem[]): number =>
  */
 export const fitToBudget = (
   items: readonly PlannedItem[],
-  budgetMin: number,
+  budgetMinutes: number,
 ): readonly PlannedItem[] => {
   let current: readonly PlannedItem[] = items
-  if (estimateMinutes(current) <= budgetMin) {
+  if (estimateMinutes(current) <= budgetMinutes) {
     return current
   }
   current = lowerIsolationRest(current)
-  if (estimateMinutes(current) <= budgetMin) {
+  if (estimateMinutes(current) <= budgetMinutes) {
     return current
   }
   current = lowerAccessorySets(current)
-  current = dropWhileOver(current, budgetMin, lowestValueAccessoryIndex)
-  if (estimateMinutes(current) <= budgetMin) {
+  current = dropWhileOver(current, budgetMinutes, lowestValueAccessoryIndex)
+  if (estimateMinutes(current) <= budgetMinutes) {
     return current
   }
   current = lowerCompoundRest(current)
   current = lowerAllSets(current)
-  return dropWhileOver(current, budgetMin, optionalCompoundIndex)
+  return dropWhileOver(current, budgetMinutes, optionalCompoundIndex)
 }

@@ -1,5 +1,6 @@
-const CARD = 'rounded-md border border-line bg-surface p-6'
-const CARD_H3 = 'mb-2 text-lg leading-[1.12] tracking-tight'
+import { Card } from '@/components/ui/card'
+
+const CARD_H3 = 'mb-2 text-lg leading-heading tracking-tight'
 const CARD_P = 'text-sm text-ink-2'
 
 type Props = Readonly<{
@@ -12,8 +13,8 @@ type Props = Readonly<{
  * the problem, features and audience grids.
  */
 export const InfoCard = ({ body, title }: Props) => (
-  <div className={CARD}>
+  <Card inset="lg">
     <h3 className={CARD_H3}>{title}</h3>
     <p className={CARD_P}>{body}</p>
-  </div>
+  </Card>
 )

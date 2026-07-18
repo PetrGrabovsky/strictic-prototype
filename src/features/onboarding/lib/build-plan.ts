@@ -5,7 +5,7 @@ import {
   planName,
   scalingNote,
   WARMUP_CS,
-  whyFor,
+  whyThisForYou,
 } from '@/features/onboarding/lib/copy'
 import type {
   EngineContext,
@@ -86,13 +86,13 @@ const toPlanExercise = (
   goal: EngineContext['goal'],
 ): PlanExercise => ({
   exercise_id: item.exercise.id,
-  hold_s: item.holdS,
+  hold_s: item.holdSeconds,
   reps: item.reps,
-  rest_s: item.restS,
+  rest_s: item.restSeconds,
   scaling_note_cs: scalingNote(item.note),
   sets: item.sets,
   start_weight_kg: item.startWeightKg,
-  why_this_for_you_cs: whyFor(item.exercise, goal),
+  why_this_for_you_cs: whyThisForYou(item.exercise, goal),
 })
 
 /**
@@ -101,34 +101,34 @@ const toPlanExercise = (
  * contract ({@link Plan}). Pure — no I/O, no framework, no LLM.
  */
 export const buildPlan = (input: PlanInput): Plan => {
-  const ctx = buildContext(input)
+  const context = buildContext(input)
   const selection = capAccessories(
-    buildSelection(ctx),
-    MAX_EXERCISES[ctx.experience],
+    buildSelection(context),
+    MAX_EXERCISES[context.experience],
   )
-  const prescribed = prescribeAll(selection, ctx, input.equipment)
+  const prescribed = prescribeAll(selection, context, input.equipment)
   const items = fitToBudget(prescribed, input.time.minutesPerSession)
   const frequency = frequencyFor(input.time.daysPerWeekAvailable)
 
-  const excludedPatterns: ExercisePattern[] = ctx.restrictions.shoulder
+  const excludedPatterns: ExercisePattern[] = context.restrictions.shoulder
     ? ['push_v']
     : []
 
   const meta: PlanMeta = {
-    coach_summary_cs: coachSummary(ctx.goal, frequency),
-    detected_constraints: detectedConstraints(ctx.restrictions),
+    coach_summary_cs: coachSummary(context.goal, frequency),
+    detected_constraints: detectedConstraints(context.restrictions),
     excluded_patterns: excludedPatterns,
     frequency_per_week: frequency,
-    goal_primary: ctx.goal,
-    honest_notes_cs: honestNotes(ctx.goal),
-    plan_name_cs: planName(ctx.goal, frequency),
+    goal_primary: context.goal,
+    honest_notes_cs: honestNotes(context.goal),
+    plan_name_cs: planName(context.goal, frequency),
     session_time_est_min: estimateMinutes(items),
     split: 'full_body',
   }
 
   return {
     meta,
-    plan: items.map((item) => toPlanExercise(item, ctx.goal)),
+    plan: items.map((item) => toPlanExercise(item, context.goal)),
     warmup_cs: WARMUP_CS,
   }
 }

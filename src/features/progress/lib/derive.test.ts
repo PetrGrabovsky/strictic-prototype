@@ -32,8 +32,8 @@ describe('deriveProgress — per-exercise', () => {
     expect(exercises).toHaveLength(1)
     const [only] = exercises
     expect(only.trend).toBe('start')
-    expect(only.wDeltaPct).toBe(0)
-    expect(only.e1DeltaPct).toBe(0)
+    expect(only.weightGainPercent).toBe(0)
+    expect(only.strengthGainPercent).toBe(0)
     expect(only.first).toEqual(only.last)
     expect(only.series).toHaveLength(1)
   })
@@ -46,9 +46,9 @@ describe('deriveProgress — per-exercise', () => {
     const [only] = deriveProgress(['goblet_squat'], history, NOW).exercises
 
     expect(only.trend).toBe('up')
-    expect(only.wDeltaPct).toBe(20) // 20 → 24 kg
-    expect(only.first.w).toBe(20)
-    expect(only.last.w).toBe(24)
+    expect(only.weightGainPercent).toBe(20) // 20 → 24 kg
+    expect(only.first.weightKg).toBe(20)
+    expect(only.last.weightKg).toBe(24)
   })
 
   it('flags a drop and a hold distinctly', () => {

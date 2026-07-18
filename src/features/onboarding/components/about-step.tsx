@@ -1,9 +1,8 @@
 import { useTranslations } from 'next-intl'
 import type { Capabilities, Experience, Sex } from '@/features/onboarding/types'
 import { cn } from '@/lib/cn'
-import { ChoiceCard } from './choice-card'
-import { FIELD_LABEL } from './onboarding-styles'
-import { SelectableChip } from './selectable-chip'
+import { MICRO_LABEL } from '@/styles/type'
+import { ChoiceCard, SelectableChip } from './selectable'
 import { StepHeader } from './step-header'
 
 type Props = {
@@ -38,7 +37,7 @@ const PULLUP_OPTIONS: readonly Capabilities['pullupsNow'][] = [
   'unknown',
 ]
 
-const LEGEND_CLASS = cn(FIELD_LABEL, 'mb-3')
+const LEGEND_CLASS = cn(MICRO_LABEL, 'text-ink-2 mb-3')
 
 /**
  * Step 2 — the personalization the deterministic engine actually reads: sex

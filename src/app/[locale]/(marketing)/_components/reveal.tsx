@@ -54,7 +54,7 @@ export const Reveal = ({ children, className }: Props) => {
         isVisible
           ? 'opacity-100'
           : cn(
-              'translate-y-4.5 opacity-0',
+              'translate-y-4 opacity-0',
               'motion-reduce:translate-y-0 motion-reduce:opacity-100',
             ),
         className,

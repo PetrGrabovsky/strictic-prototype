@@ -1,9 +1,9 @@
 import type { z } from 'zod'
 import {
   COACH_STORAGE_KEY,
-  EQUIPMENT_STORAGE_KEY,
   HISTORY_STORAGE_KEY,
   PLAN_STORAGE_KEY,
+  PROFILE_STORAGE_KEY,
   PROGRESS_STORAGE_KEY,
   SESSION_STORAGE_KEY,
 } from '@/lib/constants'
@@ -81,10 +81,10 @@ const remove = (key: string): void => {
 }
 
 export const loadProfile = async (): Promise<null | Profile> =>
-  read(EQUIPMENT_STORAGE_KEY, profileSchema)
+  read(PROFILE_STORAGE_KEY, profileSchema)
 
 export const saveProfile = async (value: Profile): Promise<void> => {
-  write(EQUIPMENT_STORAGE_KEY, value)
+  write(PROFILE_STORAGE_KEY, value)
 }
 
 export const loadPlan = async (): Promise<null | Plan> =>

@@ -86,9 +86,9 @@ const MarketingPage = async ({ params }: Props) => {
 
       <a
         className={cn(
-          'sr-only rounded-br-[10px] focus:not-sr-only',
-          'focus:absolute focus:top-0 focus:left-0 focus:z-100',
-          'focus:bg-ink focus:px-4 focus:py-2.5 focus:text-white',
+          'sr-only rounded-ee-md focus:not-sr-only',
+          'focus:absolute focus:inset-s-0 focus:top-0 focus:z-100',
+          'focus:bg-ink focus:text-surface focus:px-4 focus:py-2.5',
         )}
         href="#content"
       >

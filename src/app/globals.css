@@ -1,6 +1,16 @@
 @import 'tailwindcss';
 
 @theme {
+  /*
+   * Breakpoints — the three responsive moments the product actually has.
+   * `phone` is where stacked CTAs unstack, `nav` is where the desktop nav
+   * and multi-column grids appear, `split` is where hero-style two-column
+   * layouts engage. Use `nav:`/`max-nav:` etc. — never a raw `min-[…px]`.
+   */
+  --breakpoint-phone: 560px;
+  --breakpoint-nav: 760px;
+  --breakpoint-split: 860px;
+
   /* Colors — light mode */
   --color-bg: #f4f4f2;
   --color-surface: #ffffff;
@@ -27,7 +37,7 @@
   --color-d-accent: #ff5a2c;
   --color-d-green: #4fb06a;
 
-  /* Typography scale — 7 tokens, no free-floating values */
+  /* Typography scale — fixed sizes, no free-floating values */
   --text-2xs: 0.625rem; /* 10px */
   --text-xs: 0.75rem; /* 12px */
   --text-sm: 0.875rem; /* 14px */
@@ -35,6 +45,17 @@
   --text-lg: 1.1875rem; /* 19px */
   --text-xl: 1.5rem; /* 24px */
   --text-2xl: 2.125rem; /* 34px */
+
+  /* Fluid display sizes — the hero h1, section h2s, the rest timer */
+  --text-display: clamp(2.125rem, 5.6vw, 3.5rem); /* 34–56px */
+  --text-display--line-height: 1.12;
+  --text-title: clamp(1.625rem, 4vw, 2.375rem); /* 26–38px */
+  --text-title--line-height: 1.12;
+  --text-timer: clamp(2.75rem, 16vw, 4.25rem); /* rest countdown */
+  --text-timer--line-height: 1;
+
+  /* Display line-height for headings set in a fixed size (card h3s) */
+  --leading-heading: 1.12;
 
   /* Tracking (letter-spacing) — 3 tokens, no free-floating values */
   --tracking-tight: -0.02em; /* display headings */
@@ -47,9 +68,18 @@
   --radius-lg: 1.125rem; /* 18px */
   --radius-full: 999px;
 
-  /* Card elevation (DESIGN-SYSTEM §6) — first use: the Progress hero cards. */
+  /* Elevation (DESIGN-SYSTEM §6) — one token per elevated surface species. */
   --shadow-card:
     0 1px 2px rgb(10 10 10 / 0.04), 0 20px 44px -24px rgb(10 10 10 / 0.18);
+  /* The auth bottom sheet, thrown upward from the screen edge. */
+  --shadow-sheet: 0 -8px 40px rgb(10 10 10 / 0.18);
+  /* The floating share-feedback pill on Progress. */
+  --shadow-toast: 0 10px 34px -8px rgb(10 10 10 / 0.55);
+  /* The landing phone mock: drop shadow plus its inset bezel ring. */
+  --shadow-phone: 0 24px 60px rgb(10 10 10 / 0.28), inset 0 0 0 6px #111;
+
+  /* Motion — the one deceleration curve every slide/entrance shares. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
@@ -99,7 +129,7 @@ html {
 
   .hero-rise > * {
     opacity: 0;
-    animation: strictic-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: strictic-rise 0.6s var(--ease-out-expo) forwards;
   }
   .hero-rise > *:nth-child(1) {
     animation-delay: 0.05s;

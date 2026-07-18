@@ -31,12 +31,12 @@ export const ManifestoSection = async () => {
   return (
     <ContentSection className="bg-d-bg text-d-ink">
       <SectionHeading
-        dark
         kicker={t('manifesto.kicker')}
         lead={t('manifesto.lead')}
         title={t('manifesto.h2')}
+        tone="dark"
       />
-      <div className="mt-8.5 grid grid-cols-1 gap-4 min-[760px]:grid-cols-2">
+      <div className="nav:grid-cols-2 mt-8 grid grid-cols-1 gap-4">
         {COLUMNS.map((column) => (
           <div
             className="border-d-line bg-d-card rounded-md border p-6"

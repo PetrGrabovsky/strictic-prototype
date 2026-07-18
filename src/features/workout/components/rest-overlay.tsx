@@ -1,11 +1,10 @@
-'use client'
-
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
-import { ActionButton } from '@/features/workout/components/action-button'
-import { ChevronRightIcon, PlayIcon } from '@/features/workout/components/icons'
-import { formatClock } from '@/features/workout/lib/format'
+import { Button } from '@/components/ui/button'
+import { ChevronRightIcon, PlayIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/cn'
+import { formatClock } from '@/lib/format'
+import { MICRO_LABEL, SECTION_LABEL } from '@/styles/type'
 
 type Props = {
   ctaLabel: string
@@ -66,16 +65,16 @@ export const RestOverlay = ({
       className={cn(
         'fixed inset-0 z-50 m-0 h-dvh max-h-none w-screen max-w-none border-0',
         'flex flex-col items-center justify-between',
-        'touch-manipulation bg-black px-6 pt-10 pb-8',
+        'bg-d-bg touch-manipulation px-6 pt-10 pb-8',
       )}
       onCancel={(event) => event.preventDefault()}
       ref={dialogRef}
     >
       <div className="flex flex-col items-center gap-1">
-        <span className="font-mono text-xs tracking-widest text-white/60 uppercase">
+        <span className={cn(SECTION_LABEL, 'text-d-ink-2')}>
           {t(isEasy ? 'rest.titleEasy' : 'rest.title')}
         </span>
-        <span className="text-2xs font-mono tracking-wide text-white/50 uppercase tabular-nums">
+        <span className={cn(MICRO_LABEL, 'text-d-ink-3 tabular-nums')}>
           {t('rest.total', { time: formatClock(elapsedSeconds) })}
         </span>
       </div>
@@ -91,7 +90,7 @@ export const RestOverlay = ({
             cy="120"
             fill="none"
             r={RADIUS}
-            stroke="rgba(255,255,255,0.08)"
+            stroke="var(--color-d-line)"
             strokeWidth="9"
           />
           <circle
@@ -99,7 +98,7 @@ export const RestOverlay = ({
             cy="120"
             fill="none"
             r={RADIUS}
-            stroke={isOver ? 'rgba(255,255,255,0.3)' : 'var(--color-d-accent)'}
+            stroke={isOver ? 'var(--color-d-ink-3)' : 'var(--color-d-accent)'}
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={dashOffset}
             strokeLinecap="round"
@@ -111,9 +110,8 @@ export const RestOverlay = ({
           <span
             aria-live="off"
             className={cn(
-              'font-mono leading-none font-bold tabular-nums',
-              'text-[clamp(2.75rem,16vw,4.25rem)]',
-              isOver ? 'text-d-accent' : 'text-white',
+              'text-timer font-mono font-bold tabular-nums',
+              isOver ? 'text-d-accent' : 'text-d-ink',
             )}
             role="timer"
           >
@@ -121,8 +119,9 @@ export const RestOverlay = ({
           </span>
           <span
             className={cn(
-              'mt-2 font-mono text-xs tracking-widest uppercase',
-              isOver ? 'text-d-accent' : 'text-white/60',
+              SECTION_LABEL,
+              'mt-2',
+              isOver ? 'text-d-accent' : 'text-d-ink-2',
             )}
           >
             {t(isOver ? 'rest.go' : 'rest.remaining')}
@@ -132,44 +131,35 @@ export const RestOverlay = ({
 
       <div className="flex w-full max-w-md flex-col items-center gap-4">
         <div className="flex min-h-11 flex-col items-center gap-1 text-center">
-          <span className="font-mono text-xs tracking-widest text-white/50 uppercase">
-            {heading}
-          </span>
-          <span className="text-base text-white/70 tabular-nums">
+          <span className={cn(SECTION_LABEL, 'text-d-ink-3')}>{heading}</span>
+          <span className="text-d-ink-2 text-base tabular-nums">
             {name}
             {detail === '' ? '' : ' · '}
-            <span className="font-semibold text-white">{detail}</span>
+            <span className="text-d-ink font-semibold">{detail}</span>
           </span>
         </div>
 
         <div className="flex w-full items-stretch gap-2.5">
           {isOver ? null : (
-            <button
+            <Button
               aria-label={t('rest.addTime')}
-              className={cn(
-                'flex shrink-0 items-center justify-center rounded-md px-5',
-                'border border-white/20 bg-white/5 font-mono text-sm font-semibold',
-                'touch-manipulation text-white',
-              )}
+              className="shrink-0 px-5 font-mono text-sm"
               onClick={onAddTime}
-              type="button"
+              size="lg"
+              tone="dark"
+              variant="ghost"
             >
               {t('rest.addTimeShort')}
-            </button>
+            </Button>
           )}
-          <ActionButton
-            block={false}
-            className="flex-1"
-            onClick={onContinue}
-            size="lg"
-          >
+          <Button className="flex-1" onClick={onContinue} size="lg" tone="dark">
             {ctaLabel}
             {isLastStep ? (
-              <ChevronRightIcon size={19} />
+              <ChevronRightIcon size={20} />
             ) : (
-              <PlayIcon size={17} />
+              <PlayIcon size={16} />
             )}
-          </ActionButton>
+          </Button>
         </div>
       </div>
     </dialog>

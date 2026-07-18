@@ -84,5 +84,5 @@ const PATTERN_WHY: Record<ExercisePattern, string> = {
  * Per-exercise `why_this_for_you_cs` (spec §4): pattern rationale tied to the
  * user's goal. Kept under 200 chars (spec §7 check 13).
  */
-export const whyFor = (exercise: Exercise, goal: GoalPrimary): string =>
+export const whyThisForYou = (exercise: Exercise, goal: GoalPrimary): string =>
   `${PATTERN_WHY[exercise.pattern]} — ${GOAL_CLAUSE[goal]}.`

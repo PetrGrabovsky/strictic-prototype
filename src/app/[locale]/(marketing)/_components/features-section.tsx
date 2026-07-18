@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
+import { cardVariants } from '@/components/ui/card'
 import { cn } from '@/lib/cn'
 import { ContentSection } from './content-section'
 import { InfoCard } from './info-card'
@@ -19,7 +20,7 @@ export const FeaturesSection = async () => {
   return (
     <ContentSection id="umi">
       <SectionHeading kicker={t('features.kicker')} title={t('features.h2')} />
-      <div className="mt-8.5 grid grid-cols-1 gap-4.5 min-[760px]:grid-cols-2">
+      <div className="nav:grid-cols-2 mt-8 grid grid-cols-1 gap-4">
         {FEATURE_CARDS.map((id) => (
           <InfoCard
             body={t(`features.cards.${id}.body`)}
@@ -30,9 +31,9 @@ export const FeaturesSection = async () => {
       </div>
       <div
         className={cn(
-          'border-line mt-4.5 rounded-md border border-l-4',
-          'border-l-accent bg-surface px-5 py-4.5',
-          'text-ink-2 text-base',
+          cardVariants({ inset: 'none' }),
+          'border-l-accent border-l-4 px-5 py-4',
+          'text-ink-2 mt-4 text-base',
         )}
       >
         {t.rich('features.antibox', { b: renderBoldInk })}

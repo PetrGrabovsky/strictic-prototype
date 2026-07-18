@@ -14,14 +14,7 @@ export const ClosingCta = async () => {
       className="border-line bg-cream border-t text-center"
       stickyBefore
     >
-      <h2
-        className={cn(
-          'text-[clamp(28px,4.6vw,42px)] font-bold',
-          'leading-[1.12] tracking-tight',
-        )}
-      >
-        {t('final.h2')}
-      </h2>
+      <h2 className="text-title font-bold tracking-tight">{t('final.h2')}</h2>
       <p className={cn(LEAD, 'mx-auto mt-3.5 mb-7 max-w-130')}>
         {t('final.lead')}
       </p>

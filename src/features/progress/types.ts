@@ -2,14 +2,15 @@ import type { ExerciseId } from '@/types/exercise'
 
 /**
  * One finished session's result for a single exercise, tagged with its date.
- * The narrow field names (`w`/`r`/`e1`) mirror the stored {@link ExerciseResult}
- * wire format so a point maps 1:1 to a history row.
+ * The derive layer translates the stored wire fields (`w`/`r`/`e1`, see
+ * {@link ExerciseResult}) into these readable names, so everything above it
+ * speaks the domain language.
  */
 export type ProgressPoint = {
   date: number
-  e1: number
-  r: number
-  w: number
+  estimatedMax: number
+  reps: number
+  weightKg: number
 }
 
 /**
@@ -20,17 +21,18 @@ export type ProgressTrend = 'down' | 'flat' | 'start' | 'up'
 
 /**
  * Per-exercise progression derived from history, one card in the hero
- * carousel. `wDeltaPct` drives the sort and the headline; `e1DeltaPct` is the
- * quieter strength-estimate delta shown in the sub-line.
+ * carousel. `weightGainPercent` drives the sort and the headline;
+ * `strengthGainPercent` is the quieter strength-estimate delta shown in the
+ * sub-line.
  */
 export type ExerciseProgress = {
-  e1DeltaPct: number
   first: ProgressPoint
   id: ExerciseId
   last: ProgressPoint
   series: readonly ProgressPoint[]
+  strengthGainPercent: number
   trend: ProgressTrend
-  wDeltaPct: number
+  weightGainPercent: number
 }
 
 /**

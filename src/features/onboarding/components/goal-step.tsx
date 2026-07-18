@@ -1,9 +1,9 @@
 import { useTranslations } from 'next-intl'
 import type { Restrictions } from '@/features/onboarding/types'
+import { cn } from '@/lib/cn'
+import { MICRO_LABEL } from '@/styles/type'
 import type { GoalPrimary } from '@/types/plan'
-import { ChoiceCard } from './choice-card'
-import { FIELD_LABEL } from './onboarding-styles'
-import { SelectableChip } from './selectable-chip'
+import { ChoiceCard, SelectableChip } from './selectable'
 import { StepHeader } from './step-header'
 
 type RestrictionId = keyof Restrictions
@@ -62,7 +62,9 @@ export const GoalStep = ({
       </fieldset>
 
       <fieldset className="border-line mt-6 border-t pt-5">
-        <legend className={FIELD_LABEL}>{t('restrictionsLabel')}</legend>
+        <legend className={cn(MICRO_LABEL, 'text-ink-2')}>
+          {t('restrictionsLabel')}
+        </legend>
         <p className="text-ink-3 -mt-1 mb-3 text-sm leading-relaxed">
           {t('restrictionsHint')}
         </p>

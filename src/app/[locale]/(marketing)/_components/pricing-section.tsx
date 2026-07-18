@@ -35,7 +35,7 @@ export const PricingSection = async () => {
   return (
     <ContentSection id="cenik">
       <SectionHeading kicker={t('pricing.kicker')} title={t('pricing.h2')} />
-      <div className="mt-8.5 grid grid-cols-1 items-stretch gap-4.5 min-[760px]:grid-cols-2">
+      <div className="nav:grid-cols-2 mt-8 grid grid-cols-1 items-stretch gap-4">
         <PriceCard
           ctaLabel={t('pricing.free.cta')}
           features={freeFeatures}

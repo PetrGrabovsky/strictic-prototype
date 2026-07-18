@@ -1,7 +1,7 @@
-'use client'
-
 import { useEffect, useRef } from 'react'
+import { createBarScale } from '@/features/progress/lib/bar-scale'
 import { cn } from '@/lib/cn'
+import { SCROLLBAR_HIDDEN } from '@/styles/layout'
 
 /**
  * Fixed bar width in px (BUILD-GUIDE §4, §5 local exception — DO NOT CHANGE).
@@ -14,12 +14,7 @@ const GUTTER = 20
 /** A label fits inside the bar only once the bar is at least this tall. */
 const INSIDE_THRESHOLD = 30
 /** Shortest a bar ever renders, so an empty/near-zero value still shows. */
-const MIN_BAR = 2
-/** Baseline height fraction of the tallest bar, leaving the floor visible. */
-const BASE_FRACTION = 0.3
-const SPAN_FRACTION = 0.7
-/** A lone bar sits mid-height — there is no min/max to scale it against. */
-const SINGLE_FRACTION = 0.62
+const MIN_BAR_HEIGHT_PX = 2
 
 /**
  * On the accent (orange) bars the inside label must be dark — white fails
@@ -33,7 +28,7 @@ const VARIANT = {
     inside: 'text-ink',
     newestAbove: 'text-accent-deep',
   },
-  ink: { bar: 'bg-ink', inside: 'text-white', newestAbove: 'text-ink' },
+  ink: { bar: 'bg-ink', inside: 'text-surface', newestAbove: 'text-ink' },
 } as const
 
 /** One bar: a stable key (a session date) plus the value it represents. */
@@ -81,27 +76,19 @@ export const BigChart = ({
     return <div style={{ height }} />
   }
 
-  const values = points.map((point) => point.value)
-  const min = Math.min(...values)
-  const max = Math.max(...values)
-  const span = max - min || 1
+  const fractionOf = createBarScale(points.map((point) => point.value))
   const tone = VARIANT[variant]
   const lastIndex = points.length - 1
 
-  const barHeight = (value: number): number => {
-    const fraction =
-      values.length === 1
-        ? SINGLE_FRACTION
-        : BASE_FRACTION + SPAN_FRACTION * ((value - min) / span)
-    return Math.max(MIN_BAR, Math.round(fraction * height))
-  }
+  const barHeight = (value: number): number =>
+    Math.max(MIN_BAR_HEIGHT_PX, Math.round(fractionOf(value) * height))
 
   return (
     <div>
       <div
         className={cn(
-          '[scrollbar-width:none] overflow-y-hidden [-ms-overflow-style:none]',
-          '[&::-webkit-scrollbar]:hidden',
+          SCROLLBAR_HIDDEN,
+          'overflow-y-hidden',
           isScrollable ? 'overflow-x-auto' : 'overflow-x-hidden',
         )}
         ref={trackRef}
@@ -111,8 +98,8 @@ export const BigChart = ({
           style={{ height: height + GUTTER }}
         >
           {points.map((point, index) => {
-            const barPx = barHeight(point.value)
-            const isInside = barPx >= INSIDE_THRESHOLD
+            const barHeightPx = barHeight(point.value)
+            const isInside = barHeightPx >= INSIDE_THRESHOLD
             const isNewest = index === lastIndex
             return (
               <div
@@ -137,7 +124,7 @@ export const BigChart = ({
                     'flex w-full items-start justify-center rounded-t-sm',
                     tone.bar,
                   )}
-                  style={{ height: barPx }}
+                  style={{ height: barHeightPx }}
                 >
                   {isInside ? (
                     <span

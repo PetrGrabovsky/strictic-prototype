@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { cardVariants } from '@/components/ui/card'
 import { cn } from '@/lib/cn'
 import { ContentSection } from './content-section'
 import { FAQ_ITEMS } from './faq-items'
@@ -16,20 +17,23 @@ export const FaqSection = async () => {
       <SectionHeading kicker={t('faq.kicker')} title={t('faq.h2')} />
       {FAQ_ITEMS.map((id) => (
         <details
-          className="border-line bg-surface mt-3 overflow-hidden rounded-md border"
+          className={cn(
+            cardVariants({ inset: 'none' }),
+            'mt-3 overflow-hidden',
+          )}
           key={id}
         >
           <summary
             className={cn(
               'flex cursor-pointer list-none justify-between gap-3',
-              'px-5 py-4.5 text-base font-semibold',
+              'px-5 py-4 text-base font-semibold',
               '[&::-webkit-details-marker]:hidden',
             )}
           >
             <span>{t(`faq.items.${id}.question`)}</span>
             <span aria-hidden className="faq-marker text-accent-deep text-lg" />
           </summary>
-          <div className="text-ink-2 px-5 pb-4.5 text-sm">
+          <div className="text-ink-2 px-5 pb-4 text-sm">
             {t(`faq.items.${id}.answer`)}
           </div>
         </details>

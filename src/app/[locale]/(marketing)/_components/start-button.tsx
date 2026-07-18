@@ -1,23 +1,30 @@
 'use client'
 
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/cn'
 import { trackEvent } from './analytics'
 import { useAuthModal } from './auth-modal-provider'
-import type { ButtonVariant } from './button-classes'
-import { buttonClass } from './button-classes'
+
+/** The two roles a landing CTA can play; size is a separate axis. */
+export type StartButtonVariant = 'ghost' | 'primary'
 
 type Props = Readonly<{
   className?: string
   label: string
-  variant?: ButtonVariant
+  size?: 'lg' | 'md'
+  variant?: StartButtonVariant
 }>
 
 /**
  * Landing sign-in CTA. Opens the shared {@link AuthModal}; the real auth
- * flow lands in Etapa 6, so the modal itself is still a mock.
+ * flow lands in Etapa 6, so the modal itself is still a mock. Defaults to
+ * the large primary CTA; the header passes `size="md"`, the free pricing
+ * tier `variant="ghost"`.
  */
 export const StartButton = ({
   className,
   label,
+  size = 'lg',
   variant = 'primary',
 }: Props) => {
   const openAuthModal = useAuthModal()
@@ -31,7 +38,7 @@ export const StartButton = ({
 
   return (
     <button
-      className={buttonClass(variant, className)}
+      className={cn(buttonVariants({ size, variant }), className)}
       onClick={handleClick}
       type="button"
     >

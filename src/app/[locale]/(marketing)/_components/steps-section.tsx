@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/cn'
 import { ContentSection } from './content-section'
 import { PlaceholderCard } from './placeholder-card'
@@ -30,13 +31,13 @@ export const StepsSection = async () => {
   return (
     <ContentSection id="jak">
       <SectionHeading kicker={t('steps.kicker')} title={t('steps.h2')} />
-      <div className="mt-7.5">
+      <div className="mt-7">
         {STEP_ITEMS.map((id, index) => (
           <div
             className={cn(
               'grid grid-cols-1 items-center gap-4 border-t',
-              'border-line py-7.5',
-              'min-[820px]:grid-cols-[64px_1fr_0.9fr] min-[820px]:gap-6.5',
+              'border-line py-7',
+              'split:grid-cols-[64px_1fr_0.9fr] split:gap-6',
               index === STEP_ITEMS.length - 1 && 'border-b',
             )}
             key={id}
@@ -45,7 +46,7 @@ export const StepsSection = async () => {
               {`0${index + 1}`}
             </div>
             <div>
-              <h3 className="mb-1.5 text-lg leading-[1.12] tracking-tight">
+              <h3 className="leading-heading mb-1.5 text-lg tracking-tight">
                 {t(`steps.items.${id}.title`)}
               </h3>
               <p className="text-ink-2 max-w-105 text-base">
@@ -53,21 +54,21 @@ export const StepsSection = async () => {
               </p>
             </div>
             {id === 'train' ? (
-              <div className="border-line bg-surface rounded-md border p-5.5">
+              <Card inset="md">
                 <div className="text-2xs text-ink-3 tracking-widest uppercase">
-                  {t('steps.items.train.progLabel')}
+                  {t('steps.items.train.progressLabel')}
                 </div>
                 <div className="mt-1 mb-3 flex items-baseline gap-2.5">
                   <span className="text-2xl font-extrabold tabular-nums">
-                    {t('steps.items.train.progValue')}
+                    {t('steps.items.train.progressValue')}
                   </span>
                   <span className="text-green text-xs font-semibold">
-                    {t('steps.items.train.progDelta')}
+                    {t('steps.items.train.progressDelta')}
                   </span>
                 </div>
                 <div aria-hidden className="flex h-14 items-end gap-1.5">
                   {PROGRESS_BARS.map((bar) => (
-                    <i
+                    <span
                       className="bg-accent flex-1 rounded-t-sm opacity-90"
                       key={bar.id}
                       style={{ height: `${bar.height}%` }}
@@ -75,13 +76,13 @@ export const StepsSection = async () => {
                   ))}
                 </div>
                 <small className="text-2xs text-ink-3 mt-2.5 block tracking-wide">
-                  {t('steps.items.train.progNote')}
+                  {t('steps.items.train.progressNote')}
                 </small>
-              </div>
+              </Card>
             ) : (
               <PlaceholderCard
-                description={t(`steps.items.${id}.imgDesc`)}
-                title={t(`steps.items.${id}.imgTitle`)}
+                description={t(`steps.items.${id}.imageDescription`)}
+                title={t(`steps.items.${id}.imageTitle`)}
               />
             )}
           </div>

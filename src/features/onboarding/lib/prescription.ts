@@ -18,7 +18,7 @@ const COMPOUND_REPS: Record<GoalPrimary, number> = {
   strength: 5,
 }
 
-const COMPOUND_REST_S: Record<GoalPrimary, number> = {
+const COMPOUND_REST_SECONDS: Record<GoalPrimary, number> = {
   fat_loss: 120,
   health: 120,
   hypertrophy: 120,
@@ -26,9 +26,9 @@ const COMPOUND_REST_S: Record<GoalPrimary, number> = {
 }
 
 const ISOLATION_REPS = 12
-const ISOLATION_REST_S = 90
-const CORE_HOLD_S = 40
-const CORE_REST_S = 45
+const ISOLATION_REST_SECONDS = 90
+const CORE_HOLD_SECONDS = 40
+const CORE_REST_SECONDS = 45
 const DEFAULT_BODYWEIGHT_REPS = 10
 
 /** Bodyweight rep targets tied to capability, never a generic 12 (spec §8). */
@@ -58,41 +58,41 @@ const repsFor = (exercise: Exercise, role: Role, goal: GoalPrimary): number =>
 
 const restFor = (role: Role, goal: GoalPrimary): number => {
   if (role === 'core') {
-    return CORE_REST_S
+    return CORE_REST_SECONDS
   }
   if (role === 'compound') {
-    return COMPOUND_REST_S[goal]
+    return COMPOUND_REST_SECONDS[goal]
   }
-  return ISOLATION_REST_S
+  return ISOLATION_REST_SECONDS
 }
 
 /**
  * Assign sets, reps/hold, rest and starting weight to one selected exercise
- * (spec hard rules 6, 8, 10). Holds carry `holdS`; everything else carries
+ * (spec hard rules 6, 8, 10). Holds carry `holdSeconds`; everything else carries
  * `reps`.
  */
 const prescribeOne = (
   selected: Selected,
-  ctx: EngineContext,
+  context: EngineContext,
   equipment: Equipment,
 ): PlannedItem => {
   const { exercise, note, role } = selected
   return {
     exercise,
-    holdS: exercise.isHold ? CORE_HOLD_S : null,
+    holdSeconds: exercise.isHold ? CORE_HOLD_SECONDS : null,
     note,
-    reps: exercise.isHold ? null : repsFor(exercise, role, ctx.goal),
-    restS: restFor(role, ctx.goal),
+    reps: exercise.isHold ? null : repsFor(exercise, role, context.goal),
+    restSeconds: restFor(role, context.goal),
     role,
     sets: DEFAULT_SETS,
-    startWeightKg: startWeight(exercise, equipment, ctx),
+    startWeightKg: startWeight(exercise, equipment, context),
   }
 }
 
 /** Prescribe every selected exercise in order. */
 export const prescribeAll = (
   selection: readonly Selected[],
-  ctx: EngineContext,
+  context: EngineContext,
   equipment: Equipment,
 ): PlannedItem[] =>
-  selection.map((selected) => prescribeOne(selected, ctx, equipment))
+  selection.map((selected) => prescribeOne(selected, context, equipment))

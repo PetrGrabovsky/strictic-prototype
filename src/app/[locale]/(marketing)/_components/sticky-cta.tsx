@@ -9,11 +9,13 @@ type Props = Readonly<{
 }>
 
 /**
- * Mobile-only sticky sign-in bar. Shows once the hero has scrolled out of
- * view and hides again around the closing CTA, mirroring the reference
- * landing. Desktop never renders it — the header CTA stays in reach
- * there. While hidden it is `inert`, so its button is neither focusable
- * nor announced.
+ * Mobile-only sticky sign-in bar in the thumb zone — the phone's primary
+ * conversion CTA. It shows once the hero has scrolled out of view and hides
+ * again around the closing CTA (which carries its own sign-in). It pairs with
+ * the auto-hiding header: while the reader scrolls down the header is gone, so
+ * this bar keeps sign-in one tap away; desktop never renders it, where the
+ * pinned header CTA stays in reach. While hidden it is `inert`, so its button
+ * is neither focusable nor announced.
  */
 export const StickyCta = ({ label }: Props) => {
   const [isVisible, setIsVisible] = useState(false)
@@ -64,15 +66,15 @@ export const StickyCta = ({ label }: Props) => {
   return (
     <div
       className={cn(
-        'fixed inset-x-0 bottom-0 z-60 hidden max-[760px]:block',
+        'max-nav:block fixed inset-x-0 bottom-0 z-60 hidden',
         'border-line-2 bg-bg/90 border-t p-4 backdrop-blur-md',
-        'transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
+        'ease-out-expo transition-transform duration-300',
         'motion-reduce:transition-none',
         isVisible ? 'translate-y-0' : 'translate-y-[110%]',
       )}
       inert={!isVisible}
     >
-      <StartButton className="w-full py-4" label={label} />
+      <StartButton className="w-full" label={label} />
     </div>
   )
 }

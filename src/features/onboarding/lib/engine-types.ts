@@ -27,10 +27,10 @@ export type Selected = {
 /** A {@link Selected} exercise with its full prescription resolved. */
 export type PlannedItem = {
   exercise: Exercise
-  holdS: null | number
+  holdSeconds: null | number
   note: NoteKind | null
   reps: null | number
-  restS: number
+  restSeconds: number
   role: Role
   sets: number
   startWeightKg: null | number

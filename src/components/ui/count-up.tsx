@@ -1,7 +1,6 @@
-'use client'
-
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
+import { useIsReducedMotion } from '@/hooks/use-reduced-motion'
 
 const DEFAULT_DURATION_MS = 650
 
@@ -22,21 +21,18 @@ export const CountUp = ({
   format,
   value,
 }: Props) => {
-  const [displayed, setDisplayed] = useState(0)
+  const isReducedMotion = useIsReducedMotion()
+  const [animated, setAnimated] = useState(0)
 
   useEffect(() => {
-    const isReducedMotion = globalThis.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches
+    if (isReducedMotion) {
+      return
+    }
     let frame = 0
     const start = performance.now()
     const tick = (now: number): void => {
-      if (isReducedMotion) {
-        setDisplayed(value)
-        return
-      }
       const progress = Math.min(1, (now - start) / durationMs)
-      setDisplayed(value * (1 - (1 - progress) ** 3))
+      setAnimated(value * (1 - (1 - progress) ** 3))
       if (progress < 1) {
         frame = requestAnimationFrame(tick)
       }
@@ -46,7 +42,11 @@ export const CountUp = ({
     return () => {
       cancelAnimationFrame(frame)
     }
-  }, [durationMs, value])
+  }, [durationMs, isReducedMotion, value])
+
+  // Under reduced motion the final value renders directly — no animation
+  // state ever starts, so there is nothing to ease.
+  const displayed = isReducedMotion ? value : animated
 
   return format ? format(displayed) : Math.round(displayed)
 }

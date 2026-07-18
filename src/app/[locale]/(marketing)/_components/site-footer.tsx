@@ -11,12 +11,12 @@ export const SiteFooter = async () => {
   const t = await getTranslations('landing')
 
   return (
-    <footer className="border-line text-ink-3 border-t py-8.5 text-sm">
+    <footer className="border-line text-ink-3 border-t py-8 text-sm">
       <div
         className={cn(
           WRAP,
           'flex flex-wrap items-center justify-between',
-          'gap-x-6.5 gap-y-3',
+          'gap-x-6 gap-y-3',
         )}
       >
         <div>{t('footer.copyright')}</div>

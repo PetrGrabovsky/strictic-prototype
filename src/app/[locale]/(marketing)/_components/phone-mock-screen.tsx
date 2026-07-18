@@ -1,7 +1,9 @@
 'use client'
 
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
+import { useIsReducedMotion } from '@/hooks/use-reduced-motion'
 import { cn } from '@/lib/cn'
+import { formatClock } from '@/lib/format'
 
 export type PhoneLabels = Readonly<{
   cta: string
@@ -92,44 +94,10 @@ const CHIP_BASE = cn(
 )
 
 const CHIP_VARIANT: Record<ChipVariant, string> = {
-  done: cn(
-    'border border-[rgba(79,176,106,0.5)]',
-    'text-d-green bg-[rgba(79,176,106,0.14)]',
-  ),
+  done: 'border-d-green/50 text-d-green bg-d-green/15 border',
   current: 'border-d-accent text-d-ink border',
   next: 'border-d-line text-d-ink-3 border border-dashed',
 }
-
-const formatClock = (totalSeconds: number) => {
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`
-}
-
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
-
-const subscribeReducedMotion = (onChange: () => void) => {
-  const query = globalThis.matchMedia(REDUCED_MOTION_QUERY)
-  query.addEventListener('change', onChange)
-  return () => {
-    query.removeEventListener('change', onChange)
-  }
-}
-
-const isReducedMotionEnabled = () =>
-  globalThis.matchMedia(REDUCED_MOTION_QUERY).matches
-
-/**
- * Tracks `prefers-reduced-motion` through an external store, so the value
- * is read during render (no `setState` in an effect) with no hydration
- * mismatch — the server snapshot is always `false`.
- */
-const useIsReducedMotion = () =>
-  useSyncExternalStore(
-    subscribeReducedMotion,
-    isReducedMotionEnabled,
-    () => false,
-  )
 
 /**
  * The live training-screen card. Renders frame 0 on the server; once
@@ -169,8 +137,8 @@ export const PhoneMockScreen = ({ labels }: Props) => {
       className={cn(
         'mx-auto w-[min(320px,88vw)] rounded-[34px]',
         'border-d-line bg-d-bg text-d-ink border',
-        'px-4 pt-5 pb-4.5',
-        'shadow-[0_24px_60px_rgba(10,10,10,0.28),inset_0_0_0_6px_#111]',
+        'px-4 pt-5 pb-4',
+        'shadow-phone',
       )}
     >
       <div
@@ -186,10 +154,7 @@ export const PhoneMockScreen = ({ labels }: Props) => {
         {labels.name}
       </div>
       <div
-        className={cn(
-          'text-2xs mb-4.5 uppercase',
-          'text-d-ink-2 tracking-wide',
-        )}
+        className={cn('text-2xs mb-4 uppercase', 'text-d-ink-2 tracking-wide')}
       >
         {labels.muscles}
       </div>

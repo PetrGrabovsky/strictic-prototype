@@ -1,8 +1,11 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { IconButton } from '@/components/ui/icon-button'
+import { ChevronLeftIcon } from '@/components/ui/icons'
+import { LoadingScreen } from '@/components/ui/loading-screen'
 import { StepDots, type StepDotStatus } from '@/components/ui/step-dots'
 import { buildPlan } from '@/features/onboarding/lib/build-plan'
 import {
@@ -15,13 +18,15 @@ import {
   isTimeStepValid,
   type WizardDraft,
 } from '@/features/onboarding/lib/wizard'
+import { useRouter } from '@/i18n/routing'
 import { cn } from '@/lib/cn'
 import { savePlan, saveProfile } from '@/lib/storage'
+import { SCREEN } from '@/styles/layout'
+import { MICRO_LABEL } from '@/styles/type'
 import type { Plan } from '@/types/plan'
 import { AboutStep } from './about-step'
 import { EquipmentStep } from './equipment-step'
 import { GoalStep } from './goal-step'
-import { ChevronLeftIcon } from './icons'
 import { PlanReveal } from './plan-reveal'
 import { TimeStep } from './time-step'
 
@@ -32,30 +37,25 @@ const BUILD_DELAY_MS = 700
 
 const STEP_IDS = ['equipment', 'about', 'goal', 'time'] as const
 
-const CONTAINER_CLASS = cn(
-  'mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-6 pb-8',
-)
-
-/**
- * Placeholder for the workout screen (next step of Etapa 5). `console.log` is
- * banned by lint; `info` is allowed — mirrors the landing auth mock.
- */
-const logStartWorkout = () => console.info('would start workout')
-
 /**
  * The onboarding wizard: the whole thing is interactive, so it is the client
  * boundary (the route's server component renders nothing but this). Holds the
  * draft profile and step index in plain React state, deriving everything else
- * during render (the only effect resets scroll on step change). Validates each
- * step before advancing, then calls the deterministic engine, persists the
- * profile and reveals the plan.
+ * during render (the only effects sync window scroll and clean up the build
+ * timer). Validates each step before advancing, then calls the deterministic
+ * engine, persists the profile, reveals the plan and hands off to the first
+ * workout.
  */
 export const OnboardingWizard = () => {
   const t = useTranslations('onboarding')
+  const router = useRouter()
   const [draft, setDraft] = useState<WizardDraft>(createInitialDraft)
   const [stepIndex, setStepIndex] = useState(0)
   const [phase, setPhase] = useState<Phase>('wizard')
   const [plan, setPlan] = useState<null | Plan>(null)
+  const buildTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  )
 
   // Start every step (and the reveal) at the top — the previous screen may
   // have been scrolled down. Syncing window scroll is a genuine external effect.
@@ -63,31 +63,19 @@ export const OnboardingWizard = () => {
     globalThis.scrollTo({ top: 0 })
   }, [phase, stepIndex])
 
+  // Cancel the staged "building" beat if the wizard unmounts mid-delay.
+  useEffect(() => () => clearTimeout(buildTimer.current), [])
+
   if (phase === 'reveal' && plan) {
     return (
-      <main className={CONTAINER_CLASS}>
-        <PlanReveal onStart={logStartWorkout} plan={plan} />
+      <main className={SCREEN}>
+        <PlanReveal onStart={() => router.push('/app/trenink')} plan={plan} />
       </main>
     )
   }
 
   if (phase === 'building') {
-    return (
-      <main
-        className={cn(CONTAINER_CLASS, 'items-center justify-center gap-4')}
-      >
-        <span
-          aria-hidden
-          className={cn(
-            'border-line-2 border-t-accent size-8 rounded-full border-2',
-            'motion-safe:animate-spin',
-          )}
-        />
-        <output className="text-ink-2 text-sm font-medium">
-          {t('building')}
-        </output>
-      </main>
-    )
+    return <LoadingScreen label={t('building')} spinner />
   }
 
   const updateDraft = (partial: Partial<WizardDraft>): void =>
@@ -111,7 +99,7 @@ export const OnboardingWizard = () => {
 
   const generatePlan = (): void => {
     setPhase('building')
-    setTimeout(() => {
+    buildTimer.current = setTimeout(() => {
       const generated = buildPlan(draftToPlanInput(draft))
       void saveProfile(draftToProfile(draft))
       void savePlan(generated)
@@ -139,36 +127,34 @@ export const OnboardingWizard = () => {
   }))
 
   return (
-    <main className={CONTAINER_CLASS}>
+    <main className={SCREEN}>
       <div className="flex items-center gap-3">
-        <button
-          aria-label={t('back')}
+        <IconButton
           className={cn(
-            'flex size-11 shrink-0 items-center justify-center rounded-full',
-            'text-ink hover:bg-line -ms-2 transition-colors',
+            'text-ink hover:bg-line -ms-2 rounded-full transition-colors',
             stepIndex === 0 && 'invisible',
           )}
+          label={t('back')}
           onClick={goBack}
-          type="button"
         >
-          <ChevronLeftIcon />
-        </button>
+          <ChevronLeftIcon size={20} />
+        </IconButton>
         <div className="flex-1">
           <StepDots steps={dots} />
         </div>
       </div>
-      <p className="text-2xs text-ink-3 mt-2 font-mono tracking-widest uppercase">
+      <p className={cn(MICRO_LABEL, 'text-ink-3 mt-2')}>
         {t('stepStatus', { current: stepIndex + 1, total: STEP_IDS.length })}
       </p>
 
       <div className="mt-6 flex-1">
-        {stepIndex === 0 && (
+        {stepIndex === 0 ? (
           <EquipmentStep
             equipment={draft.equipment}
             onChange={(equipment) => updateDraft({ equipment })}
           />
-        )}
-        {stepIndex === 1 && (
+        ) : null}
+        {stepIndex === 1 ? (
           <AboutStep
             capabilities={draft.capabilities}
             experience={draft.experience}
@@ -180,8 +166,8 @@ export const OnboardingWizard = () => {
             onSexChange={(sex) => updateDraft({ sex })}
             sex={draft.sex}
           />
-        )}
-        {stepIndex === 2 && (
+        ) : null}
+        {stepIndex === 2 ? (
           <GoalStep
             goalPrimary={draft.goalPrimary}
             onGoalChange={(goalPrimary) => updateDraft({ goalPrimary })}
@@ -190,26 +176,24 @@ export const OnboardingWizard = () => {
             }
             restrictions={draft.restrictions}
           />
-        )}
-        {stepIndex === 3 && (
+        ) : null}
+        {stepIndex === 3 ? (
           <TimeStep
             onTimeChange={(time) => updateDraft({ time })}
             time={draft.time}
           />
-        )}
+        ) : null}
       </div>
 
-      <div className="mt-8 flex gap-3">
-        <Button
-          className="flex-1"
-          disabled={!canAdvance}
-          onClick={goNext}
-          size="lg"
-          variant="primary"
-        >
-          {t(isLastStep ? 'finish' : 'next')}
-        </Button>
-      </div>
+      <Button
+        className="mt-8 w-full"
+        disabled={!canAdvance}
+        onClick={goNext}
+        size="lg"
+        variant="primary"
+      >
+        {t(isLastStep ? 'finish' : 'next')}
+      </Button>
     </main>
   )
 }

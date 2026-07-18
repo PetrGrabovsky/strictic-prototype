@@ -25,17 +25,20 @@ const SOLID_SESSIONS = 4
  * a first-ever record (or a bodyweight exercise with no load) yields 0, never
  * a divide-by-zero — the single-record "start state" (BUILD-GUIDE §4.3).
  */
-const pctChange = (from: number, to: number): number =>
+const percentChange = (from: number, to: number): number =>
   from > 0 ? Math.round((to / from - 1) * 100) : 0
 
-const trendOf = (pointCount: number, wDeltaPct: number): ProgressTrend => {
+const trendOf = (
+  pointCount: number,
+  weightGainPercent: number,
+): ProgressTrend => {
   if (pointCount < 2) {
     return 'start'
   }
-  if (wDeltaPct > 0) {
+  if (weightGainPercent > 0) {
     return 'up'
   }
-  if (wDeltaPct < 0) {
+  if (weightGainPercent < 0) {
     return 'down'
   }
   return 'flat'
@@ -57,7 +60,11 @@ const consistencyOf = (
   return 'starting'
 }
 
-/** The chronological series of one exercise's top sets across all history. */
+/**
+ * The chronological series of one exercise's top sets across all history.
+ * This is the wire→domain boundary: the stored `w`/`r`/`e1` fields become
+ * readable names here, and nothing above this layer sees them again.
+ */
 const seriesFor = (
   exerciseId: ExerciseId,
   history: WorkoutHistory,
@@ -67,7 +74,14 @@ const seriesFor = (
       return []
     }
     const result = record.ex[exerciseId]
-    return [{ date: record.date, e1: result.e1, r: result.r, w: result.w }]
+    return [
+      {
+        date: record.date,
+        estimatedMax: result.e1,
+        reps: result.r,
+        weightKg: result.w,
+      },
+    ]
   })
 
 /**
@@ -87,21 +101,26 @@ const buildExercises = (
       if (first === undefined || last === undefined) {
         return []
       }
-      const wDeltaPct = pctChange(first.w, last.w)
+      const weightGainPercent = percentChange(first.weightKg, last.weightKg)
       return [
         {
-          e1DeltaPct: pctChange(first.e1, last.e1),
           first,
           id,
           last,
           series,
-          trend: trendOf(series.length, wDeltaPct),
-          wDeltaPct,
+          strengthGainPercent: percentChange(
+            first.estimatedMax,
+            last.estimatedMax,
+          ),
+          trend: trendOf(series.length, weightGainPercent),
+          weightGainPercent,
         },
       ]
     })
     .toSorted(
-      (a, b) => b.wDeltaPct - a.wDeltaPct || b.e1DeltaPct - a.e1DeltaPct,
+      (a, b) =>
+        b.weightGainPercent - a.weightGainPercent ||
+        b.strengthGainPercent - a.strengthGainPercent,
     )
 
 /**

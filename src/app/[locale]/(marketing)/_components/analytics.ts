@@ -5,7 +5,7 @@
  */
 type PlausibleEvent = 'landing_cta'
 
-type PlausibleFn = (event: PlausibleEvent) => void
+type PlausibleTracker = (event: PlausibleEvent) => void
 
 declare global {
   /**
@@ -13,7 +13,7 @@ declare global {
    * on the global scope. `var` is the only declaration form that augments
    * the global type.
    */
-  var plausible: PlausibleFn | undefined
+  var plausible: PlausibleTracker | undefined
 }
 
 /**

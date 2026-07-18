@@ -1,12 +1,12 @@
-'use client'
-
 import { useFormatter, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { ArrowRightIcon, ShareIcon } from '@/components/ui/icons'
 import { BigChart } from '@/features/progress/components/big-chart'
-import { ArrowRightIcon, ShareIcon } from '@/features/progress/components/icons'
 import type { ExerciseProgress } from '@/features/progress/types'
 import { cn } from '@/lib/cn'
-import { fmtDateShort, fmtKg } from '@/lib/format'
+import { formatKg, formatShortDate } from '@/lib/format'
+import { MICRO_LABEL } from '@/styles/type'
 
 /** Per-exercise chart is a touch shorter than the volume chart (reference). */
 const CHART_HEIGHT = 88
@@ -33,7 +33,7 @@ export const ExerciseProgressCard = ({
 }: Props) => {
   const t = useTranslations('progress')
   const format = useFormatter()
-  const { first, last, series, trend, wDeltaPct } = exercise
+  const { first, last, series, trend, weightGainPercent } = exercise
   const isUp = trend === 'up'
   const isStart = trend === 'start'
   const hasEstimate = series.length >= 2
@@ -61,7 +61,7 @@ export const ExerciseProgressCard = ({
   const badge = (): string => {
     switch (trend) {
       case 'down': {
-        return t('badge.down', { pct: wDeltaPct })
+        return t('badge.down', { percent: weightGainPercent })
       }
       case 'flat': {
         return t('badge.flat')
@@ -70,17 +70,17 @@ export const ExerciseProgressCard = ({
         return t('badge.start')
       }
       case 'up': {
-        return t('badge.up', { pct: wDeltaPct })
+        return t('badge.up', { percent: weightGainPercent })
       }
     }
   }
 
   return (
-    <div className="border-line-2 bg-surface shadow-card rounded-lg border px-4.5 pt-4.5 pb-4">
+    <Card className="shadow-card">
       <div className="flex items-center justify-between gap-2">
         <span
           className={cn(
-            'text-2xs font-mono font-semibold tracking-widest uppercase',
+            MICRO_LABEL,
             isTopProgress ? 'text-accent-deep' : 'text-ink-3',
           )}
         >
@@ -104,7 +104,7 @@ export const ExerciseProgressCard = ({
         {isStart ? null : (
           <>
             <span className="text-ink-3 text-lg font-medium tabular-nums">
-              {fmtKg(format, first.w)}
+              {formatKg(format, first.weightKg)}
             </span>
             <span className={isUp ? 'text-accent' : 'text-ink-3'}>
               <ArrowRightIcon size={16} />
@@ -113,14 +113,14 @@ export const ExerciseProgressCard = ({
         )}
         <span
           className={cn(
-            'text-[30px] leading-none font-bold tracking-tight tabular-nums',
+            'text-2xl leading-none font-bold tracking-tight tabular-nums',
             isUp ? 'text-accent' : 'text-ink',
           )}
         >
-          {fmtKg(format, last.w)}
+          {formatKg(format, last.weightKg)}
         </span>
         <span className="text-ink-3 font-mono text-xs tabular-nums">
-          {t('card.reps', { reps: last.r })}
+          {t('card.reps', { reps: last.reps })}
         </span>
       </div>
 
@@ -128,23 +128,23 @@ export const ExerciseProgressCard = ({
         {t('card.workingWeight')}
         {hasEstimate
           ? t('card.strengthEstimate', {
-              from: fmtKg(format, first.e1),
-              to: fmtKg(format, last.e1),
+              from: formatKg(format, first.estimatedMax),
+              to: formatKg(format, last.estimatedMax),
             })
           : ''}
       </p>
 
       <div className="mt-3.5">
         <BigChart
-          format={(value) => fmtKg(format, value)}
+          format={(value) => formatKg(format, value)}
           height={CHART_HEIGHT}
           points={series.map((point) => ({
             key: String(point.date),
-            value: point.w,
+            value: point.weightKg,
           }))}
           rangeLabel={t('dateRange', {
-            from: fmtDateShort(format, first.date),
-            to: fmtDateShort(format, last.date),
+            from: formatShortDate(format, first.date),
+            to: formatShortDate(format, last.date),
           })}
         />
       </div>
@@ -153,11 +153,11 @@ export const ExerciseProgressCard = ({
         <span className="text-ink-3 text-2xs font-mono tabular-nums">
           {t('card.sessions', { count: series.length })}
         </span>
-        <Button className="min-h-11" onClick={onShare} size="sm" variant="dark">
+        <Button onClick={onShare} size="sm" variant="ink">
           <ShareIcon size={14} />
           {t('card.share')}
         </Button>
       </div>
-    </div>
+    </Card>
   )
 }

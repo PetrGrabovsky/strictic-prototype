@@ -138,23 +138,23 @@ export const implementWeights = (
 export const startWeight = (
   exercise: Exercise,
   equipment: Equipment,
-  ctx: EngineContext,
+  context: EngineContext,
 ): null | number => {
   if (exercise.loadType !== 'external') {
     return null
   }
   const group = ANCHOR_GROUP[exercise.id]
-  const owned = implementWeights(exercise, equipment, ctx.gear)
+  const owned = implementWeights(exercise, equipment, context.gear)
   if (!group || !owned || owned.length === 0) {
     return null
   }
   const sorted = owned.toSorted((a, b) => a - b)
   const anchor = ANCHORS[group]
-  const base = ctx.sex === 'male' ? anchor.male : anchor.female
+  const base = context.sex === 'male' ? anchor.male : anchor.female
   const snappedIndex = sorted.findLastIndex((weight) => weight <= base)
   const startIndex = snappedIndex === -1 ? 0 : snappedIndex
   const index = Math.min(
-    startIndex + EXPERIENCE_STEP[ctx.experience],
+    startIndex + EXPERIENCE_STEP[context.experience],
     sorted.length - 1,
   )
   return sorted[index]

@@ -1,13 +1,11 @@
 import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui/button'
+import { cardVariants } from '@/components/ui/card'
+import { CheckIcon, PlayIcon, UndoIcon } from '@/components/ui/icons'
 import { Stepper } from '@/components/ui/stepper'
-import { ActionButton } from '@/features/workout/components/action-button'
-import {
-  CheckIcon,
-  PlayIcon,
-  UndoIcon,
-} from '@/features/workout/components/icons'
 import type { WorkoutExercise } from '@/features/workout/types'
 import { cn } from '@/lib/cn'
+import { QUIET_ACTION, SECTION_LABEL } from '@/styles/type'
 import type { WorkoutSet } from '@/types/workout'
 
 type Props = {
@@ -44,12 +42,9 @@ type HeaderProps = {
   isEditing: boolean
 }
 
-const CARD = cn('bg-d-card border-d-line-2 mt-3.5 rounded-md border p-4')
+const CARD = cn(cardVariants({ tone: 'dark' }), 'mt-3')
 
-const QUIET_BUTTON = cn(
-  'text-d-ink-3 mt-2 flex w-full items-center justify-center gap-1.5 py-2',
-  'font-mono text-xs tracking-wide uppercase touch-manipulation',
-)
+const QUIET_BUTTON = cn(QUIET_ACTION, 'text-d-ink-3 mt-2 w-full')
 
 /**
  * The focused set: reps steppers, a hold timer, or — once every set is
@@ -82,11 +77,11 @@ const CardHeader = ({ exercise, isEditing }: HeaderProps) => {
     <div className="flex items-center justify-between">
       <span
         className={cn(
+          SECTION_LABEL,
           'text-d-accent inline-flex items-center gap-2',
-          'font-mono text-xs tracking-wide uppercase',
         )}
       >
-        {isEditing ? <UndoIcon size={12} /> : null}
+        {isEditing ? <UndoIcon size={14} /> : null}
         {t(isEditing ? 'set.editingLabel' : 'set.activeLabel')}
       </span>
       <span className="text-d-ink-3 font-mono text-xs tabular-nums">
@@ -100,17 +95,18 @@ const EditActions = ({ onSave, onUndo }: EditActionsProps) => {
   const t = useTranslations('workout')
   return (
     <div>
-      <ActionButton
-        className="mt-3"
+      <Button
+        className="mt-3 w-full"
         onClick={onSave}
         size="sm"
-        variant="outline"
+        tone="dark"
+        variant="ghost"
       >
         <CheckIcon size={16} />
         {t('saveEdit')}
-      </ActionButton>
+      </Button>
       <button className={QUIET_BUTTON} onClick={onUndo} type="button">
-        <UndoIcon size={13} />
+        <UndoIcon size={14} />
         {t('undoSet')}
       </button>
     </div>
@@ -139,34 +135,34 @@ const RepsInput = ({
       <div className="mt-3 flex gap-3">
         <Stepper
           active
-          dark
           decreaseLabel={t('repsDecrease')}
           increaseLabel={t('repsIncrease')}
           label={t('repsLabel')}
           onDecrement={() => onAdjustReps(-1)}
           onIncrement={() => onAdjustReps(1)}
           onSet={onSetReps}
+          tone="dark"
           value={heroSet.reps}
         />
         <Stepper
           active
-          dark
           decreaseLabel={t('weightDecrease')}
           increaseLabel={t('weightIncrease')}
           label={weightLabel}
           onDecrement={() => onAdjustWeight(-1)}
           onIncrement={() => onAdjustWeight(1)}
           onSet={onSetWeight}
+          tone="dark"
           value={heroSet.weight}
         />
       </div>
       {isEditing ? (
         <EditActions onSave={onSaveEdit} onUndo={onUndoSet} />
       ) : (
-        <ActionButton className="mt-3" onClick={onLogSet}>
+        <Button className="mt-3 w-full" onClick={onLogSet} tone="dark">
           <CheckIcon size={18} />
           {t('logSet')}
-        </ActionButton>
+        </Button>
       )}
     </div>
   )
@@ -197,21 +193,22 @@ const HoldInput = ({
         <EditActions onSave={onSaveEdit} onUndo={onUndoSet} />
       ) : null}
       {!isEditing && isRunning ? (
-        <ActionButton className="mt-3" onClick={onStopHold}>
+        <Button className="mt-3 w-full" onClick={onStopHold} tone="dark">
           <CheckIcon size={18} />
           {t('stopHold')}
-        </ActionButton>
+        </Button>
       ) : null}
       {!isEditing && !isRunning ? (
-        <ActionButton
-          className="mt-3"
+        <Button
+          className="mt-3 w-full"
           onClick={onStartHold}
           size="sm"
-          variant="outline"
+          tone="dark"
+          variant="ghost"
         >
-          <PlayIcon size={15} />
+          <PlayIcon size={16} />
           {t('startHold')}
-        </ActionButton>
+        </Button>
       ) : null}
     </div>
   )

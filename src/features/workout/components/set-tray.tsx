@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl'
-import { UndoIcon } from '@/features/workout/components/icons'
+import { UndoIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/cn'
+import { MICRO_LABEL } from '@/styles/type'
 import type { WorkoutSet } from '@/types/workout'
 
 type SetVariant = 'current' | 'done' | 'editing' | 'upcoming'
@@ -45,7 +46,7 @@ const setVariant = (
   return 'upcoming'
 }
 
-const renderChipValue = (isHold: boolean, set: WorkoutSet): string =>
+const chipValue = (isHold: boolean, set: WorkoutSet): string =>
   isHold ? `${set.secs ?? 0}s` : String(set.reps)
 
 /**
@@ -99,7 +100,7 @@ export const SetTray = ({
               onClick={isClickable ? onClick : undefined}
               type="button"
             >
-              {set.done ? renderChipValue(isHold, set) : position + 1}
+              {set.done ? chipValue(isHold, set) : position + 1}
             </button>
           )
         })}
@@ -108,11 +109,11 @@ export const SetTray = ({
       {doneCount > 0 ? (
         <div
           className={cn(
+            MICRO_LABEL,
             'text-d-ink-3 mt-2 flex items-center gap-1.5',
-            'text-2xs font-mono tracking-wide uppercase',
           )}
         >
-          <UndoIcon size={11} />
+          <UndoIcon size={14} />
           {t('editHint')}
         </div>
       ) : null}

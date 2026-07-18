@@ -15,8 +15,8 @@ export const FounderSection = async () => {
       <SectionHeading kicker={t('founder.kicker')} title={t('founder.h2')} />
       <div
         className={cn(
-          'mt-7.5 grid grid-cols-1 items-center gap-9.5',
-          'min-[820px]:grid-cols-[1fr_300px]',
+          'mt-7 grid grid-cols-1 items-center gap-9',
+          'split:grid-cols-[1fr_300px]',
         )}
       >
         <div className="text-ink-2 max-w-140 text-base">
@@ -29,8 +29,8 @@ export const FounderSection = async () => {
         </div>
         <PlaceholderCard
           className="min-h-55"
-          description={t('founder.imgDesc')}
-          title={t('founder.imgTitle')}
+          description={t('founder.imageDescription')}
+          title={t('founder.imageTitle')}
         />
       </div>
     </ContentSection>
