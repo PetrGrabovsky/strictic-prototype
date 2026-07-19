@@ -1,3 +1,4 @@
+import type { BarDomain } from '@/features/progress/lib/bar-scale'
 import type { ExerciseId } from '@/types/exercise'
 
 /**
@@ -23,7 +24,8 @@ export type ProgressTrend = 'down' | 'flat' | 'start' | 'up'
  * Per-exercise progression derived from history, one card in the hero
  * carousel. `weightGainPercent` drives the sort and the headline;
  * `strengthGainPercent` is the quieter strength-estimate delta shown in the
- * sub-line.
+ * sub-line. `weightDeltaKg` and `weightDomain` are always global — measured
+ * from the very first session, independent of any visible chart window.
  */
 export type ExerciseProgress = {
   first: ProgressPoint
@@ -32,6 +34,8 @@ export type ExerciseProgress = {
   series: readonly ProgressPoint[]
   strengthGainPercent: number
   trend: ProgressTrend
+  weightDeltaKg: number
+  weightDomain: BarDomain
   weightGainPercent: number
 }
 

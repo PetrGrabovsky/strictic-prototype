@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createBarScale } from '@/features/progress/lib/bar-scale'
+import { createBarScale, domainOf } from '@/features/progress/lib/bar-scale'
 
 describe('createBarScale', () => {
   it('puts a lone bar at mid height', () => {
@@ -20,5 +20,25 @@ describe('createBarScale', () => {
     const scale = createBarScale([25, 25, 25])
 
     expect(scale(25)).toBe(0.3)
+  })
+
+  it('pins the scale to an explicit domain wider than the values', () => {
+    const scale = createBarScale([50, 60], { max: 80, min: 40 })
+
+    expect(scale(40)).toBe(0.3)
+    expect(scale(60)).toBeCloseTo(0.65)
+    expect(scale(80)).toBe(1)
+  })
+
+  it('scales a lone bar by the domain instead of mid height', () => {
+    const scale = createBarScale([60], { max: 80, min: 40 })
+
+    expect(scale(60)).toBeCloseTo(0.65)
+  })
+})
+
+describe('domainOf', () => {
+  it('captures the series extremes', () => {
+    expect(domainOf([30, 10, 20])).toEqual({ max: 30, min: 10 })
   })
 })

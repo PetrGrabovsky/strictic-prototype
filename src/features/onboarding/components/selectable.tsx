@@ -11,9 +11,12 @@ import { cn } from '@/lib/cn'
  */
 const SELECTABLE_FRAME = cn(
   'border-line-2 bg-surface cursor-pointer border transition-colors',
-  'has-[:checked]:border-accent has-[:checked]:bg-cream',
+  /* accent-deep, not accent: vivid accent is 2.92:1 against the cream
+     fill it touches — under the 3:1 of WCAG 1.4.11. */
+  'has-[:checked]:border-accent-deep has-[:checked]:bg-cream',
   'has-[:focus-visible]:outline has-[:focus-visible]:outline-2',
-  'has-[:focus-visible]:outline-accent has-[:focus-visible]:outline-offset-2',
+  'has-[:focus-visible]:outline-accent-deep',
+  'has-[:focus-visible]:outline-offset-2',
 )
 
 type ChipProps = {
@@ -92,7 +95,8 @@ export const ChoiceCard = ({
       className={cn(
         'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full',
         'border-line-2 border text-transparent',
-        'peer-checked:border-accent peer-checked:bg-accent peer-checked:text-d-bg',
+        'peer-checked:border-accent-deep peer-checked:bg-accent',
+        'peer-checked:text-d-bg',
       )}
     >
       <CheckIcon size={16} />

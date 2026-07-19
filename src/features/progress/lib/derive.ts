@@ -1,3 +1,4 @@
+import { domainOf } from '@/features/progress/lib/bar-scale'
 import type {
   Consistency,
   ExerciseProgress,
@@ -113,6 +114,8 @@ const buildExercises = (
             last.estimatedMax,
           ),
           trend: trendOf(series.length, weightGainPercent),
+          weightDeltaKg: last.weightKg - first.weightKg,
+          weightDomain: domainOf(series.map((point) => point.weightKg)),
           weightGainPercent,
         },
       ]

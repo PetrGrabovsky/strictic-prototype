@@ -51,6 +51,20 @@ describe('deriveProgress — per-exercise', () => {
     expect(only.last.weightKg).toBe(24)
   })
 
+  it('exposes the global weight delta and session-level domain', () => {
+    // The 28 kg peak sits mid-series: the domain must catch it, the delta
+    // stays first→last regardless.
+    const history = [
+      record(28, { goblet_squat: result(20, 10, 26) }),
+      record(14, { goblet_squat: result(28, 8, 35) }),
+      record(0, { goblet_squat: result(24, 10, 32) }),
+    ]
+    const [only] = deriveProgress(['goblet_squat'], history, NOW).exercises
+
+    expect(only.weightDeltaKg).toBe(4)
+    expect(only.weightDomain).toEqual({ max: 28, min: 20 })
+  })
+
   it('flags a drop and a hold distinctly', () => {
     const down = [
       record(7, { db_ohp: result(16, 10, 21) }),
