@@ -9,12 +9,15 @@ import { cn } from '@/lib/cn'
  * contrast on orange, BUILD-GUIDE §4), `ink` (solid ink), `ghost` (outlined
  * surface). `tone="dark"` swaps the same three roles onto the `d-*` palette
  * for the training world. Sizes are fixed heights (44/48/56px) so every
- * button is a real tap target, not a padding guess.
+ * button is a real tap target, not a padding guess. `md`/`lg` labels are
+ * 19px bold — WCAG "large text" (≥18.66px at 700), so ink-on-accent
+ * (5.9:1) clears AAA (1.4.6). `sm` stays 14px and is therefore reserved
+ * for `ghost`/`ink` variants; never render an accent `primary` at `sm`.
  */
 export const buttonVariants = cva(
   cn(
     'inline-flex cursor-pointer items-center justify-center gap-2',
-    'rounded-md font-semibold whitespace-nowrap touch-manipulation',
+    'rounded-md font-bold whitespace-nowrap touch-manipulation',
     'transition-[filter,background-color,border-color] duration-100 ease-out',
     'hover:brightness-95 active:brightness-90',
     'disabled:pointer-events-none disabled:opacity-50',
@@ -23,8 +26,8 @@ export const buttonVariants = cva(
     variants: {
       size: {
         sm: 'h-11 px-4 text-sm',
-        md: 'h-12 px-5 text-sm',
-        lg: 'h-14 px-7 text-base',
+        md: 'h-12 px-5 text-lg',
+        lg: 'h-14 px-7 text-lg',
       },
       tone: { dark: '', light: '' },
       variant: { ghost: 'border', ink: '', primary: '' },

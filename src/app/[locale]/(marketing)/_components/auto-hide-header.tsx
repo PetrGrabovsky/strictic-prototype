@@ -8,6 +8,8 @@ import { cn } from '@/lib/cn'
 const SCROLL_DELTA_PX = 6
 /** Keep the header pinned until the reader is clearly past the hero top. */
 const REVEAL_ABOVE_PX = 90
+/** Past this the header floats over content and gains its glass elevation. */
+const ELEVATE_AFTER_PX = 8
 
 type Props = Readonly<{
   children: ReactNode
@@ -24,9 +26,14 @@ type Props = Readonly<{
  * passed in as `children`; only this thin scroll wrapper is a client
  * component. Scroll reads are rAF-throttled and the listener is passive, so
  * the tracking never blocks the main thread.
+ *
+ * At the very top the header melts into the hero — no border, no glass; once
+ * the reader scrolls past {@link ELEVATE_AFTER_PX} it exposes `data-scrolled`
+ * so the caller's classes can fade in the floating-glass elevation.
  */
 export const AutoHideHeader = ({ children, className }: Props) => {
   const [isHidden, setIsHidden] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const lastScrollY = useRef(0)
   const frame = useRef(0)
 
@@ -39,7 +46,14 @@ export const AutoHideHeader = ({ children, className }: Props) => {
       }
       frame.current = globalThis.requestAnimationFrame(() => {
         frame.current = 0
-        const currentScrollY = globalThis.scrollY
+        /* Clamp so rubber-band overscroll never reads as a direction flip. */
+        const maxScrollY =
+          document.documentElement.scrollHeight - globalThis.innerHeight
+        const currentScrollY = Math.min(
+          Math.max(globalThis.scrollY, 0),
+          maxScrollY,
+        )
+        setIsScrolled(currentScrollY > ELEVATE_AFTER_PX)
         const delta = currentScrollY - lastScrollY.current
         if (Math.abs(delta) < SCROLL_DELTA_PX) {
           return
@@ -50,6 +64,8 @@ export const AutoHideHeader = ({ children, className }: Props) => {
     }
 
     globalThis.addEventListener('scroll', onScroll, { passive: true })
+    /* Sync the elevation once on mount — the page may load mid-scroll. */
+    onScroll()
     return () => {
       globalThis.removeEventListener('scroll', onScroll)
       if (frame.current !== 0) {
@@ -67,6 +83,7 @@ export const AutoHideHeader = ({ children, className }: Props) => {
         isHidden ? 'max-nav:-translate-y-full' : 'translate-y-0',
         className,
       )}
+      data-scrolled={isScrolled || undefined}
     >
       {children}
     </header>

@@ -18,12 +18,15 @@
   --color-line-2: #e0e0dd;
   --color-line-field: #8b8b85;
   --color-ink: #0a0a0a;
-  --color-ink-2: #6e6e6b;
-  --color-ink-3: #67675f;
+  /* Secondary inks sit at ≥7:1 (WCAG 1.4.6 AAA) on bg, surface and cream
+     while keeping ~3:1 separation from ink so the hierarchy survives. */
+  --color-ink-2: #4f4f4d;
+  --color-ink-3: #4f4f47;
   --color-accent: #ff4d1c;
   --color-accent-deep: #c13a12;
   --color-cream: #f8efe7;
-  --color-green: #3e9457;
+  /* Deep enough for ≥7:1 (AAA) as 12px stat text on light backgrounds. */
+  --color-green: #275a37;
 
   /* Colors — dark/dim mode (training screen) */
   --color-d-bg: #0c0c0b;
@@ -32,10 +35,13 @@
   --color-d-line: #2a2a24;
   --color-d-line-2: #3a3a30;
   --color-d-ink: #f5f5f2;
-  --color-d-ink-2: #a4a49c;
-  --color-d-ink-3: #828278;
+  /* Dark-world secondary inks: ≥7:1 (AAA) even on d-card. The price of
+     AAA here is that the two levels nearly merge — dark-screen hierarchy
+     leans on size/weight, not shade. */
+  --color-d-ink-2: #adada5;
+  --color-d-ink-3: #a9a99f;
   --color-d-accent: #ff5a2c;
-  --color-d-green: #4fb06a;
+  --color-d-green: #5cbe79;
 
   /* Typography scale — fixed sizes, no free-floating values */
   --text-2xs: 0.625rem; /* 10px */
@@ -71,6 +77,9 @@
   /* Elevation (DESIGN-SYSTEM §6) — one token per elevated surface species. */
   --shadow-card:
     0 1px 2px rgb(10 10 10 / 0.04), 0 20px 44px -24px rgb(10 10 10 / 0.18);
+  /* The sticky glass header once it floats over scrolled content. */
+  --shadow-header:
+    0 1px 2px rgb(10 10 10 / 0.04), 0 8px 24px -12px rgb(10 10 10 / 0.08);
   /* The auth bottom sheet, thrown upward from the screen edge. */
   --shadow-sheet: 0 -8px 40px rgb(10 10 10 / 0.18);
   /* The floating share-feedback pill on Progress. */
@@ -95,7 +104,10 @@ html {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  /* accent-deep, not accent: the brighter orange only reaches 3.01:1 on
+     the page background and 2.17:1 on the glass header over dark
+     sections — accent-deep clears WCAG 1.4.11 (3:1) everywhere. */
+  outline: 2px solid var(--color-accent-deep);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
 }

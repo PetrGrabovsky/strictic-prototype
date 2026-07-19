@@ -15,7 +15,6 @@ const robots = (): MetadataRoute.Robots => ({
     disallow: '/*/app',
   },
   sitemap: `${SITE_URL}/sitemap.xml`,
-  host: SITE_URL,
 })
 
 export default robots

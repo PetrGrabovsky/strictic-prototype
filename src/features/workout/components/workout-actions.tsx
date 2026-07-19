@@ -100,7 +100,7 @@ export const WorkoutActions = ({
           <Button
             className="flex-1"
             onClick={onCancelDiscard}
-            size="sm"
+            size="md"
             tone="dark"
             variant="ghost"
           >
@@ -109,7 +109,7 @@ export const WorkoutActions = ({
           <Button
             className="flex-1"
             onClick={onConfirmDiscard}
-            size="sm"
+            size="md"
             tone="dark"
           >
             {t('discardConfirm')}

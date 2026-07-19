@@ -64,7 +64,7 @@ export const Hero = async () => {
           >
             {TRUSTLINE.map((key) => (
               <li key={key}>
-                <span aria-hidden className="text-accent">
+                <span aria-hidden className="text-accent-deep">
                   {'— '}
                 </span>
                 {t(`hero.trustline.${key}`)}
