@@ -65,6 +65,24 @@ describe('deriveProgress — per-exercise', () => {
     expect(only.weightDomain).toEqual({ max: 28, min: 20 })
   })
 
+  it('folds each exercise into max buckets with a single record star', () => {
+    // The 28 kg peak sits mid-series, so it — not the newest bar — is the ★.
+    const history = [
+      record(28, { goblet_squat: result(20, 10, 26) }),
+      record(14, { goblet_squat: result(28, 8, 35) }),
+      record(0, { goblet_squat: result(24, 10, 32) }),
+    ]
+    const [only] = deriveProgress(['goblet_squat'], history, NOW).exercises
+
+    // At most 20 sessions render one bar each, folded by max weight (1:1 here).
+    expect(only.weightBuckets.granularity).toBe('session')
+    expect(only.weightBuckets.buckets.map((bucket) => bucket.value)).toEqual([
+      20, 28, 24,
+    ])
+    const starred = only.weightBuckets.buckets.filter((bucket) => bucket.isPr)
+    expect(starred.map((bucket) => bucket.value)).toEqual([28])
+  })
+
   it('flags a drop and a hold distinctly', () => {
     const down = [
       record(7, { db_ohp: result(16, 10, 21) }),
@@ -111,7 +129,10 @@ describe('deriveProgress — overview', () => {
     ]
     const data = deriveProgress(['goblet_squat'], history, NOW)
 
-    expect(data.volumeSeries).toEqual([800, 1200])
+    expect(data.volumeBuckets.granularity).toBe('session')
+    expect(data.volumeBuckets.buckets.map((bucket) => bucket.value)).toEqual([
+      800, 1200,
+    ])
     expect(data.totalVolumeKg).toBe(2000)
     expect(data.weeksSpan).toBe(2)
     expect(data.sessionCount).toBe(2)

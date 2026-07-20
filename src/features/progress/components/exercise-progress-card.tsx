@@ -3,9 +3,12 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ArrowRightIcon, ShareIcon } from '@/components/ui/icons'
 import { BigChart } from '@/features/progress/components/big-chart'
+import { DeltaBadge } from '@/features/progress/components/delta-badge'
+import { GhostPreview } from '@/features/progress/components/ghost-preview'
+import { formatBucketDate } from '@/features/progress/lib/format-bucket-date'
 import type { ExerciseProgress } from '@/features/progress/types'
 import { cn } from '@/lib/cn'
-import { formatKg, formatShortDate } from '@/lib/format'
+import { formatKg } from '@/lib/format'
 import { MICRO_LABEL } from '@/styles/type'
 
 /** Per-exercise chart is a touch shorter than the volume chart (reference). */
@@ -20,10 +23,11 @@ type Props = {
 
 /**
  * One hero card in the Progress carousel: the trend eyebrow and delta badge,
- * the exercise name, the from→to working weight, the weight-over-time
+ * the exercise name, the from→to working weight, the bucketed weight-over-time
  * {@link BigChart}, and a footer with the session count and a share button.
- * A single-record exercise renders as a "start line" — no delta, no arrow —
- * so a first data point never reads as a broken chart (BUILD-GUIDE §4.3).
+ * A single-record exercise renders as a "start line" — no delta, no arrow, and
+ * a {@link GhostPreview} in place of real bars — so a first data point never
+ * reads as a broken chart (BUILD-GUIDE §4.3).
  */
 export const ExerciseProgressCard = ({
   exercise,
@@ -33,7 +37,16 @@ export const ExerciseProgressCard = ({
 }: Props) => {
   const t = useTranslations('progress')
   const format = useFormatter()
-  const { first, last, series, trend, weightGainPercent } = exercise
+  const {
+    first,
+    last,
+    series,
+    trend,
+    weightBuckets,
+    weightDeltaKg,
+    weightDomain,
+    weightGainPercent,
+  } = exercise
   const isUp = trend === 'up'
   const isStart = trend === 'start'
   const hasEstimate = series.length >= 2
@@ -58,23 +71,6 @@ export const ExerciseProgressCard = ({
     }
   }
 
-  const badge = (): string => {
-    switch (trend) {
-      case 'down': {
-        return t('badge.down', { percent: weightGainPercent })
-      }
-      case 'flat': {
-        return t('badge.flat')
-      }
-      case 'start': {
-        return t('badge.start')
-      }
-      case 'up': {
-        return t('badge.up', { percent: weightGainPercent })
-      }
-    }
-  }
-
   return (
     <Card className="shadow-card">
       <div className="flex items-center justify-between gap-2">
@@ -86,14 +82,11 @@ export const ExerciseProgressCard = ({
         >
           {eyebrow()}
         </span>
-        <span
-          className={cn(
-            'font-mono text-xs font-bold tabular-nums',
-            isUp ? 'text-accent-deep' : 'text-ink-3',
-          )}
-        >
-          {badge()}
-        </span>
+        <DeltaBadge
+          percent={weightGainPercent}
+          trend={trend}
+          weightDeltaKg={weightDeltaKg}
+        />
       </div>
 
       <h3 className="text-ink mt-2 text-lg leading-tight font-semibold tracking-tight">
@@ -135,18 +128,38 @@ export const ExerciseProgressCard = ({
       </p>
 
       <div className="mt-3.5">
-        <BigChart
-          format={(value) => formatKg(format, value)}
-          height={CHART_HEIGHT}
-          points={series.map((point) => ({
-            key: String(point.date),
-            value: point.weightKg,
-          }))}
-          rangeLabel={t('dateRange', {
-            from: formatShortDate(format, first.date),
-            to: formatShortDate(format, last.date),
-          })}
-        />
+        {isStart ? (
+          <GhostPreview
+            copy={t('ghost')}
+            firstLabel={formatKg(format, first.weightKg)}
+            height={CHART_HEIGHT}
+          />
+        ) : (
+          <BigChart
+            domain={weightDomain}
+            format={(value) => formatKg(format, value)}
+            height={CHART_HEIGHT}
+            points={weightBuckets.buckets.map((bucket) => ({
+              isEmpty: bucket.isEmpty,
+              isPr: bucket.isPr,
+              key: bucket.key,
+              value: bucket.value,
+            }))}
+            rangeLabel={t('rangeCaption', {
+              from: formatBucketDate(
+                format,
+                first.date,
+                weightBuckets.granularity,
+              ),
+              period: t(`granularity.${weightBuckets.granularity}`),
+              to: formatBucketDate(
+                format,
+                last.date,
+                weightBuckets.granularity,
+              ),
+            })}
+          />
+        )}
       </div>
 
       <div className="border-line mt-3 flex items-center justify-between border-t pt-3">

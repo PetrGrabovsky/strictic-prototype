@@ -8,8 +8,9 @@ import { SCROLLBAR_HIDDEN } from '@/styles/layout'
  * Fixed bar width in px (BUILD-GUIDE §4, §5 local exception — DO NOT CHANGE).
  * Bars never stretch to fill the container: a single record must stay a
  * normal-width bar, not a full-width slab that breaks the label centring.
+ * Exported so the start-state ghost preview draws bars of the same width.
  */
-const COLUMN_WIDTH = 42
+export const COLUMN_WIDTH = 42
 /** Headroom above the tallest bar for an over-the-bar label. */
 const GUTTER = 20
 /** A label fits inside the bar only once the bar is at least this tall. */

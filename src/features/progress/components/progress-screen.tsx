@@ -12,6 +12,7 @@ import { BigChart } from '@/features/progress/components/big-chart'
 import { ExerciseProgressCard } from '@/features/progress/components/exercise-progress-card'
 import { HeroCarousel } from '@/features/progress/components/hero-carousel'
 import { deriveProgress } from '@/features/progress/lib/derive'
+import { formatBucketDate } from '@/features/progress/lib/format-bucket-date'
 import {
   buildShareCanvas,
   deliverShareImage,
@@ -21,7 +22,7 @@ import type { ExerciseProgress, ProgressData } from '@/features/progress/types'
 import { useStorageSnapshot } from '@/hooks/use-storage-snapshot'
 import { useRouter } from '@/i18n/routing'
 import { cn } from '@/lib/cn'
-import { formatKg, formatShortDate, formatVolume } from '@/lib/format'
+import { formatKg, formatVolume } from '@/lib/format'
 import type { Formatter } from '@/lib/format'
 import { PLAUSIBLE_DOMAIN } from '@/lib/site-config'
 import { loadHistory, loadPlan } from '@/lib/storage'
@@ -194,8 +195,8 @@ export const ProgressScreen = () => {
     sessionCount,
     sessionsLast30,
     totalVolumeKg,
+    volumeBuckets,
     volumeDates,
-    volumeSeries,
     weekDots,
     weeksSpan,
   } = snapshot.data
@@ -265,13 +266,24 @@ export const ProgressScreen = () => {
             <BigChart
               format={(value) => formatVolume(format, value)}
               height={VOLUME_CHART_HEIGHT}
-              points={volumeDates.map((date, index) => ({
-                key: String(date),
-                value: volumeSeries[index],
+              points={volumeBuckets.buckets.map((bucket) => ({
+                isEmpty: bucket.isEmpty,
+                isInProgress: bucket.isInProgress,
+                key: bucket.key,
+                value: bucket.value,
               }))}
-              rangeLabel={t('dateRange', {
-                from: formatShortDate(format, volumeDates[0]),
-                to: formatShortDate(format, lastVolumeDate),
+              rangeLabel={t('rangeCaption', {
+                from: formatBucketDate(
+                  format,
+                  volumeDates[0],
+                  volumeBuckets.granularity,
+                ),
+                period: t(`granularity.${volumeBuckets.granularity}`),
+                to: formatBucketDate(
+                  format,
+                  lastVolumeDate,
+                  volumeBuckets.granularity,
+                ),
               })}
               variant="ink"
             />

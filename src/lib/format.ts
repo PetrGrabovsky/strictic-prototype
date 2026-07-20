@@ -28,6 +28,20 @@ export const formatKg = (format: Formatter, kg: number): string =>
   })
 
 /**
+ * A signed weight change, e.g. `+4 kg`, `-2,5 kg`, `0 kg` (cs) — for a delta
+ * chip where the leading sign is the whole point. Zero shows no sign. Pair
+ * with `tabular-nums` so the digits stay put while a count-up animates them.
+ */
+export const formatKgDelta = (format: Formatter, kg: number): string =>
+  format.number(kg, {
+    maximumFractionDigits: 2,
+    signDisplay: 'exceptZero',
+    style: 'unit',
+    unit: 'kilogram',
+    unitDisplay: 'short',
+  })
+
+/**
  * Training volume; rolls over to tonnes from 1000 kg, e.g. `840 kg`,
  * `5,4 t` (cs). The `t` symbol is appended literally — `tonne` is not an
  * Intl-sanctioned unit — while the number itself is still locale-formatted.

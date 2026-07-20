@@ -1,4 +1,5 @@
 import type { BarDomain } from '@/features/progress/lib/bar-scale'
+import type { BucketedSeries } from '@/features/progress/lib/bucket-series'
 import type { ExerciseId } from '@/types/exercise'
 
 /**
@@ -26,6 +27,9 @@ export type ProgressTrend = 'down' | 'flat' | 'start' | 'up'
  * `strengthGainPercent` is the quieter strength-estimate delta shown in the
  * sub-line. `weightDeltaKg` and `weightDomain` are always global — measured
  * from the very first session, independent of any visible chart window.
+ * `weightBuckets` is the same history folded into the journey overview
+ * (`max` per period); `series` stays the raw per-session data the header and
+ * share sparkline read.
  */
 export type ExerciseProgress = {
   first: ProgressPoint
@@ -34,6 +38,7 @@ export type ExerciseProgress = {
   series: readonly ProgressPoint[]
   strengthGainPercent: number
   trend: ProgressTrend
+  weightBuckets: BucketedSeries
   weightDeltaKg: number
   weightDomain: BarDomain
   weightGainPercent: number
@@ -58,8 +63,10 @@ export type ProgressData = {
   sessionCount: number
   sessionsLast30: number
   totalVolumeKg: number
+  /** Whole-history volume folded for the overview (`sum` per period). */
+  volumeBuckets: BucketedSeries
+  /** Raw per-session dates, kept for the chart's from–to range caption. */
   volumeDates: readonly number[]
-  volumeSeries: readonly number[]
   weekDots: readonly WeekDot[]
   weeksSpan: number
 }

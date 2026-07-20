@@ -1,4 +1,5 @@
 import { domainOf } from '@/features/progress/lib/bar-scale'
+import { bucketSeries } from '@/features/progress/lib/bucket-series'
 import type {
   Consistency,
   ExerciseProgress,
@@ -93,6 +94,7 @@ const seriesFor = (
 const buildExercises = (
   exerciseIds: readonly ExerciseId[],
   history: WorkoutHistory,
+  now: number,
 ): ExerciseProgress[] =>
   exerciseIds
     .flatMap((id) => {
@@ -114,6 +116,14 @@ const buildExercises = (
             last.estimatedMax,
           ),
           trend: trendOf(series.length, weightGainPercent),
+          weightBuckets: bucketSeries(
+            series.map((point) => ({
+              date: point.date,
+              value: point.weightKg,
+            })),
+            'max',
+            now,
+          ),
           weightDeltaKg: last.weightKg - first.weightKg,
           weightDomain: domainOf(series.map((point) => point.weightKg)),
           weightGainPercent,
@@ -171,14 +181,20 @@ export const deriveProgress = (
     },
   )
 
+  const volumeBuckets = bucketSeries(
+    history.map((record) => ({ date: record.date, value: record.volume })),
+    'sum',
+    now,
+  )
+
   return {
     consistency: consistencyOf(lastGapDays, sessionsLast30),
-    exercises: buildExercises(exerciseIds, history),
+    exercises: buildExercises(exerciseIds, history, now),
     sessionCount: history.length,
     sessionsLast30,
     totalVolumeKg: history.reduce((sum, record) => sum + record.volume, 0),
+    volumeBuckets,
     volumeDates: history.map((record) => record.date),
-    volumeSeries: history.map((record) => record.volume),
     weekDots,
     weeksSpan,
   }
