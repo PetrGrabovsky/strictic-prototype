@@ -43,7 +43,7 @@ export const SelectableChip = ({
       SELECTABLE_FRAME,
       'inline-flex min-h-11 items-center gap-2 rounded-full',
       'px-4 py-2.5 text-sm font-semibold',
-      'text-ink-2 has-[:checked]:text-ink',
+      'text-ink-2 has-checked:text-ink',
     )}
   >
     <input
