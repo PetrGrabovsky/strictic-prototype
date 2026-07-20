@@ -1,4 +1,6 @@
 import { createBarScale } from '@/features/progress/lib/bar-scale'
+import type { BarDomain } from '@/features/progress/lib/bar-scale'
+import { MAX_OVERVIEW_BARS } from '@/features/progress/lib/bucket-series'
 import { tokens } from '@/styles/tokens'
 
 /** The share image is a fixed 1080×1080 square (DESIGN-SYSTEM §3, §7). */
@@ -6,11 +8,13 @@ const CANVAS_SIZE = 1080
 const MARGIN = 92
 const FALLBACK_FAMILY = 'system-ui, sans-serif'
 
-const SPARKLINE_TOP = 648
-const SPARKLINE_HEIGHT = 190
-const SPARKLINE_GAP = 12
-const SPARKLINE_MAX_POINTS = 14
+const BARS_TOP = 648
+const BARS_HEIGHT = 190
+const BARS_GAP = 12
 const BAR_RADIUS = 8
+/** A skipped period's tick: a short dash on the floor, as wide as this bar. */
+const GAP_TICK_WIDTH_FRACTION = 0.45
+const GAP_TICK_HEIGHT = 5
 
 /** Vertical anchors of the card's text blocks (canvas y coordinates). */
 const KICKER_Y = 300
@@ -21,24 +25,45 @@ const STAT_Y = 905
 
 type CanvasContext = CanvasRenderingContext2D
 
+/** One column of the card's journey chart — a bucket, or a skipped period. */
+export type ShareBar = {
+  /** No session fell in this period — draw a gap tick, never a zero bar. */
+  isEmpty: boolean
+  value: number
+}
+
 /**
  * Everything drawn onto the share card. All copy is passed in already
  * localized and formatted — the drawing code holds no strings of its own, so
  * it stays i18n-free (CLAUDE.md) and the caller owns every translatable word.
+ * `bars` is the same bucketed journey the Progress screen charts, and
+ * `barsDomain` pins it to the exercise's session-level scale so the shared
+ * image and the app draw identical proportions (BUILD-GUIDE decision 4).
  */
 export type ShareCard = {
+  bars: readonly ShareBar[]
+  barsDomain?: BarDomain
+  barsFromLabel: string
+  barsToLabel: string
   brand: string
   footer: string
   headline: string
   kicker: string
   name: string
-  sparkline: readonly number[]
-  sparklineFromLabel: string
-  sparklineToLabel: string
   statLabel: string
   statValue: string
   subline: string
   tagline: string
+  url: string
+}
+
+/**
+ * The brag text and landing URL that travel beside the image. Without them a
+ * shared PNG is a dead end — the recipient sees the result and has no way to
+ * reach the app, which is the whole point of the share loop.
+ */
+export type ShareMessage = {
+  text: string
   url: string
 }
 
@@ -99,20 +124,26 @@ const drawStat = (
   context.fillText(label, x, y + 34)
 }
 
-/** The mini bar chart under the headline, newest bar at full strength. */
-const drawSparkline = (
+/**
+ * The bucketed journey under the headline: one column per period, newest at
+ * full strength and the rest dimmed so the eye lands on today's number. A
+ * period the user skipped keeps its slot as a floor tick — the same honesty
+ * the on-screen chart owes (decision 7), and a lapsed month never silently
+ * shortens the story.
+ */
+const drawJourney = (
   context: CanvasContext,
   family: string,
   card: ShareCard,
 ): void => {
-  const points = card.sparkline.slice(-SPARKLINE_MAX_POINTS)
-  if (points.length === 0) {
+  const bars = card.bars.slice(-MAX_OVERVIEW_BARS)
+  if (bars.length === 0) {
     return
   }
   const left = MARGIN
   const width = CANVAS_SIZE - 2 * MARGIN
-  const floor = SPARKLINE_TOP + SPARKLINE_HEIGHT
-  const lastIndex = points.length - 1
+  const floor = BARS_TOP + BARS_HEIGHT
+  const lastIndex = bars.length - 1
 
   context.strokeStyle = withAlpha(tokens.dark.ink, 0.1)
   context.lineWidth = 2
@@ -121,12 +152,36 @@ const drawSparkline = (
   context.lineTo(left + width, floor)
   context.stroke()
 
-  const barWidth = (width - SPARKLINE_GAP * lastIndex) / points.length
-  const fractionOf = createBarScale(points)
+  const barWidth = (width - BARS_GAP * lastIndex) / bars.length
+  // Empty periods carry no value to normalise against — scale to the real
+  // bars only, or the pinned domain when the caller shares one. An all-empty
+  // window falls back to every bar so no height can come out NaN.
+  const filled = bars.filter((bar) => !bar.isEmpty)
+  const scaled = filled.length > 0 ? filled : bars
+  const fractionOf = createBarScale(
+    scaled.map((bar) => bar.value),
+    card.barsDomain,
+  )
+  const heightOf = (bar: ShareBar): number =>
+    fractionOf(bar.value) * BARS_HEIGHT
 
-  for (const [index, value] of points.entries()) {
-    const barHeight = fractionOf(value) * SPARKLINE_HEIGHT
-    const x = left + index * (barWidth + SPARKLINE_GAP)
+  for (const [index, bar] of bars.entries()) {
+    const x = left + index * (barWidth + BARS_GAP)
+    if (bar.isEmpty) {
+      const tickWidth = barWidth * GAP_TICK_WIDTH_FRACTION
+      context.fillStyle = withAlpha(tokens.dark.ink, 0.25)
+      context.beginPath()
+      context.roundRect(
+        x + (barWidth - tickWidth) / 2,
+        floor - GAP_TICK_HEIGHT,
+        tickWidth,
+        GAP_TICK_HEIGHT,
+        GAP_TICK_HEIGHT / 2,
+      )
+      context.fill()
+      continue
+    }
+    const barHeight = heightOf(bar)
     context.globalAlpha = index === lastIndex ? 1 : 0.5
     context.fillStyle = tokens.dark.accent
     context.beginPath()
@@ -140,21 +195,30 @@ const drawSparkline = (
   }
   context.globalAlpha = 1
 
-  if (points.length > 1) {
-    const firstBar = fractionOf(points[0]) * SPARKLINE_HEIGHT
+  const first = bars[0]
+  if (bars.length > 1 && !first.isEmpty) {
     context.textAlign = 'left'
     context.fillStyle = withAlpha(tokens.dark.ink, 0.5)
     context.font = fontOf(family, 600, 24)
-    context.fillText(card.sparklineFromLabel, left, floor - firstBar - 16)
+    context.fillText(card.barsFromLabel, left, floor - heightOf(first) - 16)
   }
-  const lastBar = fractionOf(points[lastIndex]) * SPARKLINE_HEIGHT
+  const last = bars[lastIndex]
   context.textAlign = 'right'
   context.fillStyle = tokens.dark.ink
   context.font = fontOf(family, 700, 27)
-  context.fillText(card.sparklineToLabel, left + width, floor - lastBar - 16)
+  context.fillText(
+    card.barsToLabel,
+    left + width,
+    floor - (last.isEmpty ? 0 : heightOf(last)) - 16,
+  )
   context.textAlign = 'left'
 }
 
+/**
+ * Just the wordmark. The kicker deliberately sits with the exercise name
+ * further down and nowhere else — printing it up here too said the same word
+ * twice on one card.
+ */
 const drawHeader = (
   context: CanvasContext,
   family: string,
@@ -170,12 +234,6 @@ const drawHeader = (
   context.beginPath()
   context.arc(MARGIN + brandWidth + 20, MARGIN + 22, 7, 0, Math.PI * 2)
   context.fill()
-
-  context.textAlign = 'right'
-  context.fillStyle = withAlpha(tokens.dark.ink, 0.45)
-  context.font = fontOf(family, 600, 23)
-  context.fillText(card.kicker.toUpperCase(), CANVAS_SIZE - MARGIN, MARGIN + 34)
-  context.textAlign = 'left'
 }
 
 const drawFooter = (
@@ -266,7 +324,7 @@ export const buildShareCanvas = async (
   context.font = fontOf(family, 600, 40)
   context.fillText(card.subline, MARGIN, SUBLINE_Y)
 
-  drawSparkline(context, family, card)
+  drawJourney(context, family, card)
   drawStat(context, family, MARGIN, STAT_Y, card.statValue, card.statLabel)
   drawFooter(context, family, card)
 
@@ -274,13 +332,42 @@ export const buildShareCanvas = async (
 }
 
 /**
+ * The richest payload this platform will accept: the image together with the
+ * brag text and landing URL where possible, the bare image otherwise. The
+ * combination is probed rather than assumed — `navigator.share` rejects a
+ * payload some targets cannot carry, and losing the whole share to get the
+ * URL across would be a bad trade.
+ */
+const shareablePayload = (
+  file: File,
+  message: ShareMessage,
+): null | ShareData => {
+  if (typeof navigator.canShare !== 'function') {
+    return null
+  }
+  const withMessage = {
+    files: [file],
+    text: message.text,
+    url: message.url,
+  }
+  if (navigator.canShare(withMessage)) {
+    return withMessage
+  }
+  const imageOnly = { files: [file] }
+  return navigator.canShare(imageOnly) ? imageOnly : null
+}
+
+/**
  * Turns the rendered canvas into a PNG and hands it off: the native share
  * sheet when the platform can share files (mobile), otherwise a download.
- * A cancelled share sheet counts as handled, not a failure.
+ * The `message` rides along so the recipient gets a clickable way back to the
+ * app instead of an anonymous image — the one step that turns a share into a
+ * visit. A cancelled share sheet counts as handled, not a failure.
  */
 export const deliverShareImage = async (
   canvas: HTMLCanvasElement,
   filename: string,
+  message: ShareMessage,
 ): Promise<ShareOutcome> => {
   const blob = await new Promise<Blob | null>((resolve) => {
     canvas.toBlob(resolve, 'image/png')
@@ -289,12 +376,10 @@ export const deliverShareImage = async (
     return 'failed'
   }
   const file = new File([blob], filename, { type: 'image/png' })
-  const canShareFile =
-    typeof navigator.canShare === 'function' &&
-    navigator.canShare({ files: [file] })
-  if (canShareFile) {
+  const payload = shareablePayload(file, message)
+  if (payload !== null) {
     try {
-      await navigator.share({ files: [file] })
+      await navigator.share(payload)
       return 'shared'
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {

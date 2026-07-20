@@ -126,6 +126,7 @@
     },
     "trend": {
       "topProgress": "Tvůj největší pokrok",
+      "record": "Nový rekord",
       "start": "Startovní čára",
       "up": "Zesílil jsi",
       "down": "Tentokrát níž",
@@ -142,7 +143,8 @@
       "workingWeight": "pracovní váha na sérii",
       "strengthEstimate": " · odhad síly {from} → {to}",
       "sessions": "{count, plural, one {# trénink} few {# tréninky} other {# tréninků}}",
-      "share": "Sdílet cvik"
+      "share": "Sdílet cvik",
+      "shareRecord": "Pochlub se"
     },
     "volume": {
       "heading": "Objem za trénink",
@@ -169,7 +171,10 @@
       "firstRecordLabel": "1. ZÁZNAM",
       "sessionsLabel": "TRÉNINKŮ",
       "sublineChange": "{from} → {to} · {reps}×",
+      "sublineJourney": "{from} → {to} za {weeks, plural, one {# týden} few {# týdny} other {# týdnů}}",
       "sublineStart": "start · {to} · {reps}×",
+      "message": "{name}: z {from} na {to} za {weeks, plural, one {# týden} few {# týdny} other {# týdnů}}. Plán mi staví Strictic — trénink doma z toho, co mám.",
+      "messageSimple": "Trénuju doma podle Strictic — plán na míru z vybavení, co mám doma.",
       "downloaded": "Obrázek stažen",
       "failed": "Sdílení se nezdařilo"
     },

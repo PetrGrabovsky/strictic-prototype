@@ -112,7 +112,11 @@ export const HeroCarousel = ({
       >
         {slides.map((slide) => (
           <div
-            className="box-border shrink-0 grow-0 basis-full snap-center"
+            // `min-w-0`: without it a flex item's automatic minimum size lets
+            // the slide grow to its content's max-content width, so a card
+            // holding a wide horizontal chart blows past the viewport and
+            // pushes its own header off-screen instead of scrolling inside.
+            className="box-border min-w-0 shrink-0 grow-0 basis-full snap-center"
             key={slide.id}
           >
             {slide.content}

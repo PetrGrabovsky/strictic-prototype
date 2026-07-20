@@ -87,6 +87,33 @@ const seriesFor = (
   })
 
 /**
+ * Sessions an exercise needs before a new peak is worth announcing. The plan
+ * engine adds weight almost every early session, so without a floor the
+ * "record" voice would be the default state and mean nothing — the same
+ * marker inflation the single-★ rule avoids. It also keeps the card from
+ * shouting "new record" while the screen still greets the user with its
+ * you-are-only-starting note.
+ */
+const RECORD_MIN_SESSIONS = 3
+
+/**
+ * Whether the last point of a series beat every point before it. Matching an
+ * earlier best is deliberately not enough: the share prompt escalates on a new
+ * peak, and repeating a known weight would cry wolf.
+ */
+const isNewPeak = (series: readonly ProgressPoint[]): boolean => {
+  const last = series.at(-1)
+  if (series.length < RECORD_MIN_SESSIONS || last === undefined) {
+    return false
+  }
+  return series.slice(0, -1).every((point) => point.weightKg < last.weightKg)
+}
+
+/** Whole weeks between two session dates, at least 1 once they differ. */
+const weeksBetween = (fromMs: number, toMs: number): number =>
+  toMs > fromMs ? Math.max(1, Math.round((toMs - fromMs) / WEEK_MS)) : 0
+
+/**
  * One card per plan exercise that has at least one logged session, sorted by
  * the biggest working-weight gain first (the carousel opens on the user's
  * proudest number), breaking ties by the strength-estimate gain.
@@ -109,6 +136,7 @@ const buildExercises = (
         {
           first,
           id,
+          isNewestRecord: isNewPeak(series),
           last,
           series,
           strengthGainPercent: percentChange(
@@ -116,6 +144,7 @@ const buildExercises = (
             last.estimatedMax,
           ),
           trend: trendOf(series.length, weightGainPercent),
+          weeksSpan: weeksBetween(first.date, last.date),
           weightBuckets: bucketSeries(
             series.map((point) => ({
               date: point.date,
@@ -158,9 +187,9 @@ export const deriveProgress = (
   const lastRecord = history.at(-1)
 
   const weeksSpan =
-    history.length > 1 && firstRecord !== undefined && lastRecord !== undefined
-      ? Math.max(1, Math.round((lastRecord.date - firstRecord.date) / WEEK_MS))
-      : 0
+    firstRecord === undefined || lastRecord === undefined
+      ? 0
+      : weeksBetween(firstRecord.date, lastRecord.date)
 
   const lastGapDays =
     lastRecord === undefined

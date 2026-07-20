@@ -28,16 +28,24 @@ export type ProgressTrend = 'down' | 'flat' | 'start' | 'up'
  * sub-line. `weightDeltaKg` and `weightDomain` are always global — measured
  * from the very first session, independent of any visible chart window.
  * `weightBuckets` is the same history folded into the journey overview
- * (`max` per period); `series` stays the raw per-session data the header and
- * share sparkline read.
+ * (`max` per period); `series` stays the raw per-session data the header
+ * reads.
  */
 export type ExerciseProgress = {
   first: ProgressPoint
   id: ExerciseId
+  /**
+   * The newest session beat every session before it — the emotional peak
+   * where the share prompt is worth escalating (BUILD-GUIDE §4.3). Matching
+   * an earlier best is not a peak, so this needs a strictly higher weight.
+   */
+  isNewestRecord: boolean
   last: ProgressPoint
   series: readonly ProgressPoint[]
   strengthGainPercent: number
   trend: ProgressTrend
+  /** Whole weeks from this exercise's first session to its last; 0 if alone. */
+  weeksSpan: number
   weightBuckets: BucketedSeries
   weightDeltaKg: number
   weightDomain: BarDomain

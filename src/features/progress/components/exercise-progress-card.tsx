@@ -27,7 +27,9 @@ type Props = {
  * {@link BigChart}, and a footer with the session count and a share button.
  * A single-record exercise renders as a "start line" — no delta, no arrow, and
  * a {@link GhostPreview} in place of real bars — so a first data point never
- * reads as a broken chart (BUILD-GUIDE §4.3).
+ * reads as a broken chart (BUILD-GUIDE §4.3). On a session that beat every
+ * one before it the card switches to its record voice: the eyebrow names the
+ * peak and the share button escalates to the accent CTA.
  */
 export const ExerciseProgressCard = ({
   exercise,
@@ -39,6 +41,7 @@ export const ExerciseProgressCard = ({
   const format = useFormatter()
   const {
     first,
+    isNewestRecord,
     last,
     series,
     trend,
@@ -52,6 +55,11 @@ export const ExerciseProgressCard = ({
   const hasEstimate = series.length >= 2
 
   const eyebrow = (): string => {
+    // A brand-new peak outranks every other label: it is the one moment the
+    // card can say something the user did today, not something they are.
+    if (isNewestRecord) {
+      return t('trend.record')
+    }
     if (isTopProgress) {
       return t('trend.topProgress')
     }
@@ -77,7 +85,7 @@ export const ExerciseProgressCard = ({
         <span
           className={cn(
             MICRO_LABEL,
-            isTopProgress ? 'text-accent-deep' : 'text-ink-3',
+            isNewestRecord || isTopProgress ? 'text-accent-deep' : 'text-ink-3',
           )}
         >
           {eyebrow()}
@@ -166,9 +174,19 @@ export const ExerciseProgressCard = ({
         <span className="text-ink-3 text-2xs font-mono tabular-nums">
           {t('card.sessions', { count: series.length })}
         </span>
-        <Button onClick={onShare} size="sm" variant="ink">
-          <ShareIcon size={14} />
-          {t('card.share')}
+        {/*
+          At a new peak the share prompt escalates to the accent button — the
+          emotional high is the only moment worth asking. It steps up to `md`
+          with it: ink-on-accent is AAA only at the 19px bold `md` label, so a
+          `sm` accent button is never an option (see `buttonVariants`).
+        */}
+        <Button
+          onClick={onShare}
+          size={isNewestRecord ? 'md' : 'sm'}
+          variant={isNewestRecord ? 'primary' : 'ink'}
+        >
+          <ShareIcon size={isNewestRecord ? 18 : 14} />
+          {t(isNewestRecord ? 'card.shareRecord' : 'card.share')}
         </Button>
       </div>
     </Card>

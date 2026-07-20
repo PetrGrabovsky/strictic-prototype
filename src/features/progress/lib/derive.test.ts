@@ -24,6 +24,10 @@ const record = (
   volume,
 })
 
+/** Whether the newest `db_ohp` session in this history reads as a new peak. */
+const hasNewPeak = (history: WorkoutRecord[]): boolean =>
+  deriveProgress(['db_ohp'], history, NOW).exercises[0].isNewestRecord
+
 describe('deriveProgress — per-exercise', () => {
   it('marks a single record as a start state without dividing by zero', () => {
     const history = [record(0, { goblet_squat: result(20, 10, 26) })]
@@ -81,6 +85,50 @@ describe('deriveProgress — per-exercise', () => {
     ])
     const starred = only.weightBuckets.buckets.filter((bucket) => bucket.isPr)
     expect(starred.map((bucket) => bucket.value)).toEqual([28])
+  })
+
+  it('flags a new peak only when the newest session beats every earlier one', () => {
+    const beaten = [
+      record(28, { db_ohp: result(14, 10, 18) }),
+      record(14, { db_ohp: result(16, 10, 21) }),
+      record(0, { db_ohp: result(18, 10, 24) }),
+    ]
+    // Matching an old best is not a peak — the prompt must not cry wolf.
+    const matched = [
+      record(28, { db_ohp: result(18, 10, 24) }),
+      record(14, { db_ohp: result(16, 10, 21) }),
+      record(0, { db_ohp: result(18, 10, 24) }),
+    ]
+    // Two sessions in, every added kilo is a "record" — too soon to shout.
+    const tooEarly = [
+      record(14, { db_ohp: result(16, 10, 21) }),
+      record(0, { db_ohp: result(18, 10, 24) }),
+    ]
+
+    expect(hasNewPeak(beaten)).toBe(true)
+    expect(hasNewPeak(matched)).toBe(false)
+    expect(hasNewPeak(tooEarly)).toBe(false)
+  })
+
+  it('measures each exercise journey in whole weeks of its own', () => {
+    const history = [
+      record(35, { db_ohp: result(16, 10, 21) }),
+      record(21, { goblet_squat: result(20, 10, 26) }),
+      record(0, {
+        db_ohp: result(18, 10, 24),
+        goblet_squat: result(24, 10, 32),
+      }),
+    ]
+    const { exercises } = deriveProgress(
+      ['db_ohp', 'goblet_squat'],
+      history,
+      NOW,
+    )
+    const spanOf = (id: string): number | undefined =>
+      exercises.find((entry) => entry.id === id)?.weeksSpan
+
+    expect(spanOf('db_ohp')).toBe(5)
+    expect(spanOf('goblet_squat')).toBe(3)
   })
 
   it('flags a drop and a hold distinctly', () => {
