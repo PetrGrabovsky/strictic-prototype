@@ -319,15 +319,7 @@ export const ProgressScreen = () => {
           </p>
           <div className="mt-3.5">
             <BigChart
-              format={(value) => formatVolume(format, value)}
-              height={VOLUME_CHART_HEIGHT}
-              points={volumeBuckets.buckets.map((bucket) => ({
-                isEmpty: bucket.isEmpty,
-                isInProgress: bucket.isInProgress,
-                key: bucket.key,
-                value: bucket.value,
-              }))}
-              rangeLabel={t('rangeCaption', {
+              caption={t('rangeCaption', {
                 from: formatBucketDate(
                   format,
                   volumeDates[0],
@@ -340,6 +332,15 @@ export const ProgressScreen = () => {
                   volumeBuckets.granularity,
                 ),
               })}
+              format={(value) => formatVolume(format, value)}
+              height={VOLUME_CHART_HEIGHT}
+              label={t('chart.volume')}
+              points={volumeBuckets.buckets.map((bucket) => ({
+                isEmpty: bucket.isEmpty,
+                isInProgress: bucket.isInProgress,
+                key: bucket.key,
+                value: bucket.value,
+              }))}
               variant="ink"
             />
           </div>

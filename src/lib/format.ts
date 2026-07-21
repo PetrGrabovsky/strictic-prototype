@@ -9,6 +9,11 @@ export type Formatter = {
   // next-intl formatter's option types are narrower than the `Intl.*` ones,
   // and strict contravariance would otherwise reject a real `useFormatter()`.
   dateTime(value: Date | number, options?: Intl.DateTimeFormatOptions): string
+  dateTimeRange(
+    start: Date | number,
+    end: Date | number,
+    options?: Intl.DateTimeFormatOptions,
+  ): string
   number(value: number, options?: Intl.NumberFormatOptions): string
 }
 

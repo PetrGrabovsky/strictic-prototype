@@ -110,6 +110,11 @@
       "quarter": "po čtvrtletích"
     },
     "rangeCaption": "{period} · {from} – {to}",
+    "chart": {
+      "weight": "Graf pracovní váhy v čase: {name}",
+      "volume": "Graf objemu za trénink",
+      "detail": "Tréninky v období {period}"
+    },
     "backToPlan": "Zpátky na plán",
     "empty": {
       "title": "Zatím tu nic není",
@@ -145,6 +150,14 @@
       "sessions": "{count, plural, one {# trénink} few {# tréninky} other {# tréninků}}",
       "share": "Sdílet cvik",
       "shareRecord": "Pochlub se"
+    },
+    "detail": {
+      "label": "Detail období: {name}",
+      "barLabel": "{period}, {value}",
+      "previous": "Předchozí období",
+      "next": "Další období",
+      "close": "Zavřít detail",
+      "baseline": "start {value}"
     },
     "volume": {
       "heading": "Objem za trénink",

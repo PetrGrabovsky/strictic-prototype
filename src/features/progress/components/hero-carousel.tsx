@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { IconButton } from '@/components/ui/icon-button'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/ui/icons'
 import { cn } from '@/lib/cn'
+import { ARROW_BUTTON } from '@/styles/controls'
 import { SCROLLBAR_HIDDEN } from '@/styles/layout'
 import { SECTION_LABEL } from '@/styles/type'
 
@@ -23,12 +24,6 @@ type Props = {
 }
 
 const ARROW_ICON_SIZE = 16
-
-/** The arrows' skin on top of {@link IconButton}: a bordered surface disc. */
-const ARROW_CLASS = cn(
-  'border-line-2 text-ink bg-surface rounded-full border',
-  'hover:brightness-95 active:brightness-90',
-)
 
 /**
  * The per-exercise hero carousel. Scroll position is the single source of
@@ -127,7 +122,7 @@ export const HeroCarousel = ({
       {hasControls ? (
         <div className="mt-3.5 flex items-center justify-center gap-3.5">
           <IconButton
-            className={ARROW_CLASS}
+            className={ARROW_BUTTON}
             label={previousLabel}
             onClick={() => pageBy(-1)}
           >
@@ -157,7 +152,7 @@ export const HeroCarousel = ({
           </div>
 
           <IconButton
-            className={ARROW_CLASS}
+            className={ARROW_BUTTON}
             label={nextLabel}
             onClick={() => pageBy(1)}
           >

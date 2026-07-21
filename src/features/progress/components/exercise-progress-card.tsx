@@ -1,18 +1,28 @@
 import { useFormatter, useTranslations } from 'next-intl'
+import { useId, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ArrowRightIcon, ShareIcon } from '@/components/ui/icons'
 import { BigChart } from '@/features/progress/components/big-chart'
+import { BucketDetail } from '@/features/progress/components/bucket-detail'
 import { DeltaBadge } from '@/features/progress/components/delta-badge'
 import { GhostPreview } from '@/features/progress/components/ghost-preview'
-import { formatBucketDate } from '@/features/progress/lib/format-bucket-date'
-import type { ExerciseProgress } from '@/features/progress/types'
+import { drillIntoBucket } from '@/features/progress/lib/drill-down'
+import {
+  formatBucketDate,
+  formatBucketPeriod,
+} from '@/features/progress/lib/format-bucket-date'
+import type { ExerciseProgress, ProgressPoint } from '@/features/progress/types'
 import { cn } from '@/lib/cn'
 import { formatKg } from '@/lib/format'
 import { MICRO_LABEL } from '@/styles/type'
 
 /** Per-exercise chart is a touch shorter than the volume chart (reference). */
 const CHART_HEIGHT = 88
+
+/** The charted metric of this card: working weight, session by session. */
+const weightPoints = (series: readonly ProgressPoint[]) =>
+  series.map((point) => ({ date: point.date, value: point.weightKg }))
 
 type Props = {
   exercise: ExerciseProgress
@@ -29,7 +39,9 @@ type Props = {
  * a {@link GhostPreview} in place of real bars — so a first data point never
  * reads as a broken chart (BUILD-GUIDE §4.3). On a session that beat every
  * one before it the card switches to its record voice: the eyebrow names the
- * peak and the share button escalates to the accent CTA.
+ * peak and the share button escalates to the accent CTA. Once history is long
+ * enough for the overview to fold sessions into periods, every bar opens a
+ * {@link BucketDetail} disclosure holding the sessions behind it.
  */
 export const ExerciseProgressCard = ({
   exercise,
@@ -50,9 +62,49 @@ export const ExerciseProgressCard = ({
     weightDomain,
     weightGainPercent,
   } = exercise
+  const panelId = useId()
+  const expandedRef = useRef<HTMLButtonElement>(null)
+  const [openBucketKey, setOpenBucketKey] = useState<null | string>(null)
   const isUp = trend === 'up'
   const isStart = trend === 'start'
   const hasEstimate = series.length >= 2
+  // A session-level overview is already one bar per workout — there is nothing
+  // left to unfold, so its bars stay plain (BUILD-GUIDE, decision: level 1).
+  const isDrillable = weightBuckets.granularity !== 'session'
+  const openDetail =
+    openBucketKey === null
+      ? null
+      : drillIntoBucket(
+          weightPoints(series),
+          weightBuckets.buckets,
+          openBucketKey,
+        )
+
+  // Focus first, close second: the bar is still mounted at this point, so the
+  // keyboard lands back where the panel was opened from instead of on nothing.
+  const closeDetail = () => {
+    expandedRef.current?.focus()
+    setOpenBucketKey(null)
+  }
+
+  const overviewBars = () =>
+    weightBuckets.buckets.map((bucket) => ({
+      isEmpty: bucket.isEmpty,
+      isPr: bucket.isPr,
+      key: bucket.key,
+      label:
+        isDrillable && !bucket.isEmpty
+          ? t('detail.barLabel', {
+              period: formatBucketPeriod(
+                format,
+                bucket,
+                weightBuckets.granularity,
+              ),
+              value: formatKg(format, bucket.value),
+            })
+          : undefined,
+      value: bucket.value,
+    }))
 
   const eyebrow = (): string => {
     // A brand-new peak outranks every other label: it is the one moment the
@@ -144,16 +196,7 @@ export const ExerciseProgressCard = ({
           />
         ) : (
           <BigChart
-            domain={weightDomain}
-            format={(value) => formatKg(format, value)}
-            height={CHART_HEIGHT}
-            points={weightBuckets.buckets.map((bucket) => ({
-              isEmpty: bucket.isEmpty,
-              isPr: bucket.isPr,
-              key: bucket.key,
-              value: bucket.value,
-            }))}
-            rangeLabel={t('rangeCaption', {
+            caption={t('rangeCaption', {
               from: formatBucketDate(
                 format,
                 first.date,
@@ -166,6 +209,37 @@ export const ExerciseProgressCard = ({
                 weightBuckets.granularity,
               ),
             })}
+            domain={weightDomain}
+            drill={
+              isDrillable
+                ? {
+                    expandedKey: openBucketKey,
+                    expandedRef,
+                    onSelect: (key) =>
+                      setOpenBucketKey((current) =>
+                        current === key ? null : key,
+                      ),
+                    panelId,
+                  }
+                : undefined
+            }
+            format={(value) => formatKg(format, value)}
+            height={CHART_HEIGHT}
+            label={t('chart.weight', { name })}
+            points={overviewBars()}
+          />
+        )}
+        {openDetail === null ? null : (
+          <BucketDetail
+            baselineKg={first.weightKg}
+            detail={openDetail}
+            domain={weightDomain}
+            exerciseName={name}
+            granularity={weightBuckets.granularity}
+            height={CHART_HEIGHT}
+            id={panelId}
+            onClose={closeDetail}
+            onStep={setOpenBucketKey}
           />
         )}
       </div>

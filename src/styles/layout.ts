@@ -19,3 +19,24 @@ export const SCREEN = cn(
 export const SCROLLBAR_HIDDEN = cn(
   'scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden',
 )
+
+/**
+ * A scrolling track that shows its scrollbar as a designed rail rather than
+ * hiding it. The browser draws the rail only while the content really
+ * overflows, so it doubles as the "there is more this way" affordance — and
+ * on a pointer device it is the only way to pan at all, since a vertical
+ * wheel does not scroll a horizontal track and hijacking the wheel would
+ * trap the page. Styled through the WebKit pseudo-elements alone, not the
+ * standard `scrollbar-width`/`scrollbar-color` pair: setting either of those
+ * makes Chromium ignore the pseudo-elements, and their thin preset drags in
+ * platform stepper arrows. Firefox keeps its own slim scrollbar. The thumb
+ * rides the mid-grey line token — 3.43:1 on the card, clearing WCAG 1.4.11
+ * for a UI component. `pb-2` keeps the rail off the content it scrolls.
+ */
+export const SCROLL_RAIL = cn(
+  'pb-2',
+  '[&::-webkit-scrollbar-thumb]:bg-line-field',
+  '[&::-webkit-scrollbar-thumb]:rounded-full',
+  '[&::-webkit-scrollbar-track]:bg-transparent',
+  '[&::-webkit-scrollbar]:h-1.5',
+)
