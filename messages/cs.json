@@ -172,6 +172,8 @@
     "share": {
       "kicker": "Můj pokrok",
       "tagline": "Domácí trénink. Poctivě.",
+      "cta": "Plán na míru z toho, co máš doma",
+      "badge": "Zdarma · bez reklam",
       "deltaLabel": "SÍLA NAHORU",
       "deltaValue": "+{percent} %",
       "firstRecordLabel": "1. ZÁZNAM",

@@ -8,35 +8,65 @@ import type { BarDomain } from '@/features/progress/lib/bar-scale'
 import { MAX_OVERVIEW_BARS } from '@/features/progress/lib/bucket-series'
 import { tokens } from '@/styles/tokens'
 
-/** The share image is a fixed 1080×1080 square (DESIGN-SYSTEM §3, §7). */
-const CANVAS_SIZE = 1080
-const MARGIN = 92
+/**
+ * The share image is a 1080×1920 story (9:16) — the format Stories fill edge to
+ * edge (Instagram/Facebook/WhatsApp Status, Snapchat), where a workout brag
+ * actually gets shared. Revised from the original 1:1 square (DESIGN-SYSTEM §3,
+ * §7): the square letterboxed on every Stories surface, and chat apps render a
+ * portrait image just as happily, so a single tall format serves every channel
+ * and drops the "which format" choice entirely.
+ */
+const CANVAS_WIDTH = 1080
+const CANVAS_HEIGHT = 1920
+const MARGIN = 96
+const CONTENT_WIDTH = CANVAS_WIDTH - 2 * MARGIN
 const FALLBACK_FAMILY = 'system-ui, sans-serif'
 
-const BARS_TOP = 648
-const BARS_HEIGHT = 190
-const BARS_GAP = 12
-const BAR_RADIUS = 8
+const BARS_TOP = 1070
+const BARS_HEIGHT = 300
+const BARS_GAP = 14
+const BAR_RADIUS = 10
+/** Clearance between a bar's top and the from/to label floating above it. */
+const BARS_LABEL_GAP = 18
 /** A skipped period's tick: a short dash on the floor, as wide as this bar. */
 const GAP_TICK_WIDTH_FRACTION = 0.45
-const GAP_TICK_HEIGHT = 5
+const GAP_TICK_HEIGHT = 6
 
-/** Vertical anchors of the card's text blocks (canvas y coordinates). */
-const KICKER_Y = 300
-const NAME_Y = 384
-const HEADLINE_Y = 540
-const SUBLINE_Y = 600
-const STAT_Y = 905
+/**
+ * Vertical anchors of the card's text blocks (canvas y coordinates), tuned as a
+ * top-to-bottom poster with the hero delta as the largest element: brand,
+ * kicker, name, delta, subline, journey, stat, footer.
+ */
+const KICKER_Y = 460
+const NAME_Y = 552
+const NAME_SIZE = 64
+const NAME_LINE_HEIGHT = 74
+const NAME_MAX_LINES = 2
+const HEADLINE_Y = 840
+const SUBLINE_Y = 968
+const STAT_Y = 1450
+/**
+ * Conversion band — CTA hook, trust badge and link — pulled up into the
+ * Stories-safe zone. A Story is where the image gets shared, yet Stories ignore
+ * the link params in the share payload, so the *printed* link is the only funnel
+ * a Story has; it must clear the reply bar that overlays the frame's lowest
+ * ~250px. The brand + date sit below it as sacrificial chrome — fine to lose to
+ * that overlay, and still shown when the image is saved or sent in chat.
+ */
+const CONVERT_DIVIDER_Y = 1535
+const CONVERT_CTA_Y = 1592
+const CONVERT_LINK_Y = 1648
+const FOOTER_Y = 1824
 
 /** The logo lockup top-left: mark, wordmark, accent dot. */
-const BRAND_BASELINE = MARGIN + 40
-const BRAND_SIZE = 46
+const BRAND_BASELINE = 200
+const BRAND_SIZE = 52
 /** Inter's cap height as a fraction of its font size — centres the mark on
  *  the wordmark's optical middle rather than sitting it on the baseline. */
 const BRAND_CAP_RATIO = 0.72
 /** The mark stands a touch proud of the wordmark, as it does in the headers. */
-const BRAND_MARK_HEIGHT = 50
-const BRAND_MARK_GAP = 16
+const BRAND_MARK_HEIGHT = 58
+const BRAND_MARK_GAP = 18
 /** The wordmark's closing period, painted in the accent — the logo's single
  *  accent glyph, the same one the app header and the OG card render. */
 const BRAND_ACCENT_DOT = '.'
@@ -60,11 +90,13 @@ export type ShareBar = {
  * image and the app draw identical proportions (BUILD-GUIDE decision 4).
  */
 export type ShareCard = {
+  badge: string
   bars: readonly ShareBar[]
   barsDomain?: BarDomain
   barsFromLabel: string
   barsToLabel: string
   brand: string
+  cta: string
   footer: string
   headline: string
   kicker: string
@@ -126,6 +158,40 @@ const fitText = (
   return `${clipped}…`
 }
 
+/**
+ * Word-wraps `text` into at most `maxLines` lines that each fit `maxWidth`. The
+ * tall story frame has the vertical room a square did not, so a long exercise
+ * name reads in full across two lines instead of being cut with an ellipsis;
+ * only a name that still overruns the last line is clipped by {@link fitText}.
+ */
+const wrapLines = (
+  context: CanvasContext,
+  text: string,
+  maxWidth: number,
+  maxLines: number,
+): string[] => {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let current = ''
+  for (const [index, word] of words.entries()) {
+    const candidate = current === '' ? word : `${current} ${word}`
+    if (current !== '' && context.measureText(candidate).width > maxWidth) {
+      lines.push(current)
+      if (lines.length === maxLines - 1) {
+        lines.push(fitText(context, words.slice(index).join(' '), maxWidth))
+        return lines
+      }
+      current = word
+    } else {
+      current = candidate
+    }
+  }
+  if (current !== '') {
+    lines.push(fitText(context, current, maxWidth))
+  }
+  return lines
+}
+
 const drawStat = (
   context: CanvasContext,
   family: string,
@@ -136,19 +202,23 @@ const drawStat = (
 ): void => {
   context.textAlign = 'left'
   context.fillStyle = tokens.dark.ink
-  context.font = fontOf(family, 700, 52)
+  context.font = fontOf(family, 700, 60)
   context.fillText(value, x, y)
   context.fillStyle = withAlpha(tokens.dark.ink, 0.4)
-  context.font = fontOf(family, 600, 22)
-  context.fillText(label, x, y + 34)
+  context.font = fontOf(family, 600, 24)
+  context.fillText(label, x, y + 42)
 }
 
 /**
- * The bucketed journey under the headline: one column per period, newest at
- * full strength and the rest dimmed so the eye lands on today's number. A
- * period the user skipped keeps its slot as a floor tick — the same honesty
- * the on-screen chart owes (decision 7), and a lapsed month never silently
- * shortens the story.
+ * The bucketed journey under the headline: one column per period. The peak (the
+ * all-time-best bucket) burns at full accent while the rest are dimmed — the
+ * same bucket the on-screen chart stars, so the brightest bar is always the
+ * tallest. Highlighting the newest instead would light a *shorter* bar whenever
+ * a later period plateaus below an earlier peak, which reads as a broken chart;
+ * today's number is already called out by the bold "to" label above the last
+ * bar, so nothing is lost. A skipped period keeps its slot as a floor tick — the
+ * same honesty the on-screen chart owes (decision 7), so a lapsed month never
+ * silently shortens the story.
  */
 const drawJourney = (
   context: CanvasContext,
@@ -160,7 +230,7 @@ const drawJourney = (
     return
   }
   const left = MARGIN
-  const width = CANVAS_SIZE - 2 * MARGIN
+  const width = CONTENT_WIDTH
   const floor = BARS_TOP + BARS_HEIGHT
   const lastIndex = bars.length - 1
 
@@ -184,6 +254,18 @@ const drawJourney = (
   const heightOf = (bar: ShareBar): number =>
     fractionOf(bar.value) * BARS_HEIGHT
 
+  // The bar to burn at full accent: the highest value, ties going to the later
+  // period so a flat-at-the-top series still lights the newest bar.
+  let peakIndex = -1
+  for (const [index, bar] of bars.entries()) {
+    if (
+      !bar.isEmpty &&
+      (peakIndex === -1 || bar.value >= bars[peakIndex].value)
+    ) {
+      peakIndex = index
+    }
+  }
+
   for (const [index, bar] of bars.entries()) {
     const x = left + index * (barWidth + BARS_GAP)
     if (bar.isEmpty) {
@@ -201,7 +283,7 @@ const drawJourney = (
       continue
     }
     const barHeight = heightOf(bar)
-    context.globalAlpha = index === lastIndex ? 1 : 0.5
+    context.globalAlpha = index === peakIndex ? 1 : 0.5
     context.fillStyle = tokens.dark.accent
     context.beginPath()
     context.roundRect(x, floor - barHeight, barWidth, barHeight, [
@@ -218,17 +300,21 @@ const drawJourney = (
   if (bars.length > 1 && !first.isEmpty) {
     context.textAlign = 'left'
     context.fillStyle = withAlpha(tokens.dark.ink, 0.5)
-    context.font = fontOf(family, 600, 24)
-    context.fillText(card.barsFromLabel, left, floor - heightOf(first) - 16)
+    context.font = fontOf(family, 600, 26)
+    context.fillText(
+      card.barsFromLabel,
+      left,
+      floor - heightOf(first) - BARS_LABEL_GAP,
+    )
   }
   const last = bars[lastIndex]
   context.textAlign = 'right'
   context.fillStyle = tokens.dark.ink
-  context.font = fontOf(family, 700, 27)
+  context.font = fontOf(family, 700, 32)
   context.fillText(
     card.barsToLabel,
     left + width,
-    floor - (last.isEmpty ? 0 : heightOf(last)) - 16,
+    floor - (last.isEmpty ? 0 : heightOf(last)) - BARS_LABEL_GAP,
   )
   context.textAlign = 'left'
 }
@@ -277,36 +363,64 @@ const drawHeader = (
   context.fillText(BRAND_ACCENT_DOT, wordmarkX + brandWidth, BRAND_BASELINE)
 }
 
-const drawFooter = (
+/**
+ * The reason a stranger scrolling past acts: what the app is (the CTA hook, in
+ * the product's own words), that it costs nothing (the green trust badge) and
+ * where to get it (the link, the biggest reachable element). It sits in the
+ * Stories-safe band so the one funnel a Story has survives the reply-bar
+ * overlay. The hero brag above still dominates — this is a footer, not a pitch,
+ * or the sharer would not post it.
+ */
+const drawCallToAction = (
   context: CanvasContext,
   family: string,
   card: ShareCard,
 ): void => {
-  const line = CANVAS_SIZE - 150
   context.strokeStyle = withAlpha(tokens.dark.ink, 0.12)
   context.lineWidth = 2
   context.beginPath()
-  context.moveTo(MARGIN, line)
-  context.lineTo(CANVAS_SIZE - MARGIN, line)
+  context.moveTo(MARGIN, CONVERT_DIVIDER_Y)
+  context.lineTo(CANVAS_WIDTH - MARGIN, CONVERT_DIVIDER_Y)
   context.stroke()
 
   context.textAlign = 'left'
-  context.fillStyle = withAlpha(tokens.dark.ink, 0.8)
-  context.font = fontOf(family, 600, 27)
-  context.fillText(card.tagline, MARGIN, line + 46)
-  context.fillStyle = withAlpha(tokens.dark.ink, 0.32)
-  context.font = fontOf(family, 500, 22)
-  context.fillText(card.footer, MARGIN, line + 80)
+  context.fillStyle = tokens.dark.ink
+  context.font = fontOf(family, 700, 38)
+  context.fillText(card.cta, MARGIN, CONVERT_CTA_Y)
+
+  context.fillStyle = tokens.dark.green
+  context.font = fontOf(family, 600, 28)
+  context.fillText(card.badge, MARGIN, CONVERT_LINK_Y)
 
   context.textAlign = 'right'
   context.fillStyle = tokens.dark.accent
-  context.font = fontOf(family, 700, 30)
-  context.fillText(card.url, CANVAS_SIZE - MARGIN, line + 60)
+  context.font = fontOf(family, 700, 40)
+  context.fillText(card.url, CANVAS_WIDTH - MARGIN, CONVERT_LINK_Y)
   context.textAlign = 'left'
 }
 
 /**
- * Renders the shareable progress image on a 1080×1080 canvas. Canvas cannot
+ * Brand line and date at the very bottom — sacrificial chrome. It carries no
+ * funnel (the conversion band above owns that), so losing it to the Stories
+ * reply-bar overlay costs nothing, while a saved or chat-shared image still gets
+ * the tagline and the date's quiet "this is a real, recent result" signal.
+ */
+const drawBrandFooter = (
+  context: CanvasContext,
+  family: string,
+  card: ShareCard,
+): void => {
+  context.fillStyle = withAlpha(tokens.dark.ink, 0.3)
+  context.font = fontOf(family, 500, 24)
+  context.textAlign = 'left'
+  context.fillText(card.tagline, MARGIN, FOOTER_Y)
+  context.textAlign = 'right'
+  context.fillText(card.footer, CANVAS_WIDTH - MARGIN, FOOTER_Y)
+  context.textAlign = 'left'
+}
+
+/**
+ * Renders the shareable progress image on a 1080×1920 canvas. Canvas cannot
  * read the app's CSS color variables, so every fill comes from the JS token
  * mirror (`@/styles/tokens`) — the dark-theme palette, since the card is a
  * dark surface (BUILD-GUIDE §4.4). The font family is read from the live DOM
@@ -317,8 +431,8 @@ export const buildShareCanvas = async (
   card: ShareCard,
 ): Promise<HTMLCanvasElement | null> => {
   const canvas = document.createElement('canvas')
-  canvas.width = CANVAS_SIZE
-  canvas.height = CANVAS_SIZE
+  canvas.width = CANVAS_WIDTH
+  canvas.height = CANVAS_HEIGHT
   const context = canvas.getContext('2d')
   if (context === null) {
     return null
@@ -331,43 +445,45 @@ export const buildShareCanvas = async (
   const family = getComputedStyle(document.body).fontFamily || FALLBACK_FAMILY
 
   context.fillStyle = tokens.dark.bg
-  context.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+  context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+  // One brand light, top-right, matching the OG card — a soft accent glow over
+  // the upper third of the tall frame, fading out before the journey chart.
   const glow = context.createRadialGradient(
-    CANVAS_SIZE * 0.84,
-    CANVAS_SIZE * 0.12,
+    CANVAS_WIDTH * 0.82,
+    CANVAS_HEIGHT * 0.06,
     0,
-    CANVAS_SIZE * 0.84,
-    CANVAS_SIZE * 0.12,
-    CANVAS_SIZE * 0.92,
+    CANVAS_WIDTH * 0.82,
+    CANVAS_HEIGHT * 0.06,
+    CANVAS_WIDTH * 0.95,
   )
   glow.addColorStop(0, withAlpha(tokens.dark.accent, 0.2))
   glow.addColorStop(1, withAlpha(tokens.dark.accent, 0))
   context.fillStyle = glow
-  context.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+  context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
   drawHeader(context, family, card)
 
   context.fillStyle = tokens.dark.accent
-  context.font = fontOf(family, 600, 26)
+  context.font = fontOf(family, 600, 30)
   context.fillText(card.kicker.toUpperCase(), MARGIN, KICKER_Y)
 
   context.fillStyle = tokens.dark.ink
-  context.font = fontOf(family, 700, 60)
-  context.fillText(
-    fitText(context, card.name, CANVAS_SIZE - 2 * MARGIN),
-    MARGIN,
-    NAME_Y,
-  )
+  context.font = fontOf(family, 700, NAME_SIZE)
+  const nameLines = wrapLines(context, card.name, CONTENT_WIDTH, NAME_MAX_LINES)
+  for (const [index, nameLine] of nameLines.entries()) {
+    context.fillText(nameLine, MARGIN, NAME_Y + index * NAME_LINE_HEIGHT)
+  }
 
-  context.font = fontOf(family, 800, 150)
+  context.font = fontOf(family, 800, 190)
   context.fillText(card.headline, MARGIN, HEADLINE_Y)
   context.fillStyle = withAlpha(tokens.dark.ink, 0.45)
-  context.font = fontOf(family, 600, 40)
+  context.font = fontOf(family, 600, 46)
   context.fillText(card.subline, MARGIN, SUBLINE_Y)
 
   drawJourney(context, family, card)
   drawStat(context, family, MARGIN, STAT_Y, card.statValue, card.statLabel)
-  drawFooter(context, family, card)
+  drawCallToAction(context, family, card)
+  drawBrandFooter(context, family, card)
 
   return canvas
 }

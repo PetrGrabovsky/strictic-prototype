@@ -63,8 +63,9 @@ full-screen in dim mode) = local, not a token.
 
 **Local exceptions (NOT tokens — used by a single location and tuned):**
 progress hero number 46, landing H1 38, stat 29→30, internal chart typography
-(BigChart 9.5/10 inside bars — keep exactly), share-image canvas (1080×1080, its
-own dimensions).
+(BigChart 9.5/10 inside bars — keep exactly), share-image canvas (1080×1920
+story / 9:16, its own dimensions — revised from the original 1:1 square, which
+letterboxed on every Stories surface; see progress-charts-plan decision 21).
 
 ## 4. Radii — from 23 values to 4 tokens
 

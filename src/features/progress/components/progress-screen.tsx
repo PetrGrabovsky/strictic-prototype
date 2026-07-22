@@ -186,6 +186,7 @@ export const ProgressScreen = () => {
     }
 
     return {
+      badge: t('share.badge'),
       bars: weightBuckets.buckets.map((bucket) => ({
         isEmpty: bucket.isEmpty,
         value: bucket.value,
@@ -194,6 +195,7 @@ export const ProgressScreen = () => {
       barsFromLabel: from,
       barsToLabel: to,
       brand: BRAND_WORDMARK,
+      cta: t('share.cta'),
       footer: shareDate(format),
       headline: hasGain ? formatKgDelta(format, weightDeltaKg) : to,
       kicker: t('share.kicker'),
