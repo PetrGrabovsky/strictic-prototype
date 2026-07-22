@@ -12,7 +12,10 @@ import { BigChart } from '@/features/progress/components/big-chart'
 import { ExerciseProgressCard } from '@/features/progress/components/exercise-progress-card'
 import { HeroCarousel } from '@/features/progress/components/hero-carousel'
 import { deriveProgress } from '@/features/progress/lib/derive'
-import { formatBucketDate } from '@/features/progress/lib/format-bucket-date'
+import {
+  formatBucketDate,
+  formatBucketPeriod,
+} from '@/features/progress/lib/format-bucket-date'
 import {
   buildShareCanvas,
   deliverShareImage,
@@ -251,11 +254,9 @@ export const ProgressScreen = () => {
     sessionsLast30,
     totalVolumeKg,
     volumeBuckets,
-    volumeDates,
     weekDots,
     weeksSpan,
   } = snapshot.data
-  const lastVolumeDate = volumeDates.at(-1) ?? volumeDates[0]
 
   return (
     <main className={cn(SCREEN, 'pb-16')}>
@@ -319,26 +320,29 @@ export const ProgressScreen = () => {
           </p>
           <div className="mt-3.5">
             <BigChart
-              caption={t('rangeCaption', {
-                from: formatBucketDate(
-                  format,
-                  volumeDates[0],
-                  volumeBuckets.granularity,
-                ),
-                period: t(`granularity.${volumeBuckets.granularity}`),
-                to: formatBucketDate(
-                  format,
-                  lastVolumeDate,
-                  volumeBuckets.granularity,
-                ),
-              })}
               format={(value) => formatVolume(format, value)}
               height={VOLUME_CHART_HEIGHT}
               label={t('chart.volume')}
               points={volumeBuckets.buckets.map((bucket) => ({
+                axisLabel: formatBucketDate(
+                  format,
+                  bucket.startMs,
+                  volumeBuckets.granularity,
+                ),
                 isEmpty: bucket.isEmpty,
                 isInProgress: bucket.isInProgress,
                 key: bucket.key,
+                // A skipped period draws a decorative tick, so without this a
+                // screen reader would get the bare axis label and nothing else.
+                label: bucket.isEmpty
+                  ? t('chart.emptyPeriod', {
+                      period: formatBucketPeriod(
+                        format,
+                        bucket,
+                        volumeBuckets.granularity,
+                      ),
+                    })
+                  : undefined,
                 value: bucket.value,
               }))}
               variant="ink"

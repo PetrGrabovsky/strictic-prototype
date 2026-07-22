@@ -1,30 +1,63 @@
 import type { RefObject } from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createBarScale } from '@/features/progress/lib/bar-scale'
 import type { BarDomain } from '@/features/progress/lib/bar-scale'
 import { cn } from '@/lib/cn'
+import { rem } from '@/lib/rem'
 import { SCROLL_RAIL } from '@/styles/layout'
 
 /**
- * Fixed bar width in px (BUILD-GUIDE §4, §5 local exception — DO NOT CHANGE).
- * Bars never stretch to fill the container: a single record must stay a
- * normal-width bar, not a full-width slab that breaks the label centring.
- * Exported so the start-state ghost preview draws bars of the same width.
+ * Fixed bar width in design px (BUILD-GUIDE §4, §5 local exception — DO NOT
+ * CHANGE). Bars never stretch to fill the container: a single record must stay
+ * a normal-width bar, not a full-width slab that breaks the label centring.
+ * Rendered through {@link rem}, so "fixed" means fixed relative to the text it
+ * carries, not to the browser's default font size. Exported so the start-state
+ * ghost preview draws bars of the same width.
  */
 export const COLUMN_WIDTH = 42
-/** Headroom above the tallest bar for an over-the-bar label. */
-const GUTTER = 20
-/** A label fits inside the bar only once the bar is at least this tall. */
-const INSIDE_THRESHOLD = 30
-/** Shortest a bar ever renders, so an empty/near-zero value still shows. */
-const MIN_BAR_HEIGHT_PX = 2
 
 /**
- * Clamps a 0–1 height fraction so a baseline whose value sits outside the
- * scaled range still renders inside the plot rather than off-canvas.
+ * The column's width as a CSS length. It grows with the reader's text so the
+ * labels never outgrow the bar they sit in, but it never shrinks below the
+ * design width: a reader who makes text *smaller* is not asking for a tap
+ * target under 44px (WCAG 2.5.5), which a purely proportional column would
+ * give them. Exported for the ghost preview, whose bars must line up with it.
  */
-const clampFraction = (fraction: number): number =>
-  Math.min(1, Math.max(0, fraction))
+export const COLUMN_WIDTH_CSS = `max(${rem(COLUMN_WIDTH)}, ${COLUMN_WIDTH}px)`
+/** Row under the plot carrying each column's period name, when one is given. */
+const AXIS_HEIGHT = 16
+/** Headroom above the tallest bar for an over-the-bar label. */
+const GUTTER = 20
+/**
+ * The value label's own box: a 15px line inset 6px from the bar's top edge,
+ * both measured in the browser. A number picked to feel safe instead is what
+ * kept labels outside bars that had plenty of room for them.
+ */
+const INSIDE_LABEL_HEIGHT = 21
+/** Clearance below the inside label, so it never sits flush on the baseline. */
+const INSIDE_LABEL_CLEARANCE = 4
+/** Labels move inside the bars once the *shortest* bar is at least this tall. */
+const INSIDE_THRESHOLD = INSIDE_LABEL_HEIGHT + INSIDE_LABEL_CLEARANCE
+/** Shortest a bar ever renders, so an empty/near-zero value still shows. */
+const MIN_BAR_HEIGHT_PX = 2
+/**
+ * Width of one glyph in the labels' monospace face — measured, and exact
+ * rather than typical: eight of any character render to 43.99px, at every
+ * weight the chart uses. In design px like {@link COLUMN_WIDTH}, and both
+ * scale together, so the budget below holds at any text size.
+ */
+const MONO_CHAR_WIDTH = 5.5
+/**
+ * Longest label that still fits inside a bar. `22,5 kg` (7) is the widest the
+ * bar can hold; `106,3 kg` (8) would hang over both of its edges, putting dark
+ * text half on the bar and half on the card. Above the bars the same label has
+ * the whole column pitch to spread into, so length only gates going inside.
+ */
+const MAX_INSIDE_LABEL_CHARS = Math.floor(COLUMN_WIDTH / MONO_CHAR_WIDTH)
+
+/** Pixel height of a bar from its scaled 0–1 fraction, never below the floor. */
+const scaledBarHeight = (fraction: number, height: number): number =>
+  Math.max(MIN_BAR_HEIGHT_PX, Math.round(fraction * height))
 
 /**
  * On the accent (orange) bars the inside label must be dark — white fails
@@ -52,6 +85,13 @@ const PR_STAR = '★'
 
 /** One bar: a stable key, its value, and optional journey-state flags. */
 type ChartPoint = {
+  /**
+   * The period this bar covers, pre-formatted — `čvc`, `13. 7.`. Printed under
+   * the bar as the chart's x axis, which is the only place a sighted reader
+   * can learn what a bar *is*: the value label says `14 kg` and nothing else.
+   * Omitted on every point, the axis row is not rendered at all.
+   */
+  axisLabel?: string
   /** No session fell in this period — render a faint gap tick, not a bar. */
   isEmpty?: boolean
   /** The current, still-filling period — rendered muted (decision 2). */
@@ -60,19 +100,14 @@ type ChartPoint = {
   isPr?: boolean
   key: string
   /**
-   * Accessible name of the drill button — the bar's own value label alone
-   * ("32 kg") would leave a screen reader with no idea which period it opens.
-   * Ignored on a chart with no {@link ChartDrill}, where bars are not buttons.
+   * Accessible name of the column. On a drill button it replaces the contents
+   * outright — the bar's own value label ("32 kg") would leave a screen reader
+   * with no idea which period it opens. On an empty period it is announced on
+   * its own, because the gap tick is decorative and the axis label alone
+   * ("bře") says nothing about there being no session. Elsewhere it is unused:
+   * a plain bar already reads out its value and its axis label.
    */
   label?: string
-  value: number
-}
-
-/** A dashed reference line drawn across the plot at a fixed value. */
-type ChartBaseline = {
-  /** Named in the footer legend, never over the plot — a chip pinned inside
-   * the scrolling content rides along with the bars and buries their labels. */
-  label: string
   value: number
 }
 
@@ -93,9 +128,10 @@ type ChartDrill = {
 }
 
 type Props = {
-  /** Dashed reference line at a fixed value, e.g. the first-workout start. */
-  baseline?: ChartBaseline
-  /** Note closing the footer row: the date range, or the session count. */
+  /**
+   * A note printed under the plot — the session count. Suppressed on a
+   * single-bar chart, which has nothing to summarise.
+   */
   caption?: string
   /** Pins the scale to a fixed range so overview, detail and share match. */
   domain?: BarDomain
@@ -109,54 +145,80 @@ type Props = {
   variant?: 'accent' | 'ink'
 }
 
-type ChartColumnProps = {
-  drill?: ChartDrill
+type ChartBarProps = {
   format: (value: number) => string
   height: number
+  /** Decided once for the whole chart — see {@link BigChart}. */
+  isLabelInside: boolean
   isNewest: boolean
   point: ChartPoint
   scale: (value: number) => number
   tone: (typeof VARIANT)[keyof typeof VARIANT]
 }
 
+type ChartColumnProps = ChartBarProps & {
+  /** Height reserved for the axis label, or 0 on a chart without an axis. */
+  axisHeight: number
+  drill?: ChartDrill
+}
+
+type ColumnAxisProps = {
+  /** Reserved row height, or 0 on a chart whose points carry no axis label. */
+  height: number
+  /** The column states its period some other way — don't say it twice. */
+  isDecorative?: boolean
+  label?: string
+}
+
 /**
- * A single chart column: an empty period renders a faint gap tick, otherwise a
- * value-scaled bar with its label inside (tall bars) or floated above (short
- * ones). The all-time record gains a ★, the in-progress period renders muted,
- * and a drillable column becomes a focusable button with a ≥44px tap target.
+ * The x-axis cell under one column, naming the period that column covers.
+ * It renders inside the column rather than as a separate aligned row: that
+ * makes the period name part of a drill button's tap target — with the months
+ * on screen, the name is the obvious thing to reach for. On the detail chart,
+ * where bars are not buttons and nothing else carries the date, this text is
+ * what a screen reader gets; on a drill button, that button's `aria-label`
+ * replaces it; on an empty period, the column's own note supersedes it.
  */
-const ChartColumn = ({
-  drill,
+const ColumnAxis = ({ height, isDecorative, label }: ColumnAxisProps) =>
+  height === 0 ? null : (
+    <span
+      aria-hidden={isDecorative}
+      className={cn(
+        'text-ink-3 text-2xs w-full truncate pt-1 text-center',
+        'font-mono leading-none tabular-nums',
+      )}
+      style={{ height: rem(height) }}
+    >
+      {label}
+    </span>
+  )
+
+/**
+ * The visual half of a value column: a ★ on the all-time record, the value
+ * label — inside the bar or floated just above it, as the chart decided for
+ * every bar at once — and the bar itself, muted under a dashed cap while its
+ * period is still filling. A still-filling bar keeps its label above whatever
+ * the rest of the chart does: the pale fill and the dashed cap say the number
+ * is provisional, and a label sunk into that bar would undo it. Split out of
+ * {@link ChartColumn}, which keeps only the column's geometry and the question
+ * of whether it is a button.
+ */
+const ChartBar = ({
   format,
   height,
+  isLabelInside,
   isNewest,
   point,
   scale,
   tone,
-}: ChartColumnProps) => {
-  const columnStyle = { height: height + GUTTER, width: COLUMN_WIDTH }
-
-  if (point.isEmpty === true) {
-    return (
-      <div
-        className="flex shrink-0 flex-col items-center justify-end"
-        style={columnStyle}
-      >
-        <span aria-hidden className="bg-ink/30 h-0.5 w-3 rounded-full" />
-      </div>
-    )
-  }
-
-  const barHeightPx = Math.max(
-    MIN_BAR_HEIGHT_PX,
-    Math.round(scale(point.value) * height),
-  )
+}: ChartBarProps) => {
+  const barHeightPx = scaledBarHeight(scale(point.value), height)
   const isInProgress = point.isInProgress === true
-  const isInside = barHeightPx >= INSIDE_THRESHOLD && !isInProgress
+  const isInside = isLabelInside && !isInProgress
   const shouldHighlightNewest = isNewest && !isInProgress
   const label = format(point.value)
 
-  const content = (
+  return (
     <>
       {point.isPr === true ? (
         <span
@@ -185,7 +247,7 @@ const ChartColumn = ({
             ? cn(tone.muted, 'border-ink/40 border-t border-dashed')
             : tone.bar,
         )}
-        style={{ height: barHeightPx }}
+        style={{ height: rem(barHeightPx) }}
       >
         {isInside ? (
           <span
@@ -199,6 +261,44 @@ const ChartColumn = ({
           </span>
         ) : null}
       </div>
+    </>
+  )
+}
+
+/**
+ * A single chart column: an empty period renders a faint gap tick, otherwise a
+ * {@link ChartBar}, and either way the axis label naming the period below it.
+ * A drillable column becomes a focusable button with a ≥44px tap target.
+ */
+const ChartColumn = ({ axisHeight, drill, ...bar }: ChartColumnProps) => {
+  const { height, point } = bar
+  const columnStyle = {
+    height: rem(height + GUTTER + axisHeight),
+    width: COLUMN_WIDTH_CSS,
+  }
+  if (point.isEmpty === true) {
+    return (
+      <div
+        className="flex shrink-0 flex-col items-center justify-end"
+        style={columnStyle}
+      >
+        {point.label === undefined ? null : (
+          <span className="sr-only">{point.label}</span>
+        )}
+        <span aria-hidden className="bg-ink/30 h-0.5 w-3 rounded-full" />
+        <ColumnAxis
+          height={axisHeight}
+          isDecorative={point.label !== undefined}
+          label={point.axisLabel}
+        />
+      </div>
+    )
+  }
+
+  const content = (
+    <>
+      <ChartBar {...bar} />
+      <ColumnAxis height={axisHeight} label={point.axisLabel} />
     </>
   )
 
@@ -226,8 +326,10 @@ const ChartColumn = ({
         'relative flex shrink-0 cursor-pointer flex-col items-center justify-end',
         'rounded-sm before:absolute before:-inset-x-1 before:inset-y-0',
         "before:content-['']",
-        'hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2',
-        'focus-visible:outline-accent-deep',
+        // No focus utility here on purpose: the global `:focus-visible` in
+        // `globals.css` already rings every column the same way, and the
+        // track reserves the room that ring needs to stay unclipped.
+        'hover:brightness-105',
         isExpanded && 'bg-ink/10',
       )}
       onClick={() => drill.onSelect(point.key)}
@@ -241,21 +343,21 @@ const ChartColumn = ({
 }
 
 /**
- * A horizontally-scrolling bar chart with a label on every bar — inside when
- * the bar is tall enough, otherwise floated just above it — and the newest
- * record highlighted. Bars keep a fixed width and overflow into a horizontal
- * scroll (swipe on mobile, scroll rail on a pointer) rather than compressing,
- * and the view starts pinned to the most recent record. Bars that do fit run
- * from the start edge, so a short history reads as room to grow instead of a
- * chart that failed to load. A footer row carries whatever needs naming —
- * the baseline legend, the date range, the session count — outside the
- * scrolling plot, where nothing can ride over a bar. Given a
- * {@link ChartDrill} the bars become disclosure buttons for a detail panel.
- * The value→text mapping, the bars' accessible names and the date range are
- * injected pre-formatted, so this stays free of locale logic.
+ * A horizontally-scrolling bar chart with a label on every bar — inside the
+ * bars when the shortest of them has room, floated above them all when it does
+ * not — and the newest record highlighted. Bars keep a fixed width and overflow
+ * into a horizontal scroll (swipe on mobile, scroll rail on a pointer) rather
+ * than compressing, and the view starts pinned to the most recent record. Bars
+ * that do fit run from the start edge, so a short history reads as room to grow
+ * instead of a chart that failed to load. Points carrying an
+ * {@link ChartPoint.axisLabel} get an x axis under the plot, which is what
+ * turns a row of bars into a timeline, and an optional caption closes a footer
+ * row below it — outside the scrolling plot, where nothing can ride over a bar.
+ * Given a {@link ChartDrill} the bars become disclosure buttons for a detail
+ * panel. The value→text mapping and the bars' accessible names are injected
+ * pre-formatted, so this stays free of locale logic.
  */
 export const BigChart = ({
-  baseline,
   caption,
   domain,
   drill,
@@ -266,7 +368,15 @@ export const BigChart = ({
   variant = 'accent',
 }: Props) => {
   const trackRef = useRef<HTMLElement>(null)
-  const isScrollable = points.length > 1
+  // Whether the bars *actually* outgrow the card, as opposed to the guess
+  // below — only layout can answer it, and only after a paint.
+  const [doesOverflow, setDoesOverflow] = useState(false)
+  // A guess, deliberately: `overflow-x` has to be `auto` before anything can
+  // measure whether the track scrolls, so this cannot wait for the measurement.
+  // One bar can never overflow, and is also the only chart with nothing to
+  // summarise in a caption below.
+  const hasMultipleBars = points.length > 1
+  const hasDrillButtons = drill !== undefined
   const newestKey = points.at(-1)?.key
 
   // Open on the newest record: pin the scroll to the far end on data change.
@@ -279,8 +389,29 @@ export const BigChart = ({
     }
   }, [newestKey, points.length])
 
+  // Only a chart whose bars are not buttons can ever need the tab stop, so
+  // only that chart measures. Watching both boxes covers the two ways the
+  // answer changes: the card resizing around the bars, and the bars
+  // themselves changing in number.
+  useEffect(() => {
+    const track = trackRef.current
+    if (hasDrillButtons || track === null) {
+      return
+    }
+    const plot = track.firstElementChild
+    if (plot === null) {
+      return
+    }
+    const sync = () => setDoesOverflow(track.scrollWidth > track.clientWidth)
+    sync()
+    const observer = new ResizeObserver(sync)
+    observer.observe(track)
+    observer.observe(plot)
+    return () => observer.disconnect()
+  }, [hasDrillButtons, points.length])
+
   if (points.length === 0) {
-    return <div style={{ height }} />
+    return <div style={{ height: rem(height) }} />
   }
 
   // Empty periods carry no value to normalise against — scale to the real
@@ -293,53 +424,75 @@ export const BigChart = ({
   const fractionOf = createBarScale(scaleValues, domain)
   const tone = VARIANT[variant]
   const lastIndex = points.length - 1
-  // A single bar spans no range and needs no count spelled out under it.
-  const hasCaption = caption !== undefined && isScrollable
-  const hasFooter = hasCaption || baseline !== undefined
+  const axisHeight = points.some((point) => point.axisLabel !== undefined)
+    ? AXIS_HEIGHT
+    : 0
+  // Where the value labels sit is settled once, for the whole chart, rather
+  // than bar by bar: two bars a few pixels apart in height would otherwise be
+  // labelled in two different places and two different colours, which reads as
+  // two kinds of data. Either every bar can hold its label — tall enough for
+  // the text and wide enough for it — or none does and they all float above.
+  const isLabelInside = realValues.every(
+    (value) =>
+      scaledBarHeight(fractionOf(value), height) >= INSIDE_THRESHOLD &&
+      format(value).length <= MAX_INSIDE_LABEL_CHARS,
+  )
+  const hasCaption = caption !== undefined && hasMultipleBars
 
   return (
     <div>
       {/*
-        A labelled `section` — a region — rather than a bare `div`: without
-        drill buttons inside there is nothing here for the keyboard to land
-        on, so a track wider than its card would be unreachable (WCAG 2.1.1).
-        Focusing the track itself hands it the arrow keys, and the label says
-        what was just reached. It stays focusable even on a chart that
-        currently fits, because whether the bars outgrow the card depends on
-        a width only the browser knows — and a named stop on a data chart
-        earns itself regardless, as the one way a screen reader finds it.
+        A labelled `section` — a region — rather than a bare `div`, so a
+        screen reader can find the chart by name whatever else is true of it.
+        It becomes a tab stop only when the bars really do outgrow the card
+        *and* there are no drill buttons inside to tab through: then focusing
+        the track is the one way a keyboard can pan it (WCAG 2.1.1). A track
+        that fits gets no `tabIndex` — a stop that does nothing once reached
+        is noise on the way to the controls that matter.
       */}
       <section
         aria-label={label}
         className={cn(
           SCROLL_RAIL,
           'overflow-y-hidden',
-          isScrollable ? 'overflow-x-auto' : 'overflow-x-hidden',
+          // Room for a focused *column's* ring, which reaches 5px past its box
+          // (the global `:focus-visible` in `globals.css` — 2px wide at a 3px
+          // offset) and which this element would clip: `overflow-x: auto`
+          // forces the vertical axis to clip too, so unpadded the ring lost
+          // its top edge and both ends of the track lost their sides. The
+          // matching negative margin spends the inset on the card's own
+          // gutter, so nothing on screen moves. `SCROLL_RAIL`'s `pb-2` already
+          // clears the bottom. Sized one step over the ring so it still clears
+          // it for a reader who shrinks text — the inset is rem, the ring px.
+          // Only the button chart takes it. With no drill the track itself is
+          // the tab stop (see `tabIndex` below), and an element's own outline
+          // is never clipped by its own overflow — but the inset would still
+          // push that ring 8px further out on every side, and upwards that
+          // lands it inside the detail panel's `‹ › ✕` row.
+          hasDrillButtons && '-mx-2 -mt-2 px-2 pt-2',
+          hasMultipleBars ? 'overflow-x-auto' : 'overflow-x-hidden',
         )}
         ref={trackRef}
-        tabIndex={drill === undefined && isScrollable ? 0 : undefined}
+        tabIndex={!hasDrillButtons && doesOverflow ? 0 : undefined}
       >
+        {/*
+          `relative` is load-bearing, not decoration: without it this track's
+          overflow propagates out to the document once the chart sits inside
+          the carousel's snap scroller, and the whole page gains a sideways
+          scroll into empty space. Only reproducible with two or more exercise
+          cards, so a single-exercise plan will never show it.
+        */}
         <div
           className="relative flex w-max items-end gap-2"
-          style={{ height: height + GUTTER }}
+          style={{ height: rem(height + GUTTER + axisHeight) }}
         >
-          {baseline !== undefined && (
-            <div
-              aria-hidden
-              className={cn(
-                'pointer-events-none absolute inset-x-0 z-10',
-                'border-ink/50 border-t border-dashed',
-              )}
-              style={{
-                bottom: clampFraction(fractionOf(baseline.value)) * height,
-              }}
-            />
-          )}
           {points.map((point, index) => (
             <ChartColumn
+              axisHeight={axisHeight}
               drill={drill}
               format={format}
               height={height}
+              isLabelInside={isLabelInside}
               isNewest={index === lastIndex}
               key={point.key}
               point={point}
@@ -349,25 +502,15 @@ export const BigChart = ({
           ))}
         </div>
       </section>
-      {hasFooter ? (
-        <div
+      {hasCaption ? (
+        <p
           className={cn(
-            'mt-2 flex flex-wrap items-baseline justify-between',
-            'gap-x-3 gap-y-1',
-            'text-ink-3 text-2xs font-mono tabular-nums',
+            'text-ink-3 text-2xs mt-2 text-end',
+            'font-mono tabular-nums',
           )}
         >
-          {baseline === undefined ? null : (
-            <span className="flex items-center gap-1.5">
-              <span
-                aria-hidden
-                className="border-ink/50 w-4 shrink-0 border-t border-dashed"
-              />
-              {baseline.label}
-            </span>
-          )}
-          {hasCaption ? <span className="ms-auto">{caption}</span> : null}
-        </div>
+          {caption}
+        </p>
       ) : null}
     </div>
   )

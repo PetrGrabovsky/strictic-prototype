@@ -5,6 +5,8 @@ import type {
 
 /** One session inside a drilled bucket, ready for the detail chart. */
 export type DrillSession = {
+  /** When it was logged (ms) — the detail chart's x axis names the day. */
+  date: number
   /** The all-time best session of the whole series — the chart's single ★. */
   isPr: boolean
   /** Stable render key: the session date in ms. */
@@ -73,6 +75,7 @@ export const drillIntoBucket = (
     nextKey: neighbourKey(buckets, index, 1),
     previousKey: neighbourKey(buckets, index, -1),
     sessions: inside.map((point) => ({
+      date: point.date,
       isPr: point.date === recordDate,
       key: String(point.date),
       value: point.value,

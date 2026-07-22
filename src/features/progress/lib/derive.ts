@@ -223,7 +223,6 @@ export const deriveProgress = (
     sessionsLast30,
     totalVolumeKg: history.reduce((sum, record) => sum + record.volume, 0),
     volumeBuckets,
-    volumeDates: history.map((record) => record.date),
     weekDots,
     weeksSpan,
   }

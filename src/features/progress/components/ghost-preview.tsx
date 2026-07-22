@@ -1,5 +1,6 @@
-import { COLUMN_WIDTH } from '@/features/progress/components/big-chart'
+import { COLUMN_WIDTH_CSS } from '@/features/progress/components/big-chart'
 import { cn } from '@/lib/cn'
+import { rem } from '@/lib/rem'
 
 /** The lone real record sits low so the promised future bars climb above it. */
 const REAL_BAR_FRACTION = 0.32
@@ -21,17 +22,20 @@ type Props = {
  */
 export const GhostPreview = ({ copy, firstLabel, height }: Props) => (
   <div>
-    <div className="flex items-end justify-start gap-2" style={{ height }}>
+    <div
+      className="flex items-end justify-start gap-2"
+      style={{ height: rem(height) }}
+    >
       <div
         className="flex shrink-0 flex-col items-center justify-end"
-        style={{ width: COLUMN_WIDTH }}
+        style={{ width: COLUMN_WIDTH_CSS }}
       >
         <span className="text-ink-3 text-2xs mb-1 font-mono tabular-nums">
           {firstLabel}
         </span>
         <div
           className="bg-accent w-full rounded-t-sm"
-          style={{ height: height * REAL_BAR_FRACTION }}
+          style={{ height: rem(height * REAL_BAR_FRACTION) }}
         />
       </div>
       {GHOST_BAR_FRACTIONS.map((fraction) => (
@@ -42,7 +46,7 @@ export const GhostPreview = ({ copy, firstLabel, height }: Props) => (
             'border-accent/25 border-t border-dashed',
           )}
           key={fraction}
-          style={{ height: height * fraction, width: COLUMN_WIDTH }}
+          style={{ height: rem(height * fraction), width: COLUMN_WIDTH_CSS }}
         />
       ))}
     </div>

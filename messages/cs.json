@@ -103,17 +103,11 @@
     "titleWithSpan": "Tvůj pokrok · {weeks, plural, one {# týden} few {# týdny} other {# týdnů}}",
     "startNote": "Teprve začínáš — po pár trénincích tu u každého cviku uvidíš, jak ti roste váha.",
     "ghost": "Po druhém tréninku se křivka rozjede — a poroste s tebou.",
-    "granularity": {
-      "session": "po trénincích",
-      "week": "po týdnech",
-      "month": "po měsících",
-      "quarter": "po čtvrtletích"
-    },
-    "rangeCaption": "{period} · {from} – {to}",
     "chart": {
       "weight": "Graf pracovní váhy v čase: {name}",
       "volume": "Graf objemu za trénink",
-      "detail": "Tréninky v období {period}"
+      "detail": "Tréninky v období {period}",
+      "emptyPeriod": "{period} — žádný trénink"
     },
     "backToPlan": "Zpátky na plán",
     "empty": {
@@ -156,8 +150,7 @@
       "barLabel": "{period}, {value}",
       "previous": "Předchozí období",
       "next": "Další období",
-      "close": "Zavřít detail",
-      "baseline": "start {value}"
+      "close": "Zavřít detail"
     },
     "volume": {
       "heading": "Objem za trénink",

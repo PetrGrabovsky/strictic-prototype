@@ -37,6 +37,19 @@ describe('drillIntoBucket', () => {
     ])
   })
 
+  it('carries the day each session was logged, for the detail axis', () => {
+    const detail = drillIntoBucket(sessions, buckets, keyOfMonth(3))
+    const dates = detail?.sessions.map((session) => session.date) ?? []
+
+    expect(dates).toEqual([
+      on(2026, 3, 2),
+      on(2026, 3, 9),
+      on(2026, 3, 16),
+      on(2026, 3, 23),
+      on(2026, 3, 30),
+    ])
+  })
+
   it('stars the all-time best only in the bucket that holds it', () => {
     const march = drillIntoBucket(sessions, buckets, keyOfMonth(3))
     const may = drillIntoBucket(sessions, buckets, keyOfMonth(5))

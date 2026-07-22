@@ -187,7 +187,10 @@ export const Stepper = ({
         className={cn(
           fieldClasses,
           accentColor,
-          'w-full min-w-0 bg-transparent outline-none',
+          // No `outline-none`: this input is focused the moment it appears, so
+          // the global focus ring is the only thing telling a keyboard user
+          // where they landed (WCAG 2.4.7).
+          'w-full min-w-0 bg-transparent',
         )}
         inputMode="decimal"
         onBlur={commit}

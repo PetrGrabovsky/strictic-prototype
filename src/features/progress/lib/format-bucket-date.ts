@@ -6,11 +6,11 @@ import { formatShortDate } from '@/lib/format'
 import type { Formatter } from '@/lib/format'
 
 /**
- * Formats one endpoint of a bucketed journey's from–to caption at the chart's
- * own resolution: a month journey names the month (`čvc`), a session or week
- * journey keeps the day (`14. 7.`), and a quarter journey — which only ever
- * spans multiple calendar years — carries the year too (`čvc 26`) so the span
- * cannot read as a few months. Locale formatting is delegated to the injected
+ * Formats one axis label of a bucketed journey at the chart's own resolution:
+ * a month journey names the month (`čvc`), a session or week journey keeps the
+ * day (`14. 7.`), and a quarter journey — which only ever spans multiple
+ * calendar years — carries the year too (`čvc 26`) so the span cannot read as
+ * a few months. Locale formatting is delegated to the injected
  * {@link Formatter}, so this stays a pure, framework-free helper.
  */
 export const formatBucketDate = (
@@ -18,11 +18,17 @@ export const formatBucketDate = (
   date: number,
   granularity: BucketGranularity,
 ): string => {
+  const day = new Date(date)
   if (granularity === 'quarter') {
-    return format.dateTime(new Date(date), { month: 'short', year: '2-digit' })
+    // Asking for the month and the year together throws the abbreviation away:
+    // Czech resolves that skeleton to its own `yMMM` pattern and spells the
+    // month out, and `červenec 26` is 61px of label in a 42px column.
+    // Formatting the two fields apart is what keeps `čvc 26`.
+    const month = format.dateTime(day, { month: 'short' })
+    return `${month} ${format.dateTime(day, { year: '2-digit' })}`
   }
   if (granularity === 'month') {
-    return format.dateTime(new Date(date), { month: 'short' })
+    return format.dateTime(day, { month: 'short' })
   }
   return formatShortDate(format, date)
 }
@@ -52,7 +58,16 @@ export const formatBucketPeriod = (
   // `endMs` is exclusive, `formatRange` inclusive: a week ending Monday 00:00
   // would otherwise read as eight days.
   const end = new Date(bucket.endMs - 1)
-  return granularity === 'quarter'
-    ? format.dateTimeRange(start, end, { month: 'short', year: 'numeric' })
-    : format.dateTimeRange(start, end, { day: 'numeric', month: 'numeric' })
+  if (granularity !== 'quarter') {
+    return format.dateTimeRange(start, end, {
+      day: 'numeric',
+      month: 'numeric',
+    })
+  }
+  // Same trap as in `formatBucketDate`: a range asked for the year alongside
+  // the month comes back fully spelled out on both sides ("červenec 2026 –
+  // září 2026"). The year is appended once instead — a quarter never crosses
+  // a calendar year, so the start's year covers the whole span.
+  const months = format.dateTimeRange(start, end, { month: 'short' })
+  return `${months} ${format.dateTime(start, { year: 'numeric' })}`
 }

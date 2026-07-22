@@ -103,13 +103,23 @@ html {
   scroll-behavior: smooth;
 }
 
-:focus-visible {
-  /* accent-deep, not accent: the brighter orange only reaches 3.01:1 on
-     the page background and 2.17:1 on the glass header over dark
-     sections — accent-deep clears WCAG 1.4.11 (3:1) everywhere. */
-  outline: 2px solid var(--color-accent-deep);
-  outline-offset: 3px;
-  border-radius: var(--radius-sm);
+/*
+ * Inside `@layer base` on purpose. Unlayered, this rule outranks every
+ * Tailwind utility — they all live in `@layer utilities` — so a component
+ * writing `focus-visible:outline-offset-2` or `outline-none` would look
+ * correct and do nothing at all. Layering it restores the expected order:
+ * this is the default every focusable element gets, and a utility can still
+ * override it where a component has a reason.
+ */
+@layer base {
+  :focus-visible {
+    /* accent-deep, not accent: the brighter orange only reaches 3.01:1 on
+       the page background and 2.17:1 on the glass header over dark
+       sections — accent-deep clears WCAG 1.4.11 (3:1) everywhere. */
+    outline: 2px solid var(--color-accent-deep);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
 }
 
 /*

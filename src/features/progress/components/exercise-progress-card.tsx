@@ -7,6 +7,7 @@ import { BigChart } from '@/features/progress/components/big-chart'
 import { BucketDetail } from '@/features/progress/components/bucket-detail'
 import { DeltaBadge } from '@/features/progress/components/delta-badge'
 import { GhostPreview } from '@/features/progress/components/ghost-preview'
+import type { SeriesBucket } from '@/features/progress/lib/bucket-series'
 import { drillIntoBucket } from '@/features/progress/lib/drill-down'
 import {
   formatBucketDate,
@@ -87,22 +88,37 @@ export const ExerciseProgressCard = ({
     setOpenBucketKey(null)
   }
 
+  /**
+   * What a screen reader hears on one overview bar. A skipped period says so
+   * in words — its bar is a decorative tick, so the axis label `bře` would be
+   * all a listener got. A bar that opens nothing needs no name of its own.
+   */
+  const barLabel = (bucket: SeriesBucket): string | undefined => {
+    const period = formatBucketPeriod(format, bucket, weightBuckets.granularity)
+    if (bucket.isEmpty) {
+      return t('chart.emptyPeriod', { period })
+    }
+    return isDrillable
+      ? t('detail.barLabel', {
+          period,
+          value: formatKg(format, bucket.value),
+        })
+      : undefined
+  }
+
   const overviewBars = () =>
     weightBuckets.buckets.map((bucket) => ({
+      // An empty period keeps its name rather than going anonymous: naming the
+      // month nobody trained in is the point of drawing the gap at all.
+      axisLabel: formatBucketDate(
+        format,
+        bucket.startMs,
+        weightBuckets.granularity,
+      ),
       isEmpty: bucket.isEmpty,
       isPr: bucket.isPr,
       key: bucket.key,
-      label:
-        isDrillable && !bucket.isEmpty
-          ? t('detail.barLabel', {
-              period: formatBucketPeriod(
-                format,
-                bucket,
-                weightBuckets.granularity,
-              ),
-              value: formatKg(format, bucket.value),
-            })
-          : undefined,
+      label: barLabel(bucket),
       value: bucket.value,
     }))
 
@@ -196,19 +212,6 @@ export const ExerciseProgressCard = ({
           />
         ) : (
           <BigChart
-            caption={t('rangeCaption', {
-              from: formatBucketDate(
-                format,
-                first.date,
-                weightBuckets.granularity,
-              ),
-              period: t(`granularity.${weightBuckets.granularity}`),
-              to: formatBucketDate(
-                format,
-                last.date,
-                weightBuckets.granularity,
-              ),
-            })}
             domain={weightDomain}
             drill={
               isDrillable
@@ -231,7 +234,6 @@ export const ExerciseProgressCard = ({
         )}
         {openDetail === null ? null : (
           <BucketDetail
-            baselineKg={first.weightKg}
             detail={openDetail}
             domain={weightDomain}
             exerciseName={name}

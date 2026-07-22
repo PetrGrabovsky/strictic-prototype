@@ -12,15 +12,13 @@ import type { BucketGranularity } from '@/features/progress/lib/bucket-series'
 import type { BucketDrillDown } from '@/features/progress/lib/drill-down'
 import { formatBucketPeriod } from '@/features/progress/lib/format-bucket-date'
 import { cn } from '@/lib/cn'
-import { formatKg } from '@/lib/format'
+import { formatKg, formatShortDate } from '@/lib/format'
 import { ARROW_BUTTON } from '@/styles/controls'
 import { MICRO_LABEL } from '@/styles/type'
 
 const ICON_SIZE = 16
 
 type Props = {
-  /** The very first session's weight — the dashed "where you started" line. */
-  baselineKg: number
   detail: BucketDrillDown
   /** Shared with the overview and the share card, so bar heights compare. */
   domain: BarDomain
@@ -36,13 +34,12 @@ type Props = {
 
 /**
  * Level 1 of the journey chart: the sessions folded into one overview bar,
- * against the same scale (decision 4) and over a dashed baseline at the first
- * session ever, so the whole distance travelled stays visible inside a single
- * month. `‹ ›` walk the neighbouring periods and skip the empty ones, and the
+ * drawn against the same scale as every other view of the series (decision 4),
+ * so a stubby row of bars reads as "early days" without any extra chrome to
+ * say so. `‹ ›` walk the neighbouring periods and skip the empty ones, and the
  * period name is a live region so stepping is announced, not just seen.
  */
 export const BucketDetail = ({
-  baselineKg,
   detail,
   domain,
   exerciseName,
@@ -132,20 +129,22 @@ export const BucketDetail = ({
         </IconButton>
       </div>
 
-      <div className="mt-2">
+      {/*
+        The gap holds the chart's own focus ring, not just air: the track
+        below is a tab stop whenever its bars overflow, and the ring reaches
+        5px past it. At `mt-2` that left 3px and read as touching the arrows.
+      */}
+      <div className="mt-3">
         <BigChart
-          baseline={{
-            label: t('detail.baseline', {
-              value: formatKg(format, baselineKg),
-            }),
-            value: baselineKg,
-          }}
           caption={t('card.sessions', { count: detail.sessions.length })}
           domain={domain}
           format={(value) => formatKg(format, value)}
           height={height}
           label={t('chart.detail', { period })}
-          points={detail.sessions}
+          points={detail.sessions.map((session) => ({
+            ...session,
+            axisLabel: formatShortDate(format, session.date),
+          }))}
         />
       </div>
     </section>

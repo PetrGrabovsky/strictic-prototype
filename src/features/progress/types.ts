@@ -73,8 +73,6 @@ export type ProgressData = {
   totalVolumeKg: number
   /** Whole-history volume folded for the overview (`sum` per period). */
   volumeBuckets: BucketedSeries
-  /** Raw per-session dates, kept for the chart's from–to range caption. */
-  volumeDates: readonly number[]
   weekDots: readonly WeekDot[]
   weeksSpan: number
 }
