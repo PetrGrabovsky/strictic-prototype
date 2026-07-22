@@ -1,3 +1,8 @@
+import {
+  LOGO_MARK_ASPECT_RATIO,
+  LOGO_MARK_PATHS,
+  LOGO_MARK_VIEWBOX_HEIGHT,
+} from '@/components/ui/logo-mark'
 import { createBarScale } from '@/features/progress/lib/bar-scale'
 import type { BarDomain } from '@/features/progress/lib/bar-scale'
 import { MAX_OVERVIEW_BARS } from '@/features/progress/lib/bucket-series'
@@ -23,6 +28,19 @@ const HEADLINE_Y = 540
 const SUBLINE_Y = 600
 const STAT_Y = 905
 
+/** The logo lockup top-left: mark, wordmark, accent dot. */
+const BRAND_BASELINE = MARGIN + 40
+const BRAND_SIZE = 46
+/** Inter's cap height as a fraction of its font size — centres the mark on
+ *  the wordmark's optical middle rather than sitting it on the baseline. */
+const BRAND_CAP_RATIO = 0.72
+/** The mark stands a touch proud of the wordmark, as it does in the headers. */
+const BRAND_MARK_HEIGHT = 50
+const BRAND_MARK_GAP = 16
+/** The wordmark's closing period, painted in the accent — the logo's single
+ *  accent glyph, the same one the app header and the OG card render. */
+const BRAND_ACCENT_DOT = '.'
+
 type CanvasContext = CanvasRenderingContext2D
 
 /** One column of the card's journey chart — a bucket, or a skipped period. */
@@ -34,8 +52,9 @@ export type ShareBar = {
 
 /**
  * Everything drawn onto the share card. All copy is passed in already
- * localized and formatted — the drawing code holds no strings of its own, so
- * it stays i18n-free (CLAUDE.md) and the caller owns every translatable word.
+ * localized and formatted — the drawing code holds no translatable copy of its
+ * own (only the brand's fixed accent period), so it stays i18n-free (CLAUDE.md)
+ * and the caller owns every translatable word.
  * `bars` is the same bucketed journey the Progress screen charts, and
  * `barsDomain` pins it to the exercise's session-level scale so the shared
  * image and the app draw identical proportions (BUILD-GUIDE decision 4).
@@ -215,7 +234,10 @@ const drawJourney = (
 }
 
 /**
- * Just the wordmark. The kicker deliberately sits with the exercise name
+ * The logo lockup — mark, wordmark, accent dot — top-left. It is the same
+ * glyph the app header and the OG card show: the geometry is the shared
+ * `LOGO_MARK_*`, painted here as a `Path2D` because a canvas can't mount the
+ * `Logo` component. The kicker deliberately sits with the exercise name
  * further down and nowhere else — printing it up here too said the same word
  * twice on one card.
  */
@@ -224,16 +246,35 @@ const drawHeader = (
   family: string,
   card: ShareCard,
 ): void => {
+  const centerY = BRAND_BASELINE - (BRAND_SIZE * BRAND_CAP_RATIO) / 2
+  const markWidth = BRAND_MARK_HEIGHT * LOGO_MARK_ASPECT_RATIO
+
+  context.save()
+  context.translate(MARGIN, centerY - BRAND_MARK_HEIGHT / 2)
+  const markScale = BRAND_MARK_HEIGHT / LOGO_MARK_VIEWBOX_HEIGHT
+  context.scale(markScale, markScale)
+  context.fillStyle = tokens.dark.ink
+  for (const path of LOGO_MARK_PATHS) {
+    // Canvas `fill(Path2D)`, not `Array#fill` seeding a shared reference —
+    // this unicorn rule keys on the method name alone and mis-flags a valid
+    // draw call. Filling each sub-path separately matches the OG/SVG render.
+    // eslint-disable-next-line unicorn/no-array-fill-with-reference-type
+    context.fill(new Path2D(path))
+  }
+  context.restore()
+
+  const wordmarkX = MARGIN + markWidth + BRAND_MARK_GAP
   context.textBaseline = 'alphabetic'
   context.textAlign = 'left'
   context.fillStyle = tokens.dark.ink
-  context.font = fontOf(family, 700, 46)
-  context.fillText(card.brand, MARGIN, MARGIN + 40)
+  context.font = fontOf(family, 800, BRAND_SIZE)
+  context.fillText(card.brand, wordmarkX, BRAND_BASELINE)
+
+  // The accent dot is the wordmark's closing period — same glyph, baseline and
+  // spacing as the app and OG lockups, not a free-floating circle.
   const brandWidth = context.measureText(card.brand).width
   context.fillStyle = tokens.dark.accent
-  context.beginPath()
-  context.arc(MARGIN + brandWidth + 20, MARGIN + 22, 7, 0, Math.PI * 2)
-  context.fill()
+  context.fillText(BRAND_ACCENT_DOT, wordmarkX + brandWidth, BRAND_BASELINE)
 }
 
 const drawFooter = (

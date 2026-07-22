@@ -1,11 +1,10 @@
+import {
+  LOGO_MARK_ASPECT_RATIO,
+  LOGO_MARK_PATHS,
+  LOGO_MARK_VIEWBOX,
+} from '@/components/ui/logo-mark'
+import { BRAND_WORDMARK } from '@/lib/brand'
 import { cn } from '@/lib/cn'
-
-/**
- * Width : height ratio of the mark's viewBox. The rendered width is always
- * derived from `height`, so the glyph fills its box edge-to-edge instead of
- * letterboxing inside mismatched dimensions.
- */
-const MARK_ASPECT_RATIO = 1116 / 1500
 
 type Props = {
   className?: string
@@ -32,12 +31,12 @@ export const Logo = ({
       aria-hidden
       className={cn('block shrink-0 fill-current', !withWordmark && className)}
       height={height}
-      viewBox="0 0 1116 1500"
-      width={height * MARK_ASPECT_RATIO}
+      viewBox={LOGO_MARK_VIEWBOX}
+      width={height * LOGO_MARK_ASPECT_RATIO}
     >
-      <path d="M0 738.156V1059.89L663.321 1442.86V1121.13L0 738.156Z" />
-      <path d="M352.97 0L0 203.781V631.843L762.289 1071.95V1500L1115.26 1296.22V868.168L352.97 428.051V0Z" />
-      <path d="M451.938 57.1396V378.878L1115.26 761.847V440.108L451.938 57.1396Z" />
+      {LOGO_MARK_PATHS.map((path) => (
+        <path d={path} key={path} />
+      ))}
     </svg>
   )
 
@@ -55,7 +54,8 @@ export const Logo = ({
     >
       {mark}
       <span>
-        strictic<b className="text-accent">.</b>
+        {BRAND_WORDMARK}
+        <b className="text-accent">.</b>
       </span>
     </span>
   )

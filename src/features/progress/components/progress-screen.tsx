@@ -27,6 +27,7 @@ import type {
 import type { ExerciseProgress, ProgressData } from '@/features/progress/types'
 import { useStorageSnapshot } from '@/hooks/use-storage-snapshot'
 import { useRouter } from '@/i18n/routing'
+import { BRAND_WORDMARK } from '@/lib/brand'
 import { cn } from '@/lib/cn'
 import { formatKg, formatKgDelta, formatVolume } from '@/lib/format'
 import type { Formatter } from '@/lib/format'
@@ -88,7 +89,6 @@ const shareDate = (format: Formatter): string =>
 export const ProgressScreen = () => {
   const t = useTranslations('progress')
   const tExercise = useTranslations('exercises')
-  const tCommon = useTranslations('common')
   const format = useFormatter()
   const router = useRouter()
   const snapshot = useStorageSnapshot(loadProgressSnapshot)
@@ -193,7 +193,7 @@ export const ProgressScreen = () => {
       barsDomain: weightDomain,
       barsFromLabel: from,
       barsToLabel: to,
-      brand: tCommon('appName'),
+      brand: BRAND_WORDMARK,
       footer: shareDate(format),
       headline: hasGain ? formatKgDelta(format, weightDeltaKg) : to,
       kicker: t('share.kicker'),
