@@ -3,7 +3,7 @@
 - `npm run dev` — dev server (Turbopack)
 - `npm run build` — production build
 - `npm run start` — production server
-- `npm run lint` — eslint
+- `npm run lint` — eslint (`eslint . --max-warnings 0`); `npm run lint:fix` to auto-fix
 - `npm run format` — prettier --write .
 - `npm run format:check` — prettier --check .
 - `npm test` — vitest run (once); `npx vitest` to watch

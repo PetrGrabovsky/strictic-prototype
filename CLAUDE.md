@@ -18,7 +18,8 @@ Key deps (reuse before adding a package): zod (validation, incl.
 - `src/app/` — App Router
 - `src/lib/` — shared utilities (pure, React-free)
 - `src/features/` — feature-first domains (`components/`, `lib/`,
-  `types.ts` per feature; e.g. `onboarding/lib` = the plan engine)
+  `types.ts` per feature): `onboarding` (the plan engine), `workout`
+  (the session runner), `progress` (the progress charts)
 - alias `@/*` → `./src/*`
 
 Deeper context (architecture rationale, design tokens, build plan) lives in
@@ -64,6 +65,10 @@ intent behind a choice.
 - `process.env` is read in exactly one place — `src/lib/env.ts`, which
   validates it (zod) and re-exports a typed object. Import env from
   there; never touch `process.env` elsewhere (lint enforces this).
+- Current state: the app is client-only, persisting to `localStorage`
+  via `src/lib/storage.ts`; no Server Actions and no `src/lib/env.ts`
+  exist yet. The server-first rules above are the target for when a
+  backend/secrets land — apply them the moment server code appears.
 - Prefer React/Next.js built-ins over custom code (`useOptimistic`,
   `useActionState`, `cache`, `next/image`, `next/font`) — newest stable
   API, not the oldest that still works.
