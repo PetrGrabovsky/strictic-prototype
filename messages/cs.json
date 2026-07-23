@@ -483,9 +483,8 @@
           "title": "Cvičíš — a čísla rostou",
           "body": "Aplikace tě vede sérii po sérii, hlídá pauzy, řekne ti, co si připravit, a sama navýší váhu, když na to máš. Progresivní přetížení bez tabulek v Excelu.",
           "progressLabel": "Bench press s jednoručkami",
-          "progressValue": "12 → 17,5 kg",
-          "progressDelta": "+46 %",
-          "progressNote": "9 týdnů · reálná data z aplikace"
+          "progressChartLabel": "Ukázkový graf pokroku: růst pracovní váhy v čase",
+          "progressNote": "9 týdnů · ukázkový graf z aplikace"
         }
       }
     },
